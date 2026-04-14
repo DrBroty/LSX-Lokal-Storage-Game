@@ -2018,55 +2018,6 @@ document.getElementById('btnSetAlert').addEventListener('click', () => {
   refreshModal();
 });
 
-// ═══════════════════════════════════════════════════════
-// MOBILE NAV
-// ═══════════════════════════════════════════════════════
-function isMobile() {
-  return window.innerWidth <= 1024;
-}
-
-function setMobileView(view) {
-  if (!isMobile()) return;
-
-  const market  = document.querySelector('.market-panel');
-  const sidebar = document.querySelector('.sidebar');
-
-  // Alle ausblenden
-  market.classList.add('view-hidden');
-  sidebar.classList.remove('sidebar-mobile-view');
-  sidebar.classList.add('view-hidden');
-
-  if (view === 'market') {
-    market.classList.remove('view-hidden');
-  } else {
-    // Portfolio oder History → Sidebar zeigen, richtigen Tab aktivieren
-    sidebar.classList.remove('view-hidden');
-    sidebar.classList.add('sidebar-mobile-view');
-
-    // Richtigen Sidebar-Tab aktivieren
-    const tabMap = { sidebar: 'portfolio', history: 'history' };
-    const targetTab = tabMap[view] || 'portfolio';
-    document.querySelectorAll('.stab').forEach(t => {
-      t.classList.toggle('active', t.dataset.tab === targetTab);
-    });
-    document.querySelectorAll('.stab-content').forEach(c => {
-      c.style.display = c.id === 'stab-' + targetTab ? 'block' : 'none';
-    });
-  }
-
-  // Nav Buttons updaten
-  document.querySelectorAll('.mnav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.view === view);
-  });
-}
-
-// Bottom Nav Click
-document.getElementById('mobileNav').addEventListener('click', e => {
-  const btn = e.target.closest('.mnav-btn');
-  if (!btn) return;
-  setMobileView(btn.dataset.view);
-});
-
 // Bei Resize Desktop-Layout wiederherstellen
 window.addEventListener('resize', () => {
   if (!isMobile()) {
