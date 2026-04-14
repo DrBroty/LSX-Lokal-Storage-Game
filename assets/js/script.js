@@ -1574,7 +1574,7 @@ function showConfirm(icon, title, msg) {
 // ═══════════════════════════════════════════════════════
 let toastTimer;
 function showToast(msg, isError=false) {
-  const t = document.getElementById('toast');
+  const t = document.getElementById('toastEl');
   t.textContent = msg;
   t.classList.add('show');
   t.classList.toggle('error', isError);
