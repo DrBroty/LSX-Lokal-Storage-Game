@@ -10,6 +10,43 @@ const API = 'https://los-santos-exchange.de/lsx-proxy';
 // ═══════════════════════════════════════════════════════
 const PROXY_URL   = 'https://los-santos-exchange.de/lsx-proxy/webhook.php';
 
+// ── Milestones ─────────────────────────────────────────
+const milestones = [
+  150_000,      // $150K   — Erster großer Schritt
+  200_000,      // $200K
+  300_000,      // $300K
+  500_000,      // $500K   — Halbe Million
+  750_000,      // $750K
+  1_000_000,    // $1M     — Millionär 🏆
+  1_500_000,    // $1.5M
+  2_000_000,    // $2M
+  3_000_000,    // $3M
+  5_000_000,    // $5M     — High Roller
+  7_500_000,    // $7.5M
+  10_000_000,   // $10M    — Mogul 💎
+  25_000_000,   // $25M
+  50_000_000,   // $50M
+  100_000_000,  // $100M   — Legende 👑
+];
+
+const MILESTONE_LABELS = {
+  150_000:     { title: '📈 First Steps',        desc: 'Net Worth über $150K!' },
+  200_000:     { title: '💵 Getting Serious',    desc: 'Net Worth über $200K!' },
+  300_000:     { title: '📊 On The Rise',        desc: 'Net Worth über $300K!' },
+  500_000:     { title: '🔥 Half a Million',     desc: 'Net Worth über $500K!' },
+  750_000:     { title: '💰 Three Quarters',     desc: 'Net Worth über $750K!' },
+  1_000_000:   { title: '🏆 MILLIONAIRE',        desc: 'Net Worth über $1.000.000!' },
+  1_500_000:   { title: '📈 $1.5M Club',         desc: 'Net Worth über $1.5M!' },
+  2_000_000:   { title: '💎 $2M Achieved',       desc: 'Net Worth über $2M!' },
+  3_000_000:   { title: '🚀 $3M Power Trader',   desc: 'Net Worth über $3M!' },
+  5_000_000:   { title: '💼 High Roller',        desc: 'Net Worth über $5M!' },
+  7_500_000:   { title: '🌆 $7.5M Elite',        desc: 'Net Worth über $7.5M!' },
+  10_000_000:  { title: '🏙 Mogul Status',       desc: 'Net Worth über $10M!' },
+  25_000_000:  { title: '✈️ $25M Tycoon',        desc: 'Net Worth über $25M!' },
+  50_000_000:  { title: '🛥 $50M Empire',        desc: 'Net Worth über $50M!' },
+  100_000_000: { title: '👑 LEGENDE',            desc: 'Net Worth über $100M!' },
+};
+
 function sendDiscordWebhook(embed) {
   fetch(PROXY_URL, {
     method: 'POST',
@@ -22,16 +59,15 @@ function checkMilestone() {
   const nw = state.cash + Object.entries(state.holdings)
     .reduce((a, [t, h]) => a + h.qty * state.prices[t], 0);
 
-  const milestones = [150000, 200000, 300000, 500000, 1000000];
-
   for (const m of milestones) {
-    if (nw >= m && state.lastMilestone < m) {  // ← state.lastMilestone
-      state.lastMilestone = m;                  // ← state.lastMilestone
+    if (nw >= m && state.lastMilestone < m) {
+      state.lastMilestone = m;
+      const label = MILESTONE_LABELS[m];
       sendDiscordWebhook({
-        title: '🏆 Milestone erreicht!',
-        description: `Net Worth hat **${m.toLocaleString('en-US')}** überschritten! (${fmt(nw)})`,
-        color: 0xffd700,
-        timestamp: new Date().toISOString()
+        title:       label.title,
+        description: `${label.desc}\nAktuell: **${fmt(nw)}**`,
+        color:       m >= 1_000_000 ? 0xffd700 : 0x00ff88,
+        timestamp:   new Date().toISOString()
       });
     }
   }
@@ -323,7 +359,7 @@ function defaultState() {
     prices, histories, volumes,
     holdings:    {},
     shorts: {},  // ticker -> { qty, entryPrice, collateral }
-    cash:        100000,
+    cash:        50000,
     watchlist:   [],
     limitOrders: [],
     stopLosses:  {},
