@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LSX Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0e1a;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      padding: 24px;
+    }
+
+    h1 { color: #00ff88; font-size: 22px; margin-bottom: 24px; letter-spacing: 2px; }
+    h2 { color: #00ff88; font-size: 14px; letter-spacing: 1px; margin-bottom: 12px; }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1e2d40;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    label { font-size: 12px; color: #888; display: block; margin-bottom: 4px; }
+
+    input, select {
+      background: #0a0e1a;
+      border: 1px solid #1e2d40;
+      color: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #00ff88;
+    }
+
+    button {
+      background: #00ff88;
+      color: #0a0e1a;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    button.red   { background: #ff3355; color: #fff; }
+    button.gray  { background: #1e2d40; color: #e0e0e0; }
+
+    .row { display: flex; gap: 12px; }
+    .row > * { flex: 1; }
+
+    #status {
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    #status.ok  { background: rgba(0,255,136,0.1); border: 1px solid #00ff88; color: #00ff88; }
+    #status.err { background: rgba(255,51,85,0.1);  border: 1px solid #ff3355; color: #ff3355; }
+
+    #saveData {
+      background: #0a0e1a;
+      border: 1px solid #1e2d40;
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 11px;
+      color: #888;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+
+    .holdings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .holdings-table th {
+      text-align: left;
+      color: #888;
+      padding: 6px 8px;
+      border-bottom: 1px solid #1e2d40;
+    }
+
+    .holdings-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #0f1623;
+    }
+
+    .holdings-table input {
+      margin: 0;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #1e2d40;
+      color: #00ff88;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📈 LSX ADMIN PANEL</h1>
+
+<!-- Status -->
+<div id="status"></div>
+
+<!-- ── LOAD USER ── -->
+<div class="card">
+  <h2>🔍 LOAD USER</h2>
+  <label>Discord User ID</label>
+  <div class="row">
+    <input id="discordId" type="text" placeholder="z.B. 123456789012345678">
+    <div style="flex:0">
+      <button onclick="loadUser()">LOAD</button>
+      <button class="red" onclick="deleteUser()">DELETE SAVE</button>
+    </div>
+  </div>
+  <div id="userInfo" style="display:none;">
+    <div id="userTags"></div>
+    <div id="saveData"></div>
+  </div>
+</div>
+
+<!-- ── CASH ── -->
+<div class="card" id="cardCash" style="display:none;">
+  <h2>💵 CASH</h2>
+  <div class="row">
+    <div>
+      <label>Aktuelles Cash</label>
+      <input id="currentCash" type="text" disabled>
+    </div>
+    <div>
+      <label>Neuer Wert ($)</label>
+      <input id="newCash" type="number" placeholder="z.B. 500000">
+    </div>
+  </div>
+  <button onclick="setCash()">SET CASH</button>
+  <button class="gray" onclick="addCash(100000)">+$100K</button>
+  <button class="gray" onclick="addCash(500000)">+$500K</button>
+  <button class="gray" onclick="addCash(1000000)">+$1M</button>
+  <button class="red"  onclick="addCash(-100000)">-$100K</button>
+</div>
+
+<!-- ── STATS ── -->
+<div class="card" id="cardStats" style="display:none;">
+  <h2>📊 STATS</h2>
+  <div class="row">
+    <div>
+      <label>Start Cash ($)</label>
+      <input id="statStartCash" type="number">
+    </div>
+    <div>
+      <label>Realized P&L ($)</label>
+      <input id="statPnl" type="number">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Total Trades</label>
+      <input id="statTrades" type="number">
+    </div>
+    <div>
+      <label>Total Fees Paid ($)</label>
+      <input id="statFees" type="number">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Best Trade ($)</label>
+      <input id="statBest" type="number">
+    </div>
+    <div>
+      <label>Worst Trade ($)</label>
+      <input id="statWorst" type="number">
+    </div>
+  </div>
+  <button onclick="saveStats()">SAVE STATS</button>
+</div>
+
+<!-- ── HOLDINGS ── -->
+<div class="card" id="cardHoldings" style="display:none;">
+  <h2>📦 HOLDINGS</h2>
+  <table class="holdings-table">
+    <thead>
+      <tr>
+        <th>TICKER</th>
+        <th>QTY</th>
+        <th>AVG COST ($)</th>
+        <th>ACTION</th>
+      </tr>
+    </thead>
+    <tbody id="holdingsBody"></tbody>
+  </table>
+  <div style="margin-top:16px;">
+    <h2>➕ HOLDING HINZUFÜGEN</h2>
+    <div class="row">
+      <div>
+        <label>Ticker</label>
+        <input id="addTicker" type="text" placeholder="z.B. MAZE">
+      </div>
+      <div>
+        <label>Qty</label>
+        <input id="addQty" type="number" placeholder="100">
+      </div>
+      <div>
+        <label>Avg Cost ($)</label>
+        <input id="addAvgCost" type="number" placeholder="218.50">
+      </div>
+    </div>
+    <button onclick="addHolding()">ADD HOLDING</button>
+  </div>
+</div>
+
+<!-- ── MILESTONE RESET ── -->
+<div class="card" id="cardMilestone" style="display:none;">
+  <h2>🏆 MILESTONE</h2>
+  <div class="row">
+    <div>
+      <label>lastMilestone ($)</label>
+      <input id="milestoneVal" type="number">
+    </div>
+  </div>
+  <button onclick="saveMilestone()">SET MILESTONE</button>
+  <button class="red" onclick="resetMilestone()">RESET → 0</button>
+</div>
+
+<!-- ── DANGER ZONE ── -->
+<div class="card" id="cardDanger" style="display:none;">
+  <h2>🧨 DANGER ZONE</h2>
+  <button class="red" onclick="resetGame()">FULL GAME RESET</button>
+  <button class="red" onclick="clearHoldings()">CLEAR ALL HOLDINGS</button>
+  <button class="red" onclick="clearShorts()">CLEAR ALL SHORTS</button>
+  <button class="red" onclick="clearOrders()">CLEAR LIMIT ORDERS</button>
+</div>
+
+<script>
+  const ADMIN_API = '/lsx-proxy/admin.php';
+  let saveState   = null;
+  let currentId   = null;
+
+  function showStatus(msg, ok = true) {
+    const el = document.getElementById('status');
+    el.textContent  = msg;
+    el.className    = ok ? 'ok' : 'err';
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  async function loadUser() {
+    const id = document.getElementById('discordId').value.trim();
+    if (!id) return showStatus('Bitte Discord ID eingeben', false);
+    currentId = id;
+
+    const resp = await fetch(`${ADMIN_API}?action=load&id=${id}`);
+    if (!resp.ok) return showStatus('User nicht gefunden oder Fehler', false);
+
+    saveState = await resp.json();
+    renderAll();
+    showStatus(`✅ User ${id} geladen`);
+  }
+
+  function renderAll() {
+    // User Info
+    document.getElementById('userInfo').style.display = 'block';
+    document.getElementById('userTags').innerHTML = `
+      <span class="tag">💰 $${(saveState.cash||0).toLocaleString('en-US',{maximumFractionDigits:0})}</span>
+      <span class="tag">📦 ${Object.keys(saveState.holdings||{}).length} Holdings</span>
+      <span class="tag">📉 ${Object.keys(saveState.shorts||{}).length} Shorts</span>
+      <span class="tag">📋 ${(saveState.limitOrders||[]).length} Orders</span>
+      <span class="tag">🏆 Milestone: $${(saveState.lastMilestone||0).toLocaleString()}</span>
+      <span class="tag">📅 Day ${saveState.gameDay ?? '-'}</span>
+    `;
+    document.getElementById('saveData').textContent =
+      JSON.stringify(saveState, null, 2).slice(0, 1000) + '\n...';
+
+    // Cards einblenden
+    ['cardCash','cardStats','cardHoldings','cardMilestone','cardDanger']
+      .forEach(id => document.getElementById(id).style.display = 'block');
+
+    // Cash
+    document.getElementById('currentCash').value =
+      '$' + (saveState.cash||0).toLocaleString('en-US',{minimumFractionDigits:2});
+    document.getElementById('newCash').value = saveState.cash || 0;
+
+    // Stats
+    const s = saveState.stats || {};
+    document.getElementById('statStartCash').value = s.startCash      || 0;
+    document.getElementById('statPnl').value       = s.realizedPnl    || 0;
+    document.getElementById('statTrades').value    = s.totalTrades    || 0;
+    document.getElementById('statFees').value      = s.totalFeesPaid  || 0;
+    document.getElementById('statBest').value      = s.bestTrade      || 0;
+    document.getElementById('statWorst').value     = s.worstTrade     || 0;
+
+    // Milestone
+    document.getElementById('milestoneVal').value = saveState.lastMilestone || 0;
+
+    // Holdings
+    renderHoldings();
+  }
+
+  function renderHoldings() {
+    const body = document.getElementById('holdingsBody');
+    const h    = saveState.holdings || {};
+    if (!Object.keys(h).length) {
+      body.innerHTML = '<tr><td colspan="4" style="color:#888;padding:8px">Keine Holdings</td></tr>';
+      return;
+    }
+    body.innerHTML = Object.entries(h).map(([ticker, data]) => `
+      <tr>
+        <td><strong>${ticker}</strong></td>
+        <td><input type="number" value="${data.qty}"
+             onchange="updateHolding('${ticker}','qty',this.value)"></td>
+        <td><input type="number" value="${data.avgCost}"
+             onchange="updateHolding('${ticker}','avgCost',this.value)"></td>
+        <td><button class="red" onclick="removeHolding('${ticker}')">✕</button></td>
+      </tr>`).join('');
+  }
+
+  async function save() {
+    const resp = await fetch(ADMIN_API, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ action: 'save', id: currentId, state: saveState })
+    });
+    const result = await resp.json();
+    if (result.ok) {
+      showStatus('✅ Gespeichert');
+      renderAll();
+    } else {
+      showStatus('❌ Fehler beim Speichern', false);
+    }
+  }
+
+  function setCash() {
+    const val = parseFloat(document.getElementById('newCash').value);
+    if (isNaN(val)) return showStatus('Ungültiger Wert', false);
+    saveState.cash = val;
+    save();
+  }
+
+  function addCash(amount) {
+    saveState.cash = (saveState.cash || 0) + amount;
+    save();
+  }
+
+  function saveStats() {
+    saveState.stats = {
+      startCash:      parseFloat(document.getElementById('statStartCash').value) || 0,
+      realizedPnl:    parseFloat(document.getElementById('statPnl').value)       || 0,
+      totalTrades:    parseInt(document.getElementById('statTrades').value)       || 0,
+      totalFeesPaid:  parseFloat(document.getElementById('statFees').value)       || 0,
+      bestTrade:      parseFloat(document.getElementById('statBest').value)       || 0,
+      worstTrade:     parseFloat(document.getElementById('statWorst').value)      || 0,
+      totalDividends: saveState.stats?.totalDividends || 0,
+    };
+    save();
+  }
+
+  function updateHolding(ticker, field, value) {
+    if (!saveState.holdings[ticker]) return;
+    saveState.holdings[ticker][field] = parseFloat(value);
+  }
+
+  function removeHolding(ticker) {
+    delete saveState.holdings[ticker];
+    save();
+  }
+
+  function addHolding() {
+    const ticker  = document.getElementById('addTicker').value.trim().toUpperCase();
+    const qty     = parseInt(document.getElementById('addQty').value);
+    const avgCost = parseFloat(document.getElementById('addAvgCost').value);
+    if (!ticker || !qty || !avgCost) return showStatus('Alle Felder ausfüllen', false);
+    if (!saveState.holdings) saveState.holdings = {};
+    saveState.holdings[ticker] = { qty, avgCost };
+    save();
+  }
+
+  function saveMilestone() {
+    saveState.lastMilestone = parseFloat(document.getElementById('milestoneVal').value) || 0;
+    save();
+  }
+
+  function resetMilestone() {
+    saveState.lastMilestone = 0;
+    save();
+  }
+
+  function clearHoldings() {
+    if (!confirm('Alle Holdings löschen?')) return;
+    saveState.holdings = {};
+    save();
+  }
+
+  function clearShorts() {
+    if (!confirm('Alle Shorts löschen?')) return;
+    saveState.shorts = {};
+    save();
+  }
+
+  function clearOrders() {
+    if (!confirm('Alle Limit Orders löschen?')) return;
+    saveState.limitOrders = [];
+    save();
+  }
+
+  function resetGame() {
+    if (!confirm('Kompletten Spielstand löschen? NICHT rückgängig machbar!')) return;
+    saveState = { newGame: true };
+    save();
+  }
+
+  async function deleteUser() {
+    const id = document.getElementById('discordId').value.trim();
+    if (!id) return showStatus('Bitte Discord ID eingeben', false);
+    if (!confirm(`Save-Datei für ${id} permanent löschen?`)) return;
+    const resp = await fetch(ADMIN_API, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ action: 'delete', id })
+    });
+    const result = await resp.json();
+    result.ok ? showStatus('✅ Save gelöscht') : showStatus('❌ Fehler', false);
+  }
+</script>
+
+</body>
+</html>
