@@ -1555,6 +1555,18 @@ function showToast(msg, isError=false) {
 }
 
 // ═══════════════════════════════════════════════════════
+// PWA – SERVICE WORKER
+// ═══════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('LSX: Service Worker registered'))
+      .catch(e => console.warn('SW registration failed:', e));
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════
 // PROFILE SCREEN
 // ═══════════════════════════════════════════════════════
 function showProfileScreen() {
