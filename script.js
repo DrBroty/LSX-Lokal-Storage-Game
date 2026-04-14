@@ -5,6 +5,42 @@ let heatmapMode = false;
 let chartRange = 30; // aktiver Chart-Zeitraum
 
 // ═══════════════════════════════════════════════════════
+// DISCORD WEBHOOK PROXY
+// ═══════════════════════════════════════════════════════
+const PROXY_URL    = 'https://los-santos-exchange.de/lsx-proxy/webhook.php';
+const PROXY_SECRET = 'UCJtwc5WRVFnTncgcAgrHa77cz2eqhmW8XNe';
+let lastMilestone  = 0;
+
+function sendDiscordWebhook(embed) {
+  fetch(PROXY_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-lsx-secret': PROXY_SECRET
+    },
+    body: JSON.stringify({ embeds: [embed] })
+  }).catch(() => {});
+}
+
+function checkMilestone() {
+  const nw = state.cash + Object.entries(state.holdings)
+    .reduce((a, [t, h]) => a + h.qty * state.prices[t], 0);
+  const milestones = [150000, 200000, 300000, 500000, 1000000];
+  for (const m of milestones) {
+    if (nw >= m && lastMilestone < m) {
+      lastMilestone = m;
+      sendDiscordWebhook({
+        title: '🏆 Milestone erreicht!',
+        description: `Net Worth hat **${fmt(m.toLocaleString('en-US'))}** überschritten!\nAktuell: **${fmt(nw)}**`,
+        color: 0xffd700,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════
 // STOCKS DATA
 // ═══════════════════════════════════════════════════════
 const STOCKS = [
@@ -394,6 +430,7 @@ function simulateTick(n = 1) {
   checkDividends();  
   checkPriceAlerts();   
   checkShortStopLosses();  
+  checkMilestone();
   renderAll();
 }
 
@@ -1072,6 +1109,14 @@ function executeTrade(ticker, mode, qty) {
     state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'SELL', qty, price, pnl, fee});
 if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
     showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
+    if (total >= 10000) {
+      sendDiscordWebhook({
+        title: `💹 Großer Trade — ${ticker}`,
+        description: `**SELL** ${qty} × ${ticker} @ ${fmt(price)}\nP&L: **${pnl >= 0 ? '+' : ''}${fmt(pnl)}**`,
+        color: pnl >= 0 ? 0x00ff88 : 0xff3355,
+        timestamp: new Date().toISOString()
+      });
+    }
   }
   renderAll();
   return true;
@@ -1323,6 +1368,13 @@ function applyPendingNews() {
   closeNewsToast();
   showToast(`📰 ${ticker} ${dir} ${(Math.abs(eventObj.impact) * 100).toFixed(1)}% — market reacted`);
   renderAll();
+
+  sendDiscordWebhook({
+  title: `${eventObj.impact >= 0 ? '📈' : '📉'} Breaking News — ${ticker}`,
+  description: `**${eventObj.msg}**\nKurseffekt: **${eventObj.impact >= 0 ? '+' : ''}${(eventObj.impact * 100).toFixed(1)}%**\nNeuer Kurs: **${fmt(state.prices[ticker])}**`,
+  color: eventObj.impact >= 0 ? 0x00ff88 : 0xff3355,
+  timestamp: new Date().toISOString()
+  });
 }
 
 function showNewsToast(ticker, msg, impact, sector = null) {
