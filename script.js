@@ -1483,16 +1483,6 @@ function saveGame() {
   .catch(() => showToast('Speichern fehlgeschlagen', true));
 }
 
-function loadSlot(slot) {
-  // Ersetzt durch Server-Login via checkLogin()
-  return false;
-}
-
-function getSlotMeta(slot) {
-  // Ersetzt durch Server-Spielstand
-  return null;
-}
-
 function startTimers() {
   if (saveIntervalId)    clearInterval(saveIntervalId);
   if (priceIntervalId)   clearInterval(priceIntervalId);
