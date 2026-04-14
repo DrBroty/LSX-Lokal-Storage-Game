@@ -22,6 +22,8 @@ body {
   background:var(--bg); color:var(--text);
   font-family:'Rajdhani',sans-serif; font-size:16px;
   min-height:100vh; overflow-x:hidden;
+  /* Platz fuer die fixe news-bar (26px) */
+  padding-bottom: 26px;
 }
 
 /* ── LOGIN SCREEN ────────────────────────────── */
@@ -522,7 +524,6 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
   font-family:'Rajdhani',sans-serif; font-weight:700;
   font-size:14px; letter-spacing:1px; cursor:pointer; transition:all .2s; border:1px solid;
 }
-/* Neue Button-IDs */
 .confirm-btn-yes, .btn-confirm-ok {
   background:rgba(255,51,85,0.15); border-color:rgba(255,51,85,0.5); color:#ff6680;
 }
@@ -549,7 +550,6 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 /* ── TOAST (id="toastEl") ───────────────────── */
 #toastEl, #toast {
   position: fixed;
-  /* Direkt über der news-bar (26px hoch) — 4px Luft */
   bottom: 34px;
   right: 20px;
   background: var(--panel2);
@@ -777,13 +777,14 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
   .modal-box { width: 95vw; }
   .modal     { width: 95vw; }
 
-  /* News-Bar wandert über die Mobile-Nav */
+  /* Auf Mobile: news-bar sitzt ueber der Mobile-Nav */
   .news-bar { bottom: 58px; }
 
-  /* Toast über News-Bar (26px) + Mobile-Nav (58px) + 8px Luft */
-  #toastEl, #toast {
-    bottom: 92px;
-  }
+  /* Body braucht mehr Platz: Mobile-Nav (58px) + News-Bar (26px) */
+  body { padding-bottom: 84px; }
+
+  /* Toast ueber news-bar + mobile-nav */
+  #toastEl, #toast { bottom: 92px; }
 }
 
 /* ── MOBILE (≤ 768px) ───────────────────────── */
