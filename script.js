@@ -3,6 +3,7 @@ let sortDir = 'desc';
 let searchQuery = '';
 let heatmapMode = false;
 let chartRange = 30; // aktiver Chart-Zeitraum
+const API = 'https://los-santos-exchange.de/lsx-proxy';
 
 // ═══════════════════════════════════════════════════════
 // DISCORD WEBHOOK PROXY
@@ -238,8 +239,8 @@ const NEWS_EVENTS = [
 // Insider Tipps
 // ═══════════════════════════════════════════════════════
 
-const INSIDER_INTERVAL_MS  = 90000;  // alle 90s ein Tip
-const INSIDER_ACCURACY     = 0.70;   // 70% der Tips sind korrekt
+const INSIDER_INTERVAL_MS  = 100000;  // alle 90s ein Tip
+const INSIDER_ACCURACY     = 0.60;   // 70% der Tips sind korrekt
 
 // ═══════════════════════════════════════════════════════
 // Short Selling
@@ -253,7 +254,7 @@ const SHORT_MAX_RATIO = 2.0;   // Max 2× Cash als Short-Volumen
 // Trade Logs Length
 // ═══════════════════════════════════════════════════════
 
-const TRADE_LOG_MAX = 50; // Maximale Einträge in der Trade History
+const TRADE_LOG_MAX = 30; // Maximale Einträge in der Trade History
 
 // ═══════════════════════════════════════════════════════
 // FEES AND DIVIDENS (DAYS)
@@ -262,7 +263,7 @@ const TRADE_LOG_MAX = 50; // Maximale Einträge in der Trade History
 // ── TRADING FEES ──────────────────────────────────────
 const FEE_FLAT       = 5;       // unter $1.000
 const FEE_STANDARD   = 0.003;   // 0.30%
-const FEE_LARGE      = 0.0015;  // 0.15% ab $10.000
+const FEE_LARGE      = 0.015;  // 1,5% ab $10.000
 
 // ── DIVIDENDS ─────────────────────────────────────────
 const DIVIDEND_RATES = {
@@ -892,6 +893,7 @@ function closeModal() {
 
 function refreshModal() {
   if (!modalTicker) return;
+
   const s     = STOCKS.find(x => x.ticker === modalTicker);
   const price = state.prices[modalTicker];
   const chg   = getChange(modalTicker);
@@ -912,11 +914,11 @@ function refreshModal() {
 
   const priceEl = document.getElementById('modalPrice');
   priceEl.textContent = fmt(price);
-  priceEl.className   = 'modal-price ' + (chg>=0?'up':'down');
+  priceEl.className   = 'modal-price ' + (chg >= 0 ? 'up' : 'down');
 
   const chgEl = document.getElementById('modalChange');
-  chgEl.textContent = (chg24>=0?'+':'')+chg24.toFixed(2)+'% (24H)';
-  chgEl.className   = 'modal-change ' + (chg24>=0?'up':'down');
+  chgEl.textContent = (chg24 >= 0 ? '+' : '') + chg24.toFixed(2) + '% (24H)';
+  chgEl.className   = 'modal-change ' + (chg24 >= 0 ? 'up' : 'down');
 
   document.getElementById('modalStats').innerHTML = `
     <div class="mstat">HIGH(12) <span>${fmt(hi)}</span></div>
@@ -927,13 +929,13 @@ function refreshModal() {
     <div class="mstat">MKT CAP <span>${fmtShort(mktCap)}</span></div>
     <div class="mstat">SECTOR <span style="color:var(--accent)">${s.sector}</span></div>
     <div class="mstat">RIVAL
-      <span class="rival-val rival-link" data-ticker="${s.rival||''}"
-            style="${s.rival?'cursor:pointer;text-decoration:underline':''}">
-        ${s.rival||'—'}
+      <span class="rival-val rival-link" data-ticker="${s.rival || ''}"
+            style="${s.rival ? 'cursor:pointer;text-decoration:underline' : ''}">
+        ${s.rival || '—'}
       </span>
     </div>
     ${held ? `<div class="mstat">HELD <span>${held.qty} @ ${fmt(held.avgCost)}</span></div>` : ''}
-    ${held ? `<div class="mstat">P&L  <span class="${(price-held.avgCost)>=0?'up':'down'}">${((price-held.avgCost)/held.avgCost*100).toFixed(1)}%</span></div>` : ''}
+    ${held ? `<div class="mstat">P&L  <span class="${(price - held.avgCost) >= 0 ? 'up' : 'down'}">${((price - held.avgCost) / held.avgCost * 100).toFixed(1)}%</span></div>` : ''}
   `;
 
   // Rival Quick-Link
@@ -941,25 +943,25 @@ function refreshModal() {
     el.addEventListener('click', () => {
       if (el.dataset.ticker) openModal(el.dataset.ticker);
     });
-  }); // ← diese Klammer fehlte bei dir
+  });
 
   drawChart('modalChart', modalTicker, 200, 120);
   updateMTotal();
 
-  // Short-Status
+  // ── Short-Status ──────────────────────────────────────
   const shortStatus = document.getElementById('shortStatus');
   if (shortStatus) {
     const sh = state.shorts?.[modalTicker];
     if (sh) {
       const pnl    = (sh.entryPrice - price) * sh.qty;
       const pnlPct = ((sh.entryPrice - price) / sh.entryPrice * 100).toFixed(1);
-      shortStatus.innerHTML = `📉 Short: ${sh.qty} @ ${fmt(sh.entryPrice)} · P&L: <span class="${pnl>=0?'up':'down'}">${pnl>=0?'+':''}${fmt(pnl)} (${pnlPct}%)</span>`;
+      shortStatus.innerHTML = `📉 Short: ${sh.qty} @ ${fmt(sh.entryPrice)} · P&L: <span class="${pnl >= 0 ? 'up' : 'down'}">${pnl >= 0 ? '+' : ''}${fmt(pnl)} (${pnlPct}%)</span>`;
     } else {
       shortStatus.textContent = '';
     }
   }
 
-  // Preis-Alarm Status
+  // ── Preis-Alarm Status ────────────────────────────────
   const alertStatus = document.getElementById('priceAlertStatus');
   const alertInput  = document.getElementById('priceAlertInput');
   if (alertStatus) {
@@ -975,23 +977,8 @@ function refreshModal() {
       if (alertInput) alertInput.value = '';
     }
   }
-    }
+}
 
-  if (modalTicker && state.histories?.[modalTicker]) {  drawChart('modalChart', modalTicker, 200, 120);}
-  updateMTotal();
-
-  // ── Short-Status anzeigen ──────────────────────── NEU
-  const shortStatus = document.getElementById('shortStatus');
-  if (shortStatus) {
-    const sh = state.shorts?.[modalTicker];
-    if (sh) {
-      const pnl    = (sh.entryPrice - price) * sh.qty;
-      const pnlPct = ((sh.entryPrice - price) / sh.entryPrice * 100).toFixed(1);
-      shortStatus.innerHTML = `📉 Short: ${sh.qty} @ ${fmt(sh.entryPrice)} · P&L: <span class="${pnl>=0?'up':'down'}">${pnl>=0?'+':''}${fmt(pnl)} (${pnlPct}%)</span>`;
-    } else {
-      shortStatus.textContent = '';
-    }
-  }
 
 function drawChart(canvasId, ticker, w, h) {
   if (!ticker || !state.histories?.[ticker]) return;
@@ -1364,13 +1351,6 @@ function applyPendingNews() {
   closeNewsToast();
   showToast(`📰 ${ticker} ${dir} ${(Math.abs(eventObj.impact) * 100).toFixed(1)}% — market reacted`);
   renderAll();
-
-  sendDiscordWebhook({
-    title: `${eventObj.impact >= 0 ? '📈' : '📉'} Breaking News — ${ticker}`,
-    description: `**${eventObj.msg}**\nKurseffekt: **${eventObj.impact >= 0 ? '+' : ''}${(eventObj.impact * 100).toFixed(1)}%**\nNeuer Kurs: **${fmt(state.prices[ticker])}**`,
-    color: eventObj.impact >= 0 ? 0x00ff88 : 0xff3355,
-    timestamp: new Date().toISOString()
-  });
 }
 
 function showNewsToast(ticker, msg, impact, sector = null) {
@@ -1471,12 +1451,15 @@ function closeNewsToast() {
 // SAVE / LOAD / RESET
 // ═══════════════════════════════════════════════════════
 function saveGame() {
-  if (!currentSlot) return;
   state.savedAt = Date.now();
-  try {
-    localStorage.setItem(SAVE_PREFIX + currentSlot, JSON.stringify(state));
-    showToast('💾 Saved – Slot ' + currentSlot);
-  } catch(e) { showToast('Save failed: '+e.message, true); }
+  fetch(API + '/save.php', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(state)
+  })
+  .then(() => showToast('💾 Gespeichert'))
+  .catch(() => showToast('Speichern fehlgeschlagen', true));
 }
 
 function loadSlot(slot) {
@@ -1613,6 +1596,71 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+function showLoginScreen() {
+  const el = document.createElement('div');
+  el.className = 'profile-backdrop';
+  el.id = 'loginScreen';
+  el.innerHTML = `
+    <div class="profile-box" style="text-align:center;">
+      <div class="profile-title">🎮 LOS SANTOS EXCHANGE</div>
+      <div class="profile-sub" style="margin-top:8px;">
+        Melde dich mit Discord an um deinen Spielstand zu speichern
+      </div>
+      <a href="${API}/oauth.php"
+         style="display:inline-block;margin-top:28px;padding:12px 32px;
+                background:#5865F2;color:#fff;border-radius:8px;
+                font-family:'Rajdhani',sans-serif;font-weight:700;
+                font-size:16px;letter-spacing:1px;text-decoration:none;">
+        🔐 MIT DISCORD ANMELDEN
+      </a>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+async function checkLogin() {
+  try {
+    const resp = await fetch(API + '/load.php', { credentials: 'include' });
+
+    if (resp.status === 401) {
+      showLoginScreen();
+      return;
+    }
+
+    const data = await resp.json();
+
+    if (data.newGame) {
+      initState();
+    } else {
+      const base = defaultState();
+      state = { ...base, ...data };
+      // Fehlende Felder nachrüsten (wie loadSlot)
+      if (!state.volumes)         state.volumes        = base.volumes;
+      if (!state.tradeLog)        state.tradeLog       = [];
+      if (!state.netWorthHistory) state.netWorthHistory = [];
+      if (!state.shorts)          state.shorts         = {};
+      if (!state.priceAlerts)     state.priceAlerts    = {};
+      state.stats = {
+        totalTrades:    state.stats?.totalTrades    ?? 0,
+        realizedPnl:    state.stats?.realizedPnl    ?? 0,
+        bestTrade:      state.stats?.bestTrade      ?? 0,
+        worstTrade:     state.stats?.worstTrade     ?? 0,
+        startCash:      state.stats?.startCash      ?? 100000,
+        totalFeesPaid:  state.stats?.totalFeesPaid  ?? 0,
+        totalDividends: state.stats?.totalDividends ?? 0,
+      };
+      compressTime();
+      showToast('📂 Spielstand geladen');
+    }
+
+    startTimers();
+    renderAll();
+    renderNews();
+
+  } catch(e) {
+    showToast('Verbindung zum Server fehlgeschlagen', true);
+    showLoginScreen();
+  }
+}
 
 // ═══════════════════════════════════════════════════════
 // PROFILE SCREEN
@@ -2081,4 +2129,4 @@ window.addEventListener('resize', () => {
 // BOOT
 // ═══════════════════════════════════════════════════════
 renderNews();
-showProfileScreen();
+checkLogin();
