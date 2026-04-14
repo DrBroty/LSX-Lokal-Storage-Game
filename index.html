@@ -97,29 +97,54 @@
 
   <!-- RIGHT: SIDEBAR -->
 <div class="sidebar">
-  <!-- Watchlist -->
-  <div class="watchlist-panel">
-    <div class="sidebar-title">★ Watchlist</div>
-    <div id="watchlistEl"></div>
+
+  <!-- Tab Navigation -->
+  <div class="sidebar-tabs">
+    <button class="stab active" data-tab="market">📊 MARKET</button>
+    <button class="stab" data-tab="portfolio">💼 PORTFOLIO</button>
+    <button class="stab" data-tab="history">📋 HISTORY</button>
   </div>
 
-  <!-- Portfolio -->
-  <div class="orders-panel">
-    <div class="sidebar-title">📦 Portfolio</div>
-    <div id="portfolioEl"></div>
+  <!-- TAB: MARKET -->
+  <div class="stab-content" id="stab-market">
+    <div class="watchlist-panel">
+      <div class="sidebar-title">★ Watchlist</div>
+      <div id="watchlistEl"></div>
+    </div>
+    <div class="orders-panel">
+      <div class="sidebar-title">⏱ Limit Orders</div>
+      <div id="ordersEl"><div class="watch-empty">No active orders.</div></div>
+    </div>
   </div>
 
-  <!-- Limit Orders -->
-  <div class="orders-panel">
-    <div class="sidebar-title">⏱ Limit Orders</div>
-    <div id="ordersEl"><div class="watch-empty">No active orders.</div></div>
+  <!-- TAB: PORTFOLIO -->
+  <div class="stab-content" id="stab-portfolio" style="display:none">
+    <div class="orders-panel">
+      <div class="sidebar-title">📦 Holdings</div>
+      <div id="portfolioEl"></div>
+    </div>
+    <div class="orders-panel" id="shortsPanel">
+      <div class="sidebar-title">📉 Short Positions</div>
+      <div id="shortsEl"><div class="watch-empty">No open shorts.</div></div>
+    </div>
+    <div class="orders-panel">
+      <div class="sidebar-title">📈 Net Worth</div>
+      <canvas id="portfolioChart" height="80" style="width:100%;display:block;padding:0 8px 8px;"></canvas>
+    </div>
+    <div class="score-panel">
+      <div class="sidebar-title">🏆 Stats</div>
+      <div class="score-grid" id="scoreGrid"></div>
+    </div>
   </div>
 
-  <!-- Scoreboard -->
-  <div class="score-panel">
-    <div class="sidebar-title">🏆 Stats</div>
-    <div class="score-grid" id="scoreGrid"></div>
+  <!-- TAB: HISTORY -->
+  <div class="stab-content" id="stab-history" style="display:none">
+    <div class="orders-panel">
+      <div class="sidebar-title">📋 Trade History</div>
+      <div id="tradeHistoryEl"><div class="watch-empty">No trades yet.</div></div>
+    </div>
   </div>
+
 </div>
 
 <!-- NEWS BAR -->
@@ -168,6 +193,13 @@
           <span class="m-total-val" id="mTotal">$0.00</span>
         </div>
         <button class="btn-modal-trade btn-modal-buy" id="btnModalTrade">BUY SHARES</button>
+        <!-- Short Selling -->
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="btn-modal-short" id="btnShortOpen">📉 SHORT</button>
+          <button class="btn-modal-cover" id="btnShortClose">✓ COVER</button>
+        </div>
+        <div id="shortStatus" style="font-size:12px;color:var(--dim);margin-top:6px;
+            font-family:'Share Tech Mono',monospace;min-height:16px;"></div>
       </div>
 
       <!-- Limit + Stop-Loss + Watch -->

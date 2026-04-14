@@ -141,6 +141,27 @@ const NEWS_EVENTS = [
 ];
 
 // ═══════════════════════════════════════════════════════
+// Insider Tipps
+// ═══════════════════════════════════════════════════════
+
+const INSIDER_INTERVAL_MS  = 90000;  // alle 90s ein Tip
+const INSIDER_ACCURACY     = 0.70;   // 70% der Tips sind korrekt
+
+// ═══════════════════════════════════════════════════════
+// Short Selling
+// ═══════════════════════════════════════════════════════
+
+const SHORT_FEE_DAILY = 0.005; // 0.5% Leihgebühr pro Spieltag
+const SHORT_MAX_RATIO = 2.0;   // Max 2× Cash als Short-Volumen
+
+
+// ═══════════════════════════════════════════════════════
+// Trade Logs Length
+// ═══════════════════════════════════════════════════════
+
+const TRADE_LOG_MAX = 50; // Maximale Einträge in der Trade History
+
+// ═══════════════════════════════════════════════════════
 // FEES AND DIVIDENS (DAYS)
 // ═══════════════════════════════════════════════════════
 
@@ -203,23 +224,25 @@ function defaultState() {
   return {
     prices, histories, volumes,
     holdings:    {},
+    shorts: {},  // ticker -> { qty, entryPrice, collateral }
     cash:        100000,
     watchlist:   [],
     limitOrders: [],
     stopLosses:  {},
+    tradeLog:        [],   // { time, ticker, mode, qty, price, pnl, fee }
+    netWorthHistory: [],   // [{ day, value }]
     gameDay: 0, gameHour: 8, gameMonth: 0, gameDayOfMonth: 1,
     savedAt: null,
-    // In defaultState() das stats-Objekt ersetzen:
     stats: {
     totalTrades:    0,
     realizedPnl:    0,
     bestTrade:      0,
     worstTrade:     0,
     startCash:      100000,
-    totalFeesPaid:  0,       // NEU
-    totalDividends: 0,       // NEU
+    totalFeesPaid:  0,       
+    totalDividends: 0,       
     },
-    lastDividendDay: 0,        // NEU – Spieltag der letzten Ausschüttung
+    lastDividendDay: 0,
     orderIdSeq: 1,
   };
 }
@@ -254,7 +277,14 @@ function simulateTick(n = 1) {
     STOCKS.forEach(s => {
       if (updated.has(s.ticker)) return;
       const old = state.prices[s.ticker];
-      const drift = (Math.random() - 0.495) * s.vol;
+      // Wochentag-Effekte
+      const dayMod =
+        state.gameDay === 0 ? 1.35 :   // MON – hohe Volatilität
+        state.gameDay === 4 ? 0.80 :   // FRI – leichter Sell-Off Bias
+        state.gameDay === 5 ? 0.60 :   // SAT – ruhiger Markt
+        state.gameDay === 6 ? 0.60 :   // SUN – ruhiger Markt
+        1.0;                            // DI–DO normal
+      const drift = (Math.random() - 0.495) * s.vol * dayMod;
       const np = Math.max(1, +(old * (1 + drift)).toFixed(2));
       state.prices[s.ticker] = np;
       state.histories[s.ticker].push(np);
@@ -275,18 +305,29 @@ function simulateTick(n = 1) {
       updated.add(s.ticker);
     });
 
-    state.gameHour += 2;
+    // Den bestehenden if (state.gameHour >= 24) Block ersetzen:
     if (state.gameHour >= 24) {
-      state.gameHour = 6;
-      state.gameDay = (state.gameDay + 1) % 7;
-      state.gameDayOfMonth++;
-      if (state.gameDayOfMonth > 28) { state.gameDayOfMonth = 1; state.gameMonth = (state.gameMonth + 1) % 12; }
+    state.gameHour = 6;
+    state.gameDay  = (state.gameDay + 1) % 7;
+    state.gameDayOfMonth++;
+    if (state.gameDayOfMonth > 28) {
+        state.gameDayOfMonth = 1;
+        state.gameMonth = (state.gameMonth + 1) % 12;
+    }
+    checkShortFees(); // Leihgebühr einmal täglich
     }
   }
 
+  // Nach state.gameHour/gameDay/gameMonth Updates, vor checkLimitOrders():
+    const _nwv = state.cash + Object.entries(state.holdings)
+    .reduce((a,[t,h]) => a + h.qty * state.prices[t], 0);
+    state.netWorthHistory.push(_nwv);
+    if (state.netWorthHistory.length > 120) state.netWorthHistory.shift();
+
   checkLimitOrders();
   checkStopLosses();
-  checkDividends(); // NEU
+  checkDividends();        
+  checkShortStopLosses();  
   renderAll();
 }
 
@@ -310,8 +351,11 @@ function renderAll() {
   renderTicker();
   renderWatchlist();
   renderPortfolioSidebar();
+  renderShortsSidebar();
   renderOrders();
   renderScoreboard();
+  renderTradeHistory();      
+  renderPortfolioChart();    
   updateHeader();
   updateGameTime();
   if (modalTicker) refreshModal();
@@ -422,6 +466,36 @@ function renderPortfolioSidebar() {
   }).join('');
 }
 
+function renderShortsSidebar() {
+  const el      = document.getElementById('shortsEl');
+  const entries = Object.entries(state.shorts || {});
+  if (!entries.length) {
+    el.innerHTML = '<div class="watch-empty">No open shorts.</div>';
+    return;
+  }
+  el.innerHTML = entries.map(([ticker, sh]) => {
+    const cur    = state.prices[ticker];
+    const pnl    = (sh.entryPrice - cur) * sh.qty;
+    const pnlPct = ((sh.entryPrice - cur) / sh.entryPrice) * 100;
+    const cls    = pnl >= 0 ? 'up' : 'down';
+    return `
+      <div class="portfolio-row" data-ticker="${ticker}">
+        <div class="portfolio-row-left">
+          <div class="portfolio-row-tick">
+            <span style="color:var(--red);font-size:10px;margin-right:4px;">▼</span>${ticker}
+          </div>
+          <div class="portfolio-row-qty">${sh.qty} @ ${fmt(sh.entryPrice)}</div>
+        </div>
+        <div class="portfolio-row-right">
+          <div class="portfolio-row-val">${fmt(cur * sh.qty)}</div>
+          <div class="portfolio-row-pnl ${cls}">
+            ${pnl>=0?'+':''}${fmt(pnl)} (${pnlPct.toFixed(1)}%)
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
 document.getElementById('portfolioEl').addEventListener('click', e => {
   const row = e.target.closest('.portfolio-row');
   if (row) openModal(row.dataset.ticker);
@@ -451,8 +525,8 @@ function renderScoreboard() {
     ['RETURN',       (totalReturn>=0?'+':'')+totalReturn.toFixed(1)+'%'],
     ['TRADES',       state.stats.totalTrades],
     ['REALIZED P&L', fmt(state.stats.realizedPnl)],
-    ['DIVIDENDS',    fmt(state.stats.totalDividends)],  // NEU
-    ['FEES PAID',    fmt(state.stats.totalFeesPaid)],   // NEU
+    ['DIVIDENDS',    fmt(state.stats.totalDividends)],  
+    ['FEES PAID',    fmt(state.stats.totalFeesPaid)],   
     ['BEST TRADE',   fmt(state.stats.bestTrade)],
     ['WORST TRADE',  fmt(Math.abs(state.stats.worstTrade))],
   ];
@@ -462,6 +536,73 @@ function renderScoreboard() {
       <div class="score-val" style="color:${lbl==='RETURN'?(totalReturn>=0?'var(--green)':'var(--red)'):'var(--text)'}">${val}</div>
     </div>`).join('');
 }
+
+function renderTradeHistory() {
+  const el = document.getElementById('tradeHistoryEl');
+  if (!state.tradeLog?.length) {
+    el.innerHTML = '<div class="watch-empty">No trades yet.</div>';
+    return;
+  }
+  el.innerHTML = state.tradeLog.map(t => {
+    const isBuy  = t.mode === 'BUY';
+    const pnlHtml = t.pnl !== null
+      ? `<div class="th-pnl ${t.pnl >= 0 ? 'up' : 'down'}">${t.pnl >= 0 ? '+' : ''}${fmt(t.pnl)}</div>`
+      : '';
+    return `
+      <div class="trade-hist-row">
+        <div class="th-left">
+          <span class="th-mode ${isBuy ? 'buy' : 'sell'}">${t.mode}</span>
+          <span class="th-ticker">${t.ticker}</span>
+          <span class="th-meta">${t.qty} @ ${fmt(t.price)}</span>
+        </div>
+        <div class="th-right">
+          ${pnlHtml}
+          <div class="th-fee">-${fmt(t.fee)}</div>
+          <div class="th-time">${t.time}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderPortfolioChart() {
+  const canvas = document.getElementById('portfolioChart');
+  if (!canvas || !state.netWorthHistory?.length) return;
+  const ctx  = canvas.getContext('2d');
+  const data = state.netWorthHistory.slice(-60);
+  const cw   = canvas.parentElement.clientWidth - 16;
+  const h    = 80;
+  canvas.width  = cw;
+  canvas.height = h;
+  const min   = Math.min(...data), max = Math.max(...data), range = max - min || 1;
+  const pad   = 4;
+  const isUp  = data[data.length - 1] >= data[0];
+  const col   = isUp ? 'rgba(0,255,136,0.9)' : 'rgba(255,51,85,0.9)';
+  const colFill = isUp ? 'rgba(0,255,136,0.12)' : 'rgba(255,51,85,0.12)';
+  ctx.clearRect(0, 0, cw, h);
+  const coords = data.map((v, i) => ({
+    x: (i / (data.length - 1)) * (cw - pad * 2) + pad,
+    y: h - pad - ((v - min) / range) * (h - pad * 2)
+  }));
+  // Fill
+  ctx.beginPath();
+  coords.forEach((c, i) => i === 0 ? ctx.moveTo(c.x, c.y) : ctx.lineTo(c.x, c.y));
+  ctx.lineTo(coords[coords.length-1].x, h - pad);
+  ctx.lineTo(pad, h - pad);
+  ctx.closePath();
+  ctx.fillStyle = colFill;
+  ctx.fill();
+  // Line
+  ctx.beginPath();
+  coords.forEach((c, i) => i === 0 ? ctx.moveTo(c.x, c.y) : ctx.lineTo(c.x, c.y));
+  ctx.strokeStyle = col;
+  ctx.lineWidth   = 2;
+  ctx.stroke();
+  // Dot
+  const lx = coords[coords.length-1].x, ly = coords[coords.length-1].y;
+  ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI * 2);
+  ctx.fillStyle = col; ctx.fill();
+}
+
 
 function updateHeader() {
   const totalVal = Object.entries(state.holdings).reduce((a,[t,h]) => a + h.qty*state.prices[t], 0);
@@ -510,7 +651,6 @@ function refreshModal() {
   const lo    = Math.min(...h.slice(-12));
   const held  = state.holdings[modalTicker];
 
-  // FIX: Volumen aus State lesen, nicht random
   const vol = (state.volumes[modalTicker] || 0).toLocaleString('en-US');
 
   document.getElementById('modalTicker').textContent = s.ticker;
@@ -535,6 +675,19 @@ function refreshModal() {
 
   drawChart('modalChart', modalTicker, 200, 120);
   updateMTotal();
+
+  // ── Short-Status anzeigen ──────────────────────── NEU
+  const shortStatus = document.getElementById('shortStatus');
+  if (shortStatus) {
+    const sh = state.shorts?.[modalTicker];
+    if (sh) {
+      const pnl    = (sh.entryPrice - price) * sh.qty;
+      const pnlPct = ((sh.entryPrice - price) / sh.entryPrice * 100).toFixed(1);
+      shortStatus.innerHTML = `📉 Short: ${sh.qty} @ ${fmt(sh.entryPrice)} · P&L: <span class="${pnl>=0?'up':'down'}">${pnl>=0?'+':''}${fmt(pnl)} (${pnlPct}%)</span>`;
+    } else {
+      shortStatus.textContent = '';
+    }
+  }
 }
 
 function drawChart(canvasId, ticker, w, h) {
@@ -616,6 +769,8 @@ function executeTrade(ticker, mode, qty) {
     h.avgCost = nt / h.qty;
     state.stats.totalFeesPaid += fee;
     state.stats.totalTrades++;
+    state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'BUY', qty, price, pnl: null, fee});
+    if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
     showToast(`✓ Bought ${qty} × ${ticker} @ ${fmt(price)} · Fee: ${fmt(fee)}`);
 
   } else {
@@ -632,10 +787,117 @@ function executeTrade(ticker, mode, qty) {
     if (pnl > state.stats.bestTrade)  state.stats.bestTrade  = pnl;
     if (pnl < state.stats.worstTrade) state.stats.worstTrade = pnl;
     state.stats.totalTrades++;
+    state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'SELL', qty, price, pnl, fee});
+if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
     showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
   }
   renderAll();
   return true;
+}
+
+// ═══════════════════════════════════════════════════════
+// SHORT SELLING
+// ═══════════════════════════════════════════════════════
+function openShort(ticker, qty) {
+  const price      = state.prices[ticker];
+  const total      = qty * price;
+  const fee        = calcFee(total);
+  const collateral = total; // 1:1 Sicherheit einfrieren
+
+  if (collateral + fee > state.cash) {
+    showToast(`Insufficient funds for collateral! Need ${fmt(collateral + fee)}`, true);
+    return false;
+  }
+
+  const maxShort = state.cash * SHORT_MAX_RATIO;
+  const currentShortVal = Object.entries(state.shorts)
+    .reduce((a, [t, s]) => a + s.qty * state.prices[t], 0);
+  if (currentShortVal + total > maxShort) {
+    showToast(`Max short exposure reached (${fmt(maxShort)})`, true);
+    return false;
+  }
+
+  state.cash -= (collateral + fee);
+  state.stats.totalFeesPaid += fee;
+
+  if (!state.shorts[ticker]) {
+    state.shorts[ticker] = { qty: 0, entryPrice: 0, collateral: 0 };
+  }
+  const sh    = state.shorts[ticker];
+  const nt    = sh.qty * sh.entryPrice + total;
+  sh.qty      += qty;
+  sh.entryPrice = nt / sh.qty;
+  sh.collateral += collateral;
+
+  state.stats.totalTrades++;
+  state.tradeLog.unshift({
+    time: `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,
+    ticker, mode: 'SHORT', qty, price, pnl: null, fee
+  });
+  if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
+
+  showToast(`📉 Shorted ${qty} × ${ticker} @ ${fmt(price)} · Fee: ${fmt(fee)}`);
+  renderAll();
+  return true;
+}
+
+function closeShort(ticker, qty) {
+  const sh = state.shorts[ticker];
+  if (!sh || sh.qty < qty) { showToast('No short position to close!', true); return false; }
+
+  const price      = state.prices[ticker];
+  const total      = qty * price;
+  const fee        = calcFee(total);
+  // Gewinn = (Entry - Current) × qty
+  const pnl        = (sh.entryPrice - price) * qty - fee;
+  const collateral = (sh.collateral / sh.qty) * qty;
+
+  // Collateral zurück + P&L
+  state.cash += collateral + pnl;
+  state.stats.realizedPnl   += pnl;
+  state.stats.totalFeesPaid += fee;
+  if (pnl > state.stats.bestTrade)  state.stats.bestTrade  = pnl;
+  if (pnl < state.stats.worstTrade) state.stats.worstTrade = pnl;
+
+  sh.qty        -= qty;
+  sh.collateral -= collateral;
+  if (sh.qty <= 0) delete state.shorts[ticker];
+
+  state.stats.totalTrades++;
+  state.tradeLog.unshift({
+    time: `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,
+    ticker, mode: 'COVER', qty, price, pnl, fee
+  });
+  if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
+
+  showToast(`✓ Covered ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)}`);
+  renderAll();
+  return true;
+}
+
+// Tägliche Short-Leihgebühr
+function checkShortFees() {
+  Object.entries(state.shorts).forEach(([ticker, sh]) => {
+    const dailyFee = +(state.prices[ticker] * sh.qty * SHORT_FEE_DAILY).toFixed(2);
+    state.cash -= dailyFee;
+    state.stats.totalFeesPaid += dailyFee;
+  });
+}
+
+// Short Stop-Loss – wenn Kurs über Entry + X% steigt
+function checkShortStopLosses() {
+  Object.entries(state.shorts).forEach(([ticker, sh]) => {
+    const pct = state.stopLosses['short_' + ticker];
+    if (!pct) return;
+    const price    = state.prices[ticker];
+    const lossP    = ((price - sh.entryPrice) / sh.entryPrice) * 100;
+    if (lossP >= pct) {
+      const qty = sh.qty;
+      delete state.stopLosses['short_' + ticker];
+      closeShort(ticker, qty);
+      showToast(`🛡 Short stop-loss triggered: covered ${qty} × ${ticker}`, true);
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -900,6 +1162,9 @@ function loadSlot(slot) {
     // Fehlende Felder aus alten Saves nachrüsten
     if (!state.volumes) state.volumes = base.volumes;
     if (state.lastDividendDay === undefined) state.lastDividendDay = 0;
+    if (!state.tradeLog)        state.tradeLog        = [];
+    if (!state.netWorthHistory) state.netWorthHistory = [];
+    if (!state.shorts) state.shorts = {};
 
     // Stats-Felder einzeln sichern damit keine undefined entstehen
     state.stats = {
@@ -908,8 +1173,8 @@ function loadSlot(slot) {
       bestTrade:      state.stats?.bestTrade       ?? 0,
       worstTrade:     state.stats?.worstTrade      ?? 0,
       startCash:      state.stats?.startCash       ?? 100000,
-      totalFeesPaid:  state.stats?.totalFeesPaid   ?? 0,  // NEU
-      totalDividends: state.stats?.totalDividends  ?? 0,  // NEU
+      totalFeesPaid:  state.stats?.totalFeesPaid   ?? 0,  
+      totalDividends: state.stats?.totalDividends  ?? 0,  
     };
 
     return true;
@@ -931,15 +1196,16 @@ function getSlotMeta(slot) {
 }
 
 function startTimers() {
-  if (saveIntervalId)  clearInterval(saveIntervalId);
-  if (priceIntervalId) clearInterval(priceIntervalId);
-  if (newsIntervalId)  clearInterval(newsIntervalId);
+  if (saveIntervalId)    clearInterval(saveIntervalId);
+  if (priceIntervalId)   clearInterval(priceIntervalId);
+  if (newsIntervalId)    clearInterval(newsIntervalId);
+  if (insiderIntervalId) clearInterval(insiderIntervalId);
 
-  saveIntervalId  = setInterval(saveGame, 30000);
-  priceIntervalId = setInterval(() => simulateTick(1), 4000);
-  newsIntervalId  = setInterval(fireNewsEvent, 60000);
+  saveIntervalId     = setInterval(saveGame, 30000);
+  priceIntervalId    = setInterval(() => simulateTick(1), 4000);
+  newsIntervalId     = setInterval(fireNewsEvent, 60000);
+  insiderIntervalId  = setInterval(fireInsiderTip, INSIDER_INTERVAL_MS);
 
-  // FIX: beforeunload nur einmal registrieren
   if (!beforeUnloadAdded) {
     window.addEventListener('beforeunload', saveGame);
     beforeUnloadAdded = true;
@@ -950,6 +1216,7 @@ function stopTimers() {
   clearInterval(saveIntervalId);
   clearInterval(priceIntervalId);
   clearInterval(newsIntervalId);
+  clearInterval(insiderIntervalId);
   // Pending news abbrechen
   if (pendingNewsTimer)   { clearTimeout(pendingNewsTimer);   pendingNewsTimer = null; }
   if (pendingCountdownId) { clearInterval(pendingCountdownId); pendingCountdownId = null; }
@@ -1199,6 +1466,118 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('stockModal').classList.contains('open')) closeModal();
   }
+});
+
+// ── SIDEBAR TABS ──────────────────────────────────────
+document.querySelector('.sidebar-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.stab');
+  if (!btn) return;
+  document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.stab-content').forEach(c => c.style.display = 'none');
+  btn.classList.add('active');
+  document.getElementById('stab-' + btn.dataset.tab).style.display = 'block';
+});
+
+// ═══════════════════════════════════════════════════════
+// INSIDER TIPS
+// ═══════════════════════════════════════════════════════
+const INSIDER_MSGS_UP = [
+  'heard something big is coming for',
+  'my guy on the inside says buy',
+  'word on the street — load up on',
+  'trust me on this one, watch',
+  'Lester just called, he likes',
+];
+const INSIDER_MSGS_DOWN = [
+  'something smells off about',
+  'I\'d get out of',
+  'heard some bad news incoming for',
+  'my contact says dump',
+  'word is trouble ahead for',
+];
+
+function fireInsiderTip() {
+  // Kein Tip während ein News-Event pending ist
+  if (pendingNewsEvent) return;
+
+  const s        = STOCKS[Math.floor(Math.random() * STOCKS.length)];
+  const isUp     = Math.random() > 0.5;
+  const correct  = Math.random() < INSIDER_ACCURACY;
+
+  // Richtung die dem Spieler angezeigt wird
+  const shownDir = isUp ? 'up' : 'down';
+  // Tatsächliche Wirkung (70% korrekt)
+  const realDir  = correct ? isUp : !isUp;
+
+  const msgs  = isUp ? INSIDER_MSGS_UP : INSIDER_MSGS_DOWN;
+  const msg   = msgs[Math.floor(Math.random() * msgs.length)];
+  const col   = isUp ? 'var(--gold)' : 'rgba(255,180,0,0.9)';
+  const arrow = isUp ? '▲' : '▼';
+
+  // Toast anzeigen
+  const el = document.getElementById('newsEventToast');
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.4);
+                       border-radius:3px;color:var(--gold);font-size:9px;font-weight:700;
+                       letter-spacing:1px;padding:1px 6px;">💬 INSIDER</span>
+          <span class="net-ticker">${s.ticker}</span>
+          <span style="color:${col};font-weight:700;font-size:13px;">${arrow}</span>
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:8px;">
+          "Hey… I ${msg} <strong style="color:#fff">${s.name}</strong>. Don't tell anyone."
+        </div>
+        <button
+          onclick="openModal('${s.ticker}')"
+          style="background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);
+                 border-radius:4px;color:var(--gold);font-family:'Rajdhani',sans-serif;
+                 font-weight:700;font-size:11px;letter-spacing:1px;padding:4px 10px;cursor:pointer;">
+          📊 TRADE ${s.ticker}
+        </button>
+      </div>
+      <button onclick="closeNewsToast()"
+              style="background:none;border:none;color:var(--dim);cursor:pointer;
+                     font-size:16px;line-height:1;padding:0;flex-shrink:0;">✕</button>
+    </div>`;
+
+  el.classList.add('show');
+
+  // Nach 20s den Kurs tatsächlich bewegen (versteckt, kein Announcement)
+  const impact = (0.04 + Math.random() * 0.06) * (realDir ? 1 : -1);
+  setTimeout(() => {
+    if (!state.prices[s.ticker]) return;
+    const old = state.prices[s.ticker];
+    const np  = Math.max(1, +(old * (1 + impact)).toFixed(2));
+    state.prices[s.ticker] = np;
+    state.histories[s.ticker].push(np);
+    if (state.histories[s.ticker].length > 60) state.histories[s.ticker].shift();
+    renderAll();
+  }, 20000);
+
+  // Toast nach 15s ausblenden
+  clearTimeout(newsEventTimerToast);
+  newsEventTimerToast = setTimeout(() => {
+    document.getElementById('newsEventToast').classList.remove('show');
+  }, 15000);
+}
+
+// Short buttons
+document.getElementById('btnShortOpen').addEventListener('click', () => {
+  if (!modalTicker) return;
+  const qty = parseInt(document.getElementById('mQtyInput').value);
+  if (!qty || qty < 1) { showToast('Enter a valid quantity', true); return; }
+  openShort(modalTicker, qty);
+  refreshModal();
+});
+
+document.getElementById('btnShortClose').addEventListener('click', () => {
+  if (!modalTicker) return;
+  const sh = state.shorts?.[modalTicker];
+  if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
+  closeShort(modalTicker, sh.qty);
+  refreshModal();
 });
 
 // ═══════════════════════════════════════════════════════
