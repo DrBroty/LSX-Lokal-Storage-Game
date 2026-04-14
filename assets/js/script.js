@@ -1510,6 +1510,10 @@ function closeNewsToast() {
 // ═══════════════════════════════════════════════════════
 async function saveGame() {
   state.savedAt = Date.now();
+
+    // Sicherheitsnetz: niemals undefined speichern
+  if (state.lastMilestone === undefined) state.lastMilestone = 0;
+
   try {
     await fetch(API + '/save.php', {
       method: 'POST',
@@ -1638,7 +1642,6 @@ async function checkLogin() {
       if (!state.shorts)          state.shorts          = {};
       if (!state.priceAlerts)     state.priceAlerts     = {};
       if (state.lastDividendDay  === undefined) state.lastDividendDay  = 0;
-      if (state.lastMilestone    === undefined) state.lastMilestone    = 0;
 
       state.stats = {
         totalTrades:    state.stats?.totalTrades    ?? 0,
@@ -1660,9 +1663,18 @@ async function checkLogin() {
       });
       
 
-        // ← TEMP: in Konsole prüfen
-      console.log('lastMilestone aus Save:', state.lastMilestone);
-      console.log('cash:', state.cash);
+      // STATT:
+      if (state.lastMilestone === undefined) state.lastMilestone = 0;
+
+      // SO:
+      if (state.lastMilestone === undefined) {
+        // Höchsten bereits überschrittenen Milestone berechnen
+        const nw = (state.cash || 0) + Object.entries(state.holdings || {})
+          .reduce((a, [t, h]) => a + h.qty * (state.prices?.[t] || 0), 0);
+        state.lastMilestone = Math.max(0, ...milestones.filter(m => nw >= m));
+      }
+
+      await saveGame(); // sofort persistieren
 
 
       await saveGame();
