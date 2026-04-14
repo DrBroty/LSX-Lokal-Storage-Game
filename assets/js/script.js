@@ -1992,7 +1992,7 @@ function clearPriceAlert(ticker) {
 }
 
 // ── CHART RANGE TOGGLE ────────────────────────────────
-document.querySelector('.crbs').addEventListener('click', e => {
+document.querySelector('.chart-range-btns').addEventListener('click', e => {
   const btn = e.target.closest('.crb');
   if (!btn) return;
   chartRange = parseInt(btn.dataset.range);
