@@ -1587,7 +1587,7 @@ function showToast(msg, isError=false) {
 // ═══════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
+    navigator.serviceWorker.register('./assets/js/sw.js')
       .then(() => console.log('LSX: Service Worker registered'))
       .catch(e => console.warn('SW registration failed:', e));
   });
