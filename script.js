@@ -9,7 +9,6 @@ const API = 'https://los-santos-exchange.de/lsx-proxy';
 // DISCORD WEBHOOK PROXY
 // ═══════════════════════════════════════════════════════
 const PROXY_URL   = 'https://los-santos-exchange.de/lsx-proxy/webhook.php';
-let lastMilestone = 0;
 
 function sendDiscordWebhook(embed) {
   fetch(PROXY_URL, {
@@ -22,13 +21,15 @@ function sendDiscordWebhook(embed) {
 function checkMilestone() {
   const nw = state.cash + Object.entries(state.holdings)
     .reduce((a, [t, h]) => a + h.qty * state.prices[t], 0);
+
   const milestones = [150000, 200000, 300000, 500000, 1000000];
+
   for (const m of milestones) {
-    if (nw >= m && lastMilestone < m) {
-      lastMilestone = m;
+    if (nw >= m && state.lastMilestone < m) {  // ← state.lastMilestone
+      state.lastMilestone = m;                  // ← state.lastMilestone
       sendDiscordWebhook({
         title: '🏆 Milestone erreicht!',
-        description: `Net Worth hat **$${m.toLocaleString('en-US')}** überschritten!\nAktuell: **${fmt(nw)}**`,
+        description: `Net Worth hat **${m.toLocaleString('en-US')}** überschritten! (${fmt(nw)})`,
         color: 0xffd700,
         timestamp: new Date().toISOString()
       });
@@ -341,6 +342,7 @@ function defaultState() {
     totalDividends: 0,       
     },
     lastDividendDay: 0,
+    lastMilestone: 0,   // ← NEU
     orderIdSeq: 1,
   };
 }
@@ -1558,25 +1560,24 @@ if ('serviceWorker' in navigator) {
 }
 
 function showLoginScreen() {
-  const el = document.createElement('div');
-  el.className = 'profile-backdrop';
-  el.id = 'loginScreen';
-  el.innerHTML = `
-    <div class="profile-box" style="text-align:center;">
-      <div class="profile-title">🎮 LOS SANTOS EXCHANGE</div>
-      <div class="profile-sub" style="margin-top:8px;">
-        Melde dich mit Discord an um deinen Spielstand zu speichern
-      </div>
-      <a href="${API}/oauth.php"
-         style="display:inline-block;margin-top:28px;padding:12px 32px;
-                background:#5865F2;color:#fff;border-radius:8px;
-                font-family:'Rajdhani',sans-serif;font-weight:700;
-                font-size:16px;letter-spacing:1px;text-decoration:none;">
-        🔐 MIT DISCORD ANMELDEN
-      </a>
-    </div>`;
-  document.body.appendChild(el);
+  document.getElementById('loginScreen').style.display = 'flex';
 }
+
+function showUserBadge(user) {
+  if (!user) return;
+  const badge  = document.getElementById('userBadge');
+  const avatar = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
+  document.getElementById('userAvatar').src         = avatar;
+  document.getElementById('userName').textContent   = user.username;
+  badge.style.display     = 'flex';
+  badge.style.alignItems  = 'center';
+  badge.style.gap         = '8px';
+}
+
+document.getElementById('btnLogout').addEventListener('click', async () => {
+  await fetch(API + '/logout.php', { credentials: 'include' });
+  location.reload();
+});
 
 async function checkLogin() {
   try {
@@ -1591,6 +1592,10 @@ async function checkLogin() {
     const data = await resp.json();
     console.log('Data:', data);
 
+    // User-Badge anzeigen & Login-Screen verstecken
+    if (data.user) showUserBadge(data.user);
+    document.getElementById('loginScreen').style.display = 'none';
+
     if (data.newGame) {
       initState();
     } else {
@@ -1602,7 +1607,8 @@ async function checkLogin() {
       if (!state.netWorthHistory) state.netWorthHistory = [];
       if (!state.shorts)          state.shorts          = {};
       if (!state.priceAlerts)     state.priceAlerts     = {};
-      if (state.lastDividendDay === undefined) state.lastDividendDay = 0;
+      if (state.lastDividendDay  === undefined) state.lastDividendDay  = 0;
+      if (state.lastMilestone    === undefined) state.lastMilestone    = 0;
 
       state.stats = {
         totalTrades:    state.stats?.totalTrades    ?? 0,
@@ -1614,7 +1620,7 @@ async function checkLogin() {
         totalDividends: state.stats?.totalDividends ?? 0,
       };
 
-      // Neue Stocks nachrüsten:
+      // Neue Stocks nachrüsten
       STOCKS.forEach(s => {
         if (!state.prices[s.ticker]) {
           state.prices[s.ticker]    = s.basePrice;

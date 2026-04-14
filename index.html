@@ -1,327 +1,364 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Los Santos Exchange – LCN</title>
-  <link rel="stylesheet" type="text/css" href="style.css"/>
-  <meta name="theme-color" content="#00d4ff">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="LSX">
+  <title>Los Santos Exchange</title>
+  <meta name="description" content="GTA V Stock Market Simulator">
+  <meta name="theme-color" content="#0a0e1a">
+
   <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <!-- Icons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./style.css">
   <link rel="shortcut icon" href="/assets/icons/icon-512.ico" type="image/x-icon">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-  <div class="logo">
-    <div class="logo-icon">LSX</div>
-    <div class="logo-text">
-      <h1>LOS SANTOS EXCHANGE</h1>
-      <p>LCN MARKET · EST. 1992 · SAN ANDREAS</p>
+<!-- ═══════════════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">📈 LOS SANTOS EXCHANGE</div>
+    <div class="login-sub">Sign in to save your progress across all devices</div>
+    <a href="/lsx-proxy/oauth.php" class="btn-discord">
+      <svg width="20" height="20" viewBox="0 0 71 55" fill="currentColor">
+        <path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a40 40 0 0 0-1.8 3.6
+                 54.1 54.1 0 0 0-16.3 0A38 38 0 0 0 25.6.4
+                 58.4 58.4 0 0 0 11 4.9C1.6 19-1 32.7.3 46.3
+                 a58.9 58.9 0 0 0 17.9 9 42 42 0 0 0 3.7-6
+                 38.3 38.3 0 0 1-5.8-2.8l1.4-1.1a42 42 0 0 0 36 0
+                 l1.4 1.1a38.4 38.4 0 0 1-5.8 2.8 42 42 0 0 0 3.6 6
+                 58.7 58.7 0 0 0 17.9-9C72 30.5 68.7 16.9 60.1 4.9Z
+                 M23.8 38c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2
+                 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z
+                 m23.4 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2
+                 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/>
+      </svg>
+      LOGIN WITH DISCORD
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CUSTOM CONFIRM DIALOG
+═══════════════════════════════════════════════════ -->
+<div id="confirmBackdrop">
+  <div class="confirm-box">
+    <div id="confirmIcon" class="confirm-icon"></div>
+    <div id="confirmTitle" class="confirm-title"></div>
+    <div id="confirmMsg" class="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button id="confirmNo"  class="confirm-btn-no">CANCEL</button>
+      <button id="confirmYes" class="confirm-btn-yes">CONFIRM</button>
     </div>
   </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════ -->
+<header>
+  <div class="header-left">
+    <div class="logo">📈 LSX</div>
+    <div class="header-time">
+      <span id="gameTime">08:00</span>
+      <span id="gameDate" class="game-date">MON, JAN 1</span>
+    </div>
+  </div>
+
+  <div class="header-center">
+    <div class="header-stat">
+      <span class="stat-label">PORTFOLIO</span>
+      <span id="portfolioVal" class="stat-val">$0.00</span>
+    </div>
+    <div class="header-stat">
+      <span class="stat-label">CASH</span>
+      <span id="cashDisplay" class="stat-val">$100,000.00</span>
+    </div>
+  </div>
+
   <div class="header-right">
-    <div class="hdr-btns">
-      <button class="btn-save"      id="btnSave">💾 SAVE</button>
-      <button class="btn-reset"     id="btnReset">🔄 RESET</button>
-      <button class="btn-hardreset" id="btnHardReset">🧨 HARD RESET</button>
+    <!-- User Badge (nach Login sichtbar) -->
+    <div id="userBadge" style="display:none;align-items:center;gap:8px;">
+      <img id="userAvatar" src="" width="28" height="28"
+           style="border-radius:50%;vertical-align:middle;">
+      <span id="userName" style="font-size:12px;color:var(--dim);"></span>
+      <button id="btnLogout" class="btn-sm">LOGOUT</button>
     </div>
-    <div class="time-display">
-      <div id="gameDate">MON, JAN 1</div>
-      <div id="gameTime">08:00</div>
-    </div>
-    <div class="hdr-box portfolio">
-      <div class="lbl">PORTFOLIO</div>
-      <div class="val" id="portfolioVal">$0.00</div>
-    </div>
-    <div class="hdr-box cash">
-      <div class="lbl">CASH BALANCE</div>
-      <div class="val" id="cashDisplay">$100,000.00</div>
-    </div>
+
+    <button id="btnSave"  class="btn-sm">💾 SAVE</button>
+    <button id="btnReset" class="btn-sm btn-warn">🔄 RESET</button>
+    <button id="btnHardReset" class="btn-sm btn-danger">🧨 HARD RESET</button>
   </div>
 </header>
 
-<!-- TICKER -->
+<!-- ═══════════════════════════════════════════════════
+     TICKER BAND
+═══════════════════════════════════════════════════ -->
 <div class="ticker-wrap">
-  <div class="ticker-label">LSX LIVE</div>
-  <div class="ticker-track" id="tickerTrack"></div>
+  <div id="tickerTrack" class="ticker-track"></div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<!-- ═══════════════════════════════════════════════════
+     MARKET SUMMARY BAR
+═══════════════════════════════════════════════════ -->
+<div id="marketSummary" class="market-summary"></div>
 
-  <!-- LINKE SPALTE: Market Panel -->
-  <div class="market-panel">
+<!-- ═══════════════════════════════════════════════════
+     MAIN LAYOUT
+═══════════════════════════════════════════════════ -->
+<div class="app-layout">
 
-    <div class="panel-header">
-      <div class="panel-title">◈ MARKET OVERVIEW</div>
+  <!-- ── LEFT SIDEBAR ── -->
+  <aside class="sidebar-left">
+
+    <!-- Net Worth Chart -->
+    <div class="sidebar-card">
+      <div class="sidebar-label">NET WORTH</div>
+      <canvas id="portfolioChart"></canvas>
     </div>
 
-    <!-- Market Summary Bar -->
-    <div class="market-summary" id="marketSummary"></div>
+    <!-- Scoreboard -->
+    <div class="sidebar-card">
+      <div class="sidebar-label">SCOREBOARD</div>
+      <div id="scoreGrid" class="score-grid"></div>
+    </div>
 
     <!-- Top Movers -->
-    <div class="top-movers" id="topMovers"></div>
+    <div id="topMovers" class="sidebar-card top-movers-card"></div>
 
-    <!-- Controls: Suche + Tabs + Heatmap Toggle -->
-    <div class="market-controls">
-      <input type="text" id="stockSearch" class="stock-search" placeholder="🔍 Search ticker or name…">
-      <div id="sectorTabs" class="sector-tabs">
-        <button class="tab active" data-sector="ALL">ALL</button>
-        <button class="tab" data-sector="FOOD">FOOD</button>
-        <button class="tab" data-sector="PHARMA">PHARMA</button>
-        <button class="tab" data-sector="FINANCE">FINANCE</button>
-        <button class="tab" data-sector="TRANSPORT">TRANSPORT</button>
-        <button class="tab" data-sector="ENERGY">ENERGY</button>
-        <button class="tab" data-sector="RETAIL">RETAIL</button>
-        <button class="tab" data-sector="MEDIA">MEDIA</button>
-        <button class="tab" data-sector="TECH">TECH</button>
-      </div>
-      <button class="btn-heatmap" id="btnHeatmap">⬛ HEATMAP</button>
+    <!-- Watchlist -->
+    <div class="sidebar-card">
+      <div class="sidebar-label">WATCHLIST</div>
+      <div id="watchlistEl"></div>
     </div>
 
-    <!-- Table View -->
-    <div id="tableView">
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main-content">
+
+    <!-- Sector Tabs -->
+    <div id="sectorTabs" class="sector-tabs">
+      <button class="tab active" data-sector="ALL">ALL</button>
+      <button class="tab" data-sector="FOOD">FOOD</button>
+      <button class="tab" data-sector="FINANCE">FINANCE</button>
+      <button class="tab" data-sector="TRANSPORT">TRANSPORT</button>
+      <button class="tab" data-sector="RETAIL">RETAIL</button>
+      <button class="tab" data-sector="ENERGY">ENERGY</button>
+      <button class="tab" data-sector="PHARMA">PHARMA</button>
+      <button class="tab" data-sector="MEDIA">MEDIA</button>
+      <button class="tab" data-sector="TECH">TECH</button>
+    </div>
+
+    <!-- Search + View Toggle -->
+    <div class="table-controls">
+      <input id="searchInput" class="search-input" type="text"
+             placeholder="🔍 Search ticker or name…">
+      <button id="btnHeatmap" class="btn-sm">🗺 HEATMAP</button>
+    </div>
+
+    <!-- Stock Table -->
+    <div class="table-wrap">
       <table class="stock-table">
         <thead>
           <tr>
-            <th class="sortable" data-col="name">STOCK <span class="sort-icon">⇅</span></th>
+            <th data-sort="name">STOCK ↕</th>
             <th>SECTOR</th>
-            <th class="sortable" data-col="price">PRICE <span class="sort-icon">⇅</span></th>
-            <th class="sortable" data-col="chg">CHG <span class="sort-icon">⇅</span></th>
-            <th class="sortable" data-col="chg24">24H <span class="sort-icon">⇅</span></th>
+            <th data-sort="price">PRICE ↕</th>
+            <th data-sort="chg">CHG% ↕</th>
+            <th data-sort="chg24">24H% ↕</th>
             <th>CHART</th>
-            <th class="sortable" data-col="held">HELD <span class="sort-icon">⇅</span></th>
+            <th data-sort="held">HELD ↕</th>
           </tr>
         </thead>
         <tbody id="stockTableBody"></tbody>
       </table>
     </div>
 
-    <!-- Heatmap View -->
-    <div id="heatmapView" style="display:none;" class="heatmap-grid"></div>
+    <!-- Heatmap View (hidden by default) -->
+    <div id="heatmapView" class="heatmap-view" style="display:none;"></div>
 
-  </div>
-  <!-- ENDE LINKE SPALTE -->
-
-  <!-- RECHTE SPALTE: Sidebar -->
-  <div class="sidebar">
-
-    <!-- Tab Navigation -->
-    <div class="sidebar-tabs">
-      <button class="stab active" data-tab="market">📊 MARKET</button>
-      <button class="stab" data-tab="portfolio">💼 PORTFOLIO</button>
-      <button class="stab" data-tab="history">📋 HISTORY</button>
+    <!-- Trade History -->
+    <div class="sidebar-card" style="margin-top:16px;">
+      <div class="sidebar-label">TRADE HISTORY</div>
+      <div id="tradeHistoryEl"></div>
     </div>
 
-    <!-- TAB: MARKET -->
-    <div class="stab-content" id="stab-market">
-      <div class="watchlist-panel">
-        <div class="sidebar-title">★ Watchlist</div>
-        <div id="watchlistEl"></div>
-      </div>
-      <div class="orders-panel">
-        <div class="sidebar-title">⏱ Limit Orders</div>
-        <div id="ordersEl"><div class="watch-empty">No active orders.</div></div>
-      </div>
+  </main>
+
+  <!-- ── RIGHT SIDEBAR ── -->
+  <aside class="sidebar-right">
+
+    <!-- Open Positions -->
+    <div class="sidebar-card">
+      <div class="sidebar-label">POSITIONS</div>
+      <div id="portfolioEl"></div>
     </div>
 
-    <!-- TAB: PORTFOLIO -->
-    <div class="stab-content" id="stab-portfolio" style="display:none">
-      <div class="orders-panel">
-        <div class="sidebar-title">📦 Holdings</div>
-        <div id="portfolioEl"></div>
-      </div>
-      <div class="orders-panel" id="shortsPanel">
-        <div class="sidebar-title">📉 Short Positions</div>
-        <div id="shortsEl"><div class="watch-empty">No open shorts.</div></div>
-      </div>
-      <div class="orders-panel">
-        <div class="sidebar-title">📈 Net Worth</div>
-        <canvas id="portfolioChart" height="80"
-                style="width:100%;display:block;padding:0 8px 8px;"></canvas>
-      </div>
-      <div class="score-panel">
-        <div class="sidebar-title">🏆 Stats</div>
-        <div class="score-grid" id="scoreGrid"></div>
-      </div>
+    <!-- Short Positions -->
+    <div class="sidebar-card">
+      <div class="sidebar-label">SHORTS</div>
+      <div id="shortsEl"></div>
     </div>
 
-    <!-- TAB: HISTORY -->
-    <div class="stab-content" id="stab-history" style="display:none">
-      <div class="orders-panel">
-        <div class="sidebar-title">📋 Trade History</div>
-        <div id="tradeHistoryEl"><div class="watch-empty">No trades yet.</div></div>
-      </div>
+    <!-- Limit Orders -->
+    <div class="sidebar-card">
+      <div class="sidebar-label">LIMIT ORDERS</div>
+      <div id="ordersEl"></div>
     </div>
 
-  </div>
-  <!-- ENDE RECHTE SPALTE -->
+  </aside>
 
-</div>
-<!-- ENDE MAIN -->
+</div><!-- /.app-layout -->
 
-<!-- NEWS BAR -->
-<div class="news-bar">
-  <div class="news-label">BREAKING</div>
-  <div class="news-track" id="newsTrack"></div>
-</div>
+<!-- ═══════════════════════════════════════════════════
+     STOCK MODAL
+═══════════════════════════════════════════════════ -->
+<div id="stockModal" class="modal-backdrop">
+  <div class="modal-box">
 
-<!-- STOCK DETAIL MODAL -->
-<div class="modal-backdrop" id="stockModal">
-  <div class="modal">
-    <button class="modal-close" id="modalClose">✕</button>
+    <button id="modalClose" class="modal-close">✕</button>
+
     <div class="modal-header">
       <div>
-        <div class="modal-ticker" id="modalTicker">–</div>
-        <div class="modal-name"   id="modalName">–</div>
+        <div id="modalTicker" class="modal-ticker"></div>
+        <div id="modalName"   class="modal-name"></div>
       </div>
-      <div class="modal-price-block">
-        <div class="modal-price"  id="modalPrice">–</div>
-        <div class="modal-change" id="modalChange">–</div>
+      <div class="modal-price-wrap">
+        <div id="modalPrice"  class="modal-price"></div>
+        <div id="modalChange" class="modal-change"></div>
       </div>
     </div>
-    <div class="modal-stats" id="modalStats"></div>
-    <div class="modal-chart">
-      <div class="modal-chart-header">
-        <div class="modal-chart-title">PRICE HISTORY</div>
-        <div class="chart-range-btns">
-          <button class="chart-range-btn active" data-range="15">15T</button>
-          <button class="chart-range-btn" data-range="30">30T</button>
-          <button class="chart-range-btn" data-range="60">60T</button>
-        </div>
-      </div>
-      <canvas id="modalChart" height="120"></canvas>
+
+    <!-- Chart -->
+    <canvas id="modalChart" height="120"></canvas>
+
+    <!-- Chart range -->
+    <div class="chart-range-btns">
+      <button class="crb active" data-range="10">10T</button>
+      <button class="crb"        data-range="30">30T</button>
+      <button class="crb"        data-range="60">60T</button>
     </div>
-    <div class="modal-body">
 
-      <!-- Trade -->
-      <div class="modal-trade">
-        <div class="trade-tabs2">
-          <div class="trade-tab2 buy-active" id="mTabBuy"  data-mode="buy">▲ BUY</div>
-          <div class="trade-tab2"            id="mTabSell" data-mode="sell">▼ SELL</div>
-        </div>
-        <label class="m-input-label">QUANTITY</label>
-        <input type="number" class="m-qty-input" id="mQtyInput" min="1" value="1">
-        <div class="m-qty-btns">
-          <button class="m-qty-btn" data-qty="1">1</button>
-          <button class="m-qty-btn" data-qty="10">10</button>
-          <button class="m-qty-btn" data-qty="50">50</button>
-          <button class="m-qty-btn" data-qty="100">100</button>
-          <button class="m-qty-btn" data-qty="max">MAX</button>
-        </div>
-        <div class="m-total">
-          <span class="m-total-lbl">TOTAL COST</span>
-          <span class="m-total-val" id="mTotal">$0.00</span>
-        </div>
-        <button class="btn-modal-trade btn-modal-buy" id="btnModalTrade">BUY SHARES</button>
+    <!-- Stats -->
+    <div id="modalStats" class="modal-stats"></div>
 
-        <!-- Short Selling -->
-        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button class="btn-modal-short" id="btnShortOpen">📉 SHORT</button>
-          <button class="btn-modal-cover" id="btnShortClose">✓ COVER</button>
-        </div>
-        <div id="shortStatus"
-             style="font-size:12px;color:var(--dim);margin-top:6px;
-                    font-family:'Share Tech Mono',monospace;min-height:16px;"></div>
-      </div>
+    <!-- Short Status -->
+    <div id="shortStatus" class="short-status"></div>
 
-      <!-- Limit + Stop-Loss + Watch -->
-      <div class="modal-orders">
-        <div class="order-form-title">⏱ LIMIT ORDER</div>
-        <div class="order-row">
-          <select id="limitType">
-            <option value="buy-below">BUY below</option>
-            <option value="sell-above">SELL above</option>
-          </select>
-          <input type="number" id="limitPrice" placeholder="Price $" step="0.01">
-          <input type="number" id="limitQty"   placeholder="Qty" min="1" style="max-width:70px">
-          <button class="btn-add-order" id="btnAddOrder">ADD</button>
-        </div>
+    <!-- Price Alert Status -->
+    <div id="priceAlertStatus" class="alert-status"></div>
 
-        <div class="order-form-title" style="margin-top:16px">🛡 STOP-LOSS</div>
-        <div class="stop-loss-row">
-          <span class="stop-loss-lbl">Trigger at loss ≥</span>
-          <input type="number" id="stopLossInput"
-                 placeholder="e.g. 10" min="1" max="99" step="1"
-                 style="width:80px;background:rgba(255,255,255,0.05);
-                        border:1px solid var(--border);border-radius:5px;
-                        color:#fff;font-family:'Share Tech Mono',monospace;
-                        font-size:14px;padding:7px 10px;outline:none;">
-          <span style="color:var(--dim);font-size:13px">%</span>
-          <button class="btn-add-order" id="btnSetStopLoss">SET</button>
-        </div>
-        <div id="stopLossStatus"
-             style="font-size:12px;color:var(--dim);margin-top:6px;
-                    font-family:'Share Tech Mono',monospace;"></div>
-
-        <button class="btn-watch" id="btnWatch">☆ ADD TO WATCHLIST</button>
-
-        <div class="order-form-title" style="margin-top:16px">🔔 PRICE ALERT</div>
-        <div class="stop-loss-row">
-          <span class="stop-loss-lbl">Alert when price hits</span>
-          <input type="number" id="priceAlertInput"
-                placeholder="e.g. 250" step="0.01"
-                style="width:100px;background:rgba(255,255,255,0.05);
-                        border:1px solid var(--border);border-radius:5px;
-                        color:#fff;font-family:'Share Tech Mono',monospace;
-                        font-size:14px;padding:7px 10px;outline:none;">
-          <button class="btn-add-order" id="btnSetAlert">SET</button>
-        </div>
-        <div id="priceAlertStatus"
-            style="font-size:12px;color:var(--dim);margin-top:6px;
-                    font-family:'Share Tech Mono',monospace;">
-        </div>
-
-      </div>
-
+    <!-- Trade Tabs -->
+    <div class="trade-tabs2">
+      <button id="mTabBuy"  class="trade-tab2 buy-active">BUY</button>
+      <button id="mTabSell" class="trade-tab2">SELL</button>
     </div>
+
+    <!-- Quantity -->
+    <div class="m-qty-row">
+      <input id="mQtyInput" class="m-qty-input" type="number" min="1" value="1">
+      <div class="m-qty-btns">
+        <button class="m-qty-btn" data-qty="1">1</button>
+        <button class="m-qty-btn" data-qty="5">5</button>
+        <button class="m-qty-btn" data-qty="10">10</button>
+        <button class="m-qty-btn" data-qty="50">50</button>
+        <button class="m-qty-btn" data-qty="max">MAX</button>
+      </div>
+    </div>
+    <div class="m-total">Total: <span id="mTotal">$0.00</span></div>
+
+    <button id="btnModalTrade" class="btn-modal-trade btn-modal-buy">BUY SHARES</button>
+
+    <!-- Short Sell Section -->
+    <div class="modal-section">
+      <div class="section-label">SHORT SELL</div>
+      <div class="short-row">
+        <input id="shortQtyInput" class="m-qty-input" type="number" min="1" value="1" placeholder="Qty">
+        <button id="btnOpenShort"  class="btn-sm btn-short">SHORT ▼</button>
+        <button id="btnCloseShort" class="btn-sm btn-cover">COVER ▲</button>
+      </div>
+    </div>
+
+    <!-- Limit Order Section -->
+    <div class="modal-section">
+      <div class="section-label">LIMIT ORDER</div>
+      <div class="limit-row">
+        <select id="limitType" class="limit-select">
+          <option value="buy-below">BUY ≤</option>
+          <option value="sell-above">SELL ≥</option>
+        </select>
+        <input id="limitPrice" class="m-qty-input" type="number" placeholder="Price">
+        <input id="limitQty"   class="m-qty-input" type="number" placeholder="Qty" min="1">
+        <button id="btnAddOrder" class="btn-sm">SET</button>
+      </div>
+    </div>
+
+    <!-- Stop Loss Section -->
+    <div class="modal-section">
+      <div class="section-label">STOP-LOSS</div>
+      <div class="stop-row">
+        <input id="stopLossInput" class="m-qty-input" type="number"
+               placeholder="% loss" min="1" max="99">
+        <button id="btnSetStopLoss" class="btn-sm">SET</button>
+      </div>
+      <div id="stopLossStatus" class="stop-status"></div>
+    </div>
+
+    <!-- Price Alert Section -->
+    <div class="modal-section">
+      <div class="section-label">PRICE ALERT</div>
+      <div class="stop-row">
+        <input id="priceAlertInput" class="m-qty-input" type="number" placeholder="Target $">
+        <button id="btnSetAlert" class="btn-sm">SET</button>
+      </div>
+    </div>
+
+    <!-- Watchlist Button -->
+    <button id="btnWatch" class="btn-watch">☆ ADD TO WATCHLIST</button>
+
   </div>
 </div>
 
-<!-- CONFIRM MODAL -->
-<div class="confirm-backdrop" id="confirmBackdrop">
-  <div class="confirm-box">
-    <div class="confirm-icon"  id="confirmIcon">⚠️</div>
-    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
-    <div class="confirm-msg"   id="confirmMsg"></div>
-    <div class="confirm-btns">
-      <button class="btn-confirm-cancel" id="btnConfirmCancel">Cancel</button>
-      <button class="btn-confirm-ok"     id="btnConfirmOk">Confirm</button>
-    </div>
+<!-- ═══════════════════════════════════════════════════
+     NEWS EVENT TOAST
+═══════════════════════════════════════════════════ -->
+<div id="newsEventToast" class="news-event-toast"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     TOAST NOTIFICATION
+═══════════════════════════════════════════════════ -->
+<div id="toastEl" class="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     NEWS BOTTOM BAR
+═══════════════════════════════════════════════════ -->
+<div class="news-bar">
+  <div class="news-label">BREAKING</div>
+  <div class="news-wrap">
+    <div id="newsTrack" class="news-track"></div>
   </div>
 </div>
 
-<!-- NEWS EVENT TOAST -->
-<div class="news-event-toast" id="newsEventToast"></div>
+<script src="./script.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('LSX SW registered'))
+        .catch(e => console.warn('SW failed', e));
+    });
+  }
+</script>
 
-<!-- TOAST -->
-<div id="toast"></div>
-
-<!-- MOBILE BOTTOM NAV -->
-<nav class="mobile-nav" id="mobileNav">
-  <button class="mnav-btn active" data-view="market">
-    <span class="mnav-icon">📊</span>
-    <span class="mnav-label">MARKET</span>
-  </button>
-  <button class="mnav-btn" data-view="sidebar">
-    <span class="mnav-icon">💼</span>
-    <span class="mnav-label">PORTFOLIO</span>
-  </button>
-  <button class="mnav-btn" data-view="history">
-    <span class="mnav-icon">📋</span>
-    <span class="mnav-label">HISTORY</span>
-  </button>
-</nav>
-
-<script src="/script.js"></script>
 </body>
 </html>
