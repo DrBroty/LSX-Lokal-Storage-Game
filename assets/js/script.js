@@ -1960,9 +1960,14 @@ document.getElementById('searchInput').addEventListener('input', e => {
 // ── HEATMAP TOGGLE ────────────────────────────────────
 document.getElementById('btnHeatmap').addEventListener('click', () => {
   heatmapMode = !heatmapMode;
-  document.getElementById('stockTableBody').style.display   = heatmapMode ? 'none'  : 'block';
-  document.getElementById('heatmapView').style.display = heatmapMode ? 'grid'  : 'none';
-  document.getElementById('btnHeatmap').textContent    = heatmapMode ? '📋 TABLE' : '⬛ HEATMAP';
+  const tableBody = document.getElementById('stockTableBody');
+  const heatmapEl = document.getElementById('heatmapView');
+
+  // Tabellen-thead auch ein-/ausblenden
+  document.querySelector('.stock-table').style.display = heatmapMode ? 'none' : '';
+  heatmapEl.style.display = heatmapMode ? 'grid' : 'none';
+
+  document.getElementById('btnHeatmap').textContent = heatmapMode ? '📋 TABLE' : '⬛ HEATMAP';
   if (heatmapMode) renderHeatmap();
 });
 
