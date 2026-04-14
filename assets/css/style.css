@@ -13,6 +13,7 @@
   --dim:     #8aafc8;
   --label:   #6a8fac;
   --overlay: rgba(4,8,16,0.92);
+  --card:    #0d1520;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -23,878 +24,7 @@ body {
   min-height:100vh; overflow-x:hidden;
 }
 
-/* ── HEADER ─────────────────────────────────── */
-header {
-  background:linear-gradient(135deg,#080c12,#0d1a2a);
-  border-bottom:2px solid var(--accent);
-  padding:10px 20px;
-  display:flex; align-items:center; justify-content:space-between;
-  box-shadow:0 0 30px rgba(0,212,255,0.12);
-  position:sticky; top:0; z-index:50;
-}
-.logo { display:flex; align-items:center; gap:12px; }
-.logo-icon {
-  width:44px; height:44px;
-  background:linear-gradient(135deg,var(--accent),#0066ff);
-  border-radius:8px; display:flex; align-items:center; justify-content:center;
-  font-size:14px; font-weight:900; color:#000;
-  box-shadow:0 0 18px rgba(0,212,255,0.45); letter-spacing:0;
-}
-.logo-text h1 { font-size:20px; font-weight:700; color:#fff; letter-spacing:2px; }
-.logo-text p  { font-size:10px; color:var(--accent); letter-spacing:3px; font-family:'Share Tech Mono',monospace; }
-
-.header-right { display:flex; gap:16px; align-items:center; }
-
-.hdr-box {
-  border-radius:7px; padding:7px 14px; text-align:right;
-}
-.hdr-box.cash      { background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.28); }
-.hdr-box.portfolio { background:rgba(0,255,136,0.05); border:1px solid rgba(0,255,136,0.22); }
-.hdr-box .lbl { font-size:10px; color:var(--label); letter-spacing:2px; text-transform:uppercase; }
-.hdr-box .val { font-family:'Share Tech Mono',monospace; font-size:19px; font-weight:700; }
-.hdr-box.cash .val      { color:var(--gold); }
-.hdr-box.portfolio .val { color:var(--green); }
-
-.time-display { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--dim); text-align:center; line-height:1.9; }
-
-.hdr-btns { display:flex; flex-direction:column; gap:4px; }
-.hdr-btns button {
-  padding:5px 13px; border-radius:5px;
-  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11px; letter-spacing:1px;
-  cursor:pointer; transition:all .2s; white-space:nowrap; border:1px solid;
-}
-.btn-save      { background:rgba(0,212,255,0.08); border-color:rgba(0,212,255,0.35); color:var(--accent); }
-.btn-reset     { background:rgba(255,51,85,0.07);  border-color:rgba(255,51,85,0.32);  color:#ff6680; }
-.btn-hardreset { background:rgba(180,0,180,0.08); border-color:rgba(200,0,200,0.32); color:#e060e0; }
-.hdr-btns button:hover { transform:translateY(-1px); opacity:.85; }
-
-/* ── TICKER ─────────────────────────────────── */
-.ticker-wrap {
-  background:#050810; border-bottom:1px solid var(--border);
-  overflow:hidden; height:30px; display:flex; align-items:center;
-}
-.ticker-label {
-  background:var(--accent); color:#000; font-weight:700;
-  padding:0 12px; height:100%; display:flex; align-items:center;
-  font-size:11px; letter-spacing:2px; flex-shrink:0;
-}
-.ticker-track {
-  display:flex; animation:scroll-ticker 50s linear infinite; white-space:nowrap;
-}
-.ticker-item { padding:0 20px; font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text); }
-.ticker-item strong { color:#fff; }
-@keyframes scroll-ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-
-/* ── MAIN ────────────────────────────────────── */
-.main {
-  display:grid; grid-template-columns:1fr 280px;
-  height:calc(100vh - 108px);
-}
-
-/* ── MARKET PANEL ───────────────────────────── */
-.market-panel { padding:16px; overflow-y:auto; border-right:1px solid var(--border); }
-
-.panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-.panel-title  { font-size:15px; font-weight:700; color:var(--accent); letter-spacing:2px; text-transform:uppercase; }
-
-.market-tabs  { display:flex; gap:4px; flex-wrap:wrap; }
-.tab {
-  padding:4px 12px; border:1px solid var(--border); border-radius:4px;
-  cursor:pointer; font-size:11px; font-weight:700; letter-spacing:1px;
-  transition:all .2s; background:transparent; color:var(--dim);
-}
-.tab.active              { background:var(--accent); border-color:var(--accent); color:#000; }
-.tab:hover:not(.active)  { border-color:var(--accent); color:var(--accent); }
-
-/* Stock Table */
-.stock-table { width:100%; border-collapse:collapse; }
-.stock-table thead tr { background:#080c14; border-bottom:2px solid var(--accent); }
-.stock-table th {
-  padding:9px 10px; text-align:left;
-  font-size:10px; color:var(--accent); letter-spacing:2px; font-weight:700; text-transform:uppercase;
-}
-.stock-table th:nth-child(n+4), .stock-table td:nth-child(n+4) { text-align:right; }
-.stock-row { border-bottom:1px solid rgba(30,48,80,0.6); cursor:pointer; transition:background .12s; }
-.stock-row:hover   { background:rgba(0,212,255,0.04); }
-.stock-row.watched td:first-child::before { content:'★ '; color:var(--gold); font-size:12px; }
-.stock-table td { padding:10px 10px; vertical-align:middle; }
-
-.stock-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:14px; color:#fff; }
-.stock-name   { font-size:12px; color:var(--dim); display:block; margin-top:1px; }
-.stock-price  { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--text); }
-.stock-change { font-family:'Share Tech Mono',monospace; font-size:12px; }
-.up      { color:var(--green); }
-.down    { color:var(--red); }
-.neutral { color:var(--dim); }
-
-/* Flash animations */
-@keyframes flash-up   { 0%,100%{background:transparent} 50%{background:rgba(0,255,136,0.18)} }
-@keyframes flash-down { 0%,100%{background:transparent} 50%{background:rgba(255,51,85,0.18)} }
-.flash-up   { animation:flash-up   .6s ease; }
-.flash-down { animation:flash-down .6s ease; }
-
-.mini-chart { display:flex; align-items:flex-end; gap:2px; height:26px; }
-.mini-bar   { width:4px; border-radius:1px; }
-
-.owned-badge {
-  background:rgba(255,215,0,0.12); border:1px solid var(--gold);
-  color:var(--gold); font-size:10px; padding:1px 4px;
-  border-radius:3px; margin-left:5px;
-  font-family:'Share Tech Mono',monospace; vertical-align:middle;
-}
-
-/* Sector */
-.sector { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; letter-spacing:1px; font-weight:700; text-transform:uppercase; }
-.sector-food      { background:rgba(255,140,0,0.13); color:#ffaa40; border:1px solid rgba(255,140,0,0.3); }
-.sector-pharma    { background:rgba(160,80,255,0.13); color:#bf80ff; border:1px solid rgba(160,80,255,0.3); }
-.sector-transport { background:rgba(0,180,255,0.13);  color:#40ccff; border:1px solid rgba(0,180,255,0.3); }
-.sector-finance   { background:rgba(0,255,136,0.09);  color:#40ffaa; border:1px solid rgba(0,255,136,0.25); }
-.sector-energy    { background:rgba(255,200,0,0.11);  color:#ffd040; border:1px solid rgba(255,200,0,0.25); }
-.sector-media     { background:rgba(255,60,130,0.11); color:#ff6699; border:1px solid rgba(255,60,130,0.25); }
-.sector-retail    { background:rgba(100,210,100,0.11);color:#80dd80; border:1px solid rgba(100,210,100,0.25); }
-
-/* ── RIGHT SIDEBAR ──────────────────────────── */
-.sidebar { display:flex; flex-direction:column; overflow-y:auto; }
-
-/* Watchlist */
-.watchlist-panel { padding:14px 16px; border-bottom:1px solid var(--border); }
-.sidebar-title   { font-size:11px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:10px; }
-.watch-item {
-  display:flex; justify-content:space-between; align-items:center;
-  padding:7px 10px; border-radius:5px; cursor:pointer;
-  background:rgba(255,255,255,0.02); border:1px solid var(--border);
-  margin-bottom:6px; transition:border-color .15s;
-}
-.watch-item:hover { border-color:rgba(0,212,255,0.35); }
-.watch-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:13px; color:#fff; }
-.watch-price  { font-family:'Share Tech Mono',monospace; font-size:13px; }
-.watch-chg    { font-family:'Share Tech Mono',monospace; font-size:11px; }
-.watch-empty  { color:var(--label); font-size:12px; text-align:center; padding:12px 0; }
-
-/* Portfolio list in sidebar */
-.portfolio-row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:7px 10px;
-  border-radius:5px;
-  background:rgba(255,255,255,0.02);
-  border:1px solid var(--border);
-  margin-bottom:5px;
-  cursor:pointer;
-  transition:border-color .15s, background .15s;
-}
-.portfolio-row:hover {
-  border-color:rgba(0,212,255,0.35);
-  background:rgba(0,212,255,0.04);
-}
-.portfolio-row-left  { display:flex; flex-direction:column; gap:2px; }
-.portfolio-row-tick  { font-family:'Share Tech Mono',monospace; font-weight:700; color:#fff; font-size:13px; }
-.portfolio-row-qty   { font-size:11px; color:var(--dim); }
-.portfolio-row-right { text-align:right; }
-.portfolio-row-val   { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--text); }
-.portfolio-row-pnl   { font-family:'Share Tech Mono',monospace; font-size:11px; }	
-	
-/* Limit Orders */
-.orders-panel { padding:14px 16px; border-bottom:1px solid var(--border); }
-.order-item {
-  display:flex; justify-content:space-between; align-items:center;
-  padding:6px 10px; border-radius:5px;
-  background:rgba(255,255,255,0.02); border:1px solid var(--border);
-  margin-bottom:5px; font-size:12px;
-}
-.order-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; color:#fff; }
-.order-meta   { color:var(--dim); font-family:'Share Tech Mono',monospace; font-size:11px; }
-.order-cancel { background:none; border:none; color:var(--red); cursor:pointer; font-size:14px; padding:0 4px; opacity:.7; }
-.order-cancel:hover { opacity:1; }
-
-/* Scoreboard */
-.score-panel { padding:14px 16px; flex:1; }
-.score-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.score-box {
-  background:rgba(255,255,255,0.02); border:1px solid var(--border);
-  border-radius:6px; padding:10px; text-align:center;
-}
-.score-lbl { font-size:10px; color:var(--label); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
-.score-val { font-family:'Share Tech Mono',monospace; font-size:15px; font-weight:700; color:var(--text); }
-
-/* ── STOCK DETAIL MODAL ─────────────────────── */
-.modal-backdrop {
-  position:fixed; inset:0; background:var(--overlay);
-  z-index:200; display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity .25s;
-}
-.modal-backdrop.open { opacity:1; pointer-events:all; }
-
-.modal {
-  background:var(--panel); border:1px solid var(--border);
-  border-radius:12px; width:min(820px,95vw); max-height:90vh;
-  overflow-y:auto; box-shadow:0 20px 80px rgba(0,0,0,0.8);
-  transform:translateY(18px) scale(.97); transition:transform .25s;
-  position:relative;
-}
-.modal-backdrop.open .modal { transform:translateY(0) scale(1); }
-
-.modal-close {
-  position:absolute; top:14px; right:16px;
-  background:rgba(255,255,255,0.06); border:1px solid var(--border);
-  border-radius:6px; color:var(--dim); font-size:18px;
-  width:32px; height:32px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  transition:all .2s; z-index:5;
-}
-.modal-close:hover { background:rgba(255,51,85,0.15); color:var(--red); border-color:var(--red); }
-
-.modal-header {
-  padding:20px 24px 16px; border-bottom:1px solid var(--border);
-  display:flex; justify-content:space-between; align-items:flex-start;
-}
-.modal-ticker { font-size:32px; font-weight:700; color:#fff; font-family:'Share Tech Mono',monospace; line-height:1; }
-.modal-name   { font-size:15px; color:var(--dim); margin-top:5px; font-weight:600; }
-.modal-price-block { text-align:right; }
-.modal-price  { font-size:30px; font-weight:700; font-family:'Share Tech Mono',monospace; }
-.modal-change { font-size:15px; font-family:'Share Tech Mono',monospace; font-weight:600; margin-top:4px; }
-
-.modal-stats {
-  display:flex; gap:20px; padding:12px 24px;
-  border-bottom:1px solid var(--border); flex-wrap:wrap;
-}
-.mstat { font-size:13px; color:var(--label); }
-.mstat span { color:#e8f4ff; font-weight:700; font-family:'Share Tech Mono',monospace; margin-left:5px; font-size:14px; }
-.mstat .rival-val { color:var(--accent); }
-
-.modal-chart { padding:16px 24px; border-bottom:1px solid var(--border); }
-.modal-chart-title { font-size:10px; color:var(--label); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:700; }
-canvas#modalChart { width:100%; height:120px; display:block; }
-
-.modal-body { display:grid; grid-template-columns:1fr 1fr; gap:0; }
-
-/* Trade section in modal */
-.modal-trade { padding:20px 24px; border-right:1px solid var(--border); }
-.trade-tabs2 {
-  display:grid; grid-template-columns:1fr 1fr;
-  border:1px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:14px;
-}
-.trade-tab2 { padding:9px; text-align:center; cursor:pointer; font-weight:700; font-size:14px; letter-spacing:1px; transition:all .2s; color:var(--dim); }
-.trade-tab2.buy-active  { background:rgba(0,255,136,0.12); color:#40ffaa; }
-.trade-tab2.sell-active { background:rgba(255,51,85,0.12);  color:#ff6680; }
-
-.m-input-label { font-size:11px; color:var(--label); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; display:block; font-weight:600; }
-.m-qty-input {
-  width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border);
-  border-radius:6px; color:#fff; font-family:'Share Tech Mono',monospace;
-  font-size:17px; padding:10px 14px; outline:none; transition:border-color .2s; margin-bottom:8px;
-}
-.m-qty-input:focus { border-color:var(--accent); }
-.m-qty-btns { display:flex; gap:5px; margin-bottom:12px; }
-.m-qty-btn {
-  flex:1; padding:5px; background:rgba(255,255,255,0.04);
-  border:1px solid var(--border); border-radius:4px;
-  color:var(--dim); font-size:11px; font-weight:600; cursor:pointer; transition:all .2s;
-}
-.m-qty-btn:hover { border-color:var(--accent); color:var(--accent); }
-.m-total {
-  background:rgba(0,0,0,0.3); border:1px solid var(--border);
-  border-radius:6px; padding:9px 13px; margin-bottom:12px;
-  display:flex; justify-content:space-between; align-items:center;
-}
-.m-total-lbl { font-size:12px; color:var(--label); text-transform:uppercase; letter-spacing:1px; }
-.m-total-val { font-family:'Share Tech Mono',monospace; font-size:17px; font-weight:700; color:var(--gold); }
-.btn-modal-trade {
-  width:100%; padding:12px; border:none; border-radius:7px;
-  font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700;
-  letter-spacing:2px; cursor:pointer; transition:all .2s; text-transform:uppercase;
-}
-.btn-modal-buy  { background:linear-gradient(135deg,#00c068,#00ff88); color:#001a0c; box-shadow:0 0 18px rgba(0,255,136,0.2); }
-.btn-modal-sell { background:linear-gradient(135deg,#cc0030,#ff3355); color:#fff;    box-shadow:0 0 18px rgba(255,51,85,0.2); }
-.btn-modal-buy:hover  { box-shadow:0 0 28px rgba(0,255,136,0.45); transform:translateY(-1px); }
-.btn-modal-sell:hover { box-shadow:0 0 28px rgba(255,51,85,0.45);  transform:translateY(-1px); }
-
-/* Limit order + stop loss in modal */
-.modal-orders { padding:20px 24px; }
-.order-form-title { font-size:12px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:12px; }
-.order-row { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
-.order-row select, .order-row input[type=number] {
-  background:rgba(255,255,255,0.05); border:1px solid var(--border);
-  border-radius:5px; color:#fff; font-family:'Share Tech Mono',monospace;
-  font-size:13px; padding:7px 10px; outline:none; transition:border-color .2s;
-}
-.order-row select { color:var(--text); cursor:pointer; }
-.order-row select:focus, .order-row input:focus { border-color:var(--accent); }
-.order-row input[type=number] { flex:1; }
-.btn-add-order {
-  padding:7px 14px; background:rgba(0,212,255,0.1);
-  border:1px solid rgba(0,212,255,0.35); border-radius:5px;
-  color:var(--accent); font-family:'Rajdhani',sans-serif;
-  font-weight:700; font-size:12px; letter-spacing:1px;
-  cursor:pointer; transition:all .2s; white-space:nowrap;
-}
-.btn-add-order:hover { background:rgba(0,212,255,0.18); }
-
-.stop-loss-row { display:flex; align-items:center; gap:10px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
-.stop-loss-lbl { font-size:12px; color:var(--label); letter-spacing:1px; white-space:nowrap; text-transform:uppercase; }
-.btn-watch {
-  margin-top:10px; width:100%; padding:8px;
-  background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.3);
-  border-radius:5px; color:var(--gold); font-family:'Rajdhani',sans-serif;
-  font-weight:700; font-size:13px; letter-spacing:1px; cursor:pointer; transition:all .2s;
-}
-.btn-watch:hover     { background:rgba(255,215,0,0.14); }
-.btn-watch.watching  { background:rgba(255,215,0,0.14); border-color:var(--gold); }
-
-/* ── CONFIRM MODAL ──────────────────────────── */
-.confirm-backdrop {
-  position:fixed; inset:0; background:rgba(0,0,0,0.85);
-  z-index:400; display:flex; align-items:center; justify-content:center;
-  opacity:0; pointer-events:none; transition:opacity .2s;
-}
-.confirm-backdrop.open { opacity:1; pointer-events:all; }
-.confirm-box {
-  background:var(--panel2); border:1px solid var(--border);
-  border-radius:10px; padding:28px 32px; max-width:380px; width:90%;
-  box-shadow:0 20px 60px rgba(0,0,0,0.8);
-  transform:scale(.95); transition:transform .2s;
-  text-align:center;
-}
-.confirm-backdrop.open .confirm-box { transform:scale(1); }
-.confirm-icon { font-size:36px; margin-bottom:12px; }
-.confirm-title { font-size:18px; font-weight:700; color:#fff; margin-bottom:8px; }
-.confirm-msg   { font-size:14px; color:var(--dim); line-height:1.6; margin-bottom:22px; }
-.confirm-btns  { display:flex; gap:10px; justify-content:center; }
-.confirm-btns button {
-  padding:10px 24px; border-radius:6px;
-  font-family:'Rajdhani',sans-serif; font-weight:700;
-  font-size:14px; letter-spacing:1px; cursor:pointer; transition:all .2s; border:1px solid;
-}
-.btn-confirm-ok {
-  background:rgba(255,51,85,0.15); border-color:rgba(255,51,85,0.5); color:#ff6680;
-}
-.btn-confirm-ok:hover     { background:rgba(255,51,85,0.3); }
-.btn-confirm-cancel {
-  background:rgba(255,255,255,0.06); border-color:var(--border); color:var(--dim);
-}
-.btn-confirm-cancel:hover { background:rgba(255,255,255,0.1); color:var(--text); }
-
-/* ── NEWS EVENT TOAST ───────────────────────── */
-.news-event-toast {
-  position: fixed;
-  top: 80px;
-  right: 20px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--gold);
-  border-radius: 8px;
-  padding: 14px 16px;
-  max-width: 320px;
-  min-width: 260px;
-  z-index: 1000;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-  transform: translateX(120%);
-  transition: transform .3s ease;
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.5;
-}
-.news-event-toast.show { transform: translateX(0); }
-.net-ticker { font-family: 'Share Tech Mono', monospace; font-weight: 700; color: var(--accent); font-size: 14px; }
-.net-impact { font-weight: 700; font-size: 14px; }
-
-/* ── TOAST ──────────────────────────────────── */
-#toast {
-  position:fixed; bottom:36px; right:20px;
-  background:var(--panel2); border-radius:8px; padding:12px 18px;
-  border-left:4px solid var(--green); font-size:14px; font-weight:600;
-  box-shadow:0 10px 40px rgba(0,0,0,0.7);
-  transform:translateX(160%); transition:transform .3s ease;
-  z-index:500; max-width:320px; color:var(--text);
-}
-#toast.show  { transform:translateX(0); }
-#toast.error { border-left-color:var(--red); }
-
-/* ── NEWS BAR ───────────────────────────────── */
-.news-bar {
-  position:fixed; bottom:0; left:0; right:0;
-  background:#050810; border-top:1px solid var(--border);
-  height:26px; display:flex; align-items:center; overflow:hidden; z-index:100;
-}
-.news-label { background:var(--red); color:#fff; font-weight:700; padding:0 12px; height:100%; display:flex; align-items:center; font-size:11px; letter-spacing:2px; flex-shrink:0; }
-.news-track { display:flex; animation:scroll-ticker 70s linear infinite; white-space:nowrap; }
-.news-item  { padding:0 36px; font-size:11px; color:var(--dim); font-family:'Share Tech Mono',monospace; }
-.news-item span { color:var(--text); }
-
-/* ── PROFILE MODAL ──────────────────────────── */
-.profile-backdrop {
-  position:fixed; inset:0; background:rgba(0,0,0,0.9);
-  z-index:600; display:flex; align-items:center; justify-content:center;
-}
-.profile-box {
-  background:var(--panel2); border:1px solid var(--border);
-  border-radius:12px; padding:32px; max-width:420px; width:90%;
-  box-shadow:0 20px 60px rgba(0,0,0,0.8); text-align:center;
-}
-.profile-title { font-size:24px; font-weight:700; color:#fff; letter-spacing:2px; margin-bottom:6px; }
-.profile-sub   { font-size:13px; color:var(--dim); margin-bottom:24px; }
-.slot-list     { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
-.slot-btn {
-  display:flex; justify-content:space-between; align-items:center;
-  padding:12px 16px;
-  background:rgba(255,255,255,0.03); border:1px solid var(--border);
-  border-radius:7px; cursor:pointer; transition:all .2s;
-}
-.slot-btn:hover { border-color:var(--accent); background:rgba(0,212,255,0.05); }
-.slot-name { font-weight:700; color:#fff; font-size:15px; }
-.slot-meta { font-size:12px; color:var(--dim); font-family:'Share Tech Mono',monospace; }
-.slot-actions { display:flex; gap:6px; }
-.slot-del {
-  background:rgba(255,51,85,0.1); border:1px solid rgba(255,51,85,0.3);
-  border-radius:4px; color:#ff6680; font-size:12px;
-  padding:3px 8px; cursor:pointer; transition:all .2s;
-}
-.slot-del:hover { background:rgba(255,51,85,0.25); }
-.btn-new-game {
-  width:100%; padding:12px; background:rgba(0,212,255,0.1);
-  border:1px solid rgba(0,212,255,0.35); border-radius:7px;
-  color:var(--accent); font-family:'Rajdhani',sans-serif;
-  font-weight:700; font-size:15px; letter-spacing:2px;
-  cursor:pointer; transition:all .2s; text-transform:uppercase;
-}
-.btn-new-game:hover { background:rgba(0,212,255,0.2); }
-
-/* Scrollbar */
-::-webkit-scrollbar { width:5px; }
-::-webkit-scrollbar-track { background:#050810; }
-::-webkit-scrollbar-thumb { background:#1e3050; border-radius:3px; }
-
-/* ── NEWS PENDING ROW ───────────────────────── */
-.stock-row.news-pending {
-  background: rgba(255, 215, 0, 0.04);
-  border-left: 3px solid var(--gold);
-}
-.stock-row.news-pending:hover {
-  background: rgba(255, 215, 0, 0.08);
-}
-.news-badge {
-  display: inline-block;
-  background: rgba(255, 215, 0, 0.15);
-  border: 1px solid rgba(255, 215, 0, 0.5);
-  color: var(--gold);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 1px 5px;
-  border-radius: 3px;
-  margin-left: 5px;
-  vertical-align: middle;
-  animation: pulse-gold 1s ease-in-out infinite alternate;
-}
-@keyframes pulse-gold {
-  from { opacity: 0.6; }
-  to   { opacity: 1; box-shadow: 0 0 6px rgba(255,215,0,0.4); }
-}
-
-@keyframes pulse-countdown {
-  from { opacity: 0.6; transform: scale(1);    }
-  to   { opacity: 1;   transform: scale(1.08); }
-}
-
-/* ── SIDEBAR TABS ───────────────────────────── */
-.sidebar-tabs {
-  display: flex;
-  border-bottom: 2px solid var(--border);
-  background: var(--panel);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  flex-shrink: 0;
-}
-.stab {
-  flex: 1;
-  padding: 10px 4px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  color: var(--dim);
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 10px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-}
-.stab:hover { color: var(--text); }
-.stab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-
-/* ── TRADE HISTORY ──────────────────────────── */
-.trade-hist-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 7px 10px;
-  border-radius: 5px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border);
-  margin-bottom: 5px;
-  gap: 8px;
-}
-.th-left  { display: flex; flex-direction: column; gap: 2px; }
-.th-right { text-align: right; display: flex; flex-direction: column; gap: 2px; }
-.th-mode  {
-  display: inline-block;
-  font-size: 9px; font-weight: 700; letter-spacing: 1px;
-  padding: 1px 5px; border-radius: 3px;
-}
-.th-mode.buy  { background: rgba(0,255,136,0.12); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
-.th-mode.sell { background: rgba(255,51,85,0.12);  color: var(--red);   border: 1px solid rgba(255,51,85,0.3); }
-.th-ticker { font-family: 'Share Tech Mono', monospace; font-weight: 700; color: #fff; font-size: 13px; margin-left: 5px; }
-.th-meta   { font-size: 11px; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
-.th-pnl    { font-family: 'Share Tech Mono', monospace; font-size: 12px; font-weight: 700; }
-.th-fee    { font-size: 10px; color: var(--label); font-family: 'Share Tech Mono', monospace; }
-.th-time   { font-size: 10px; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
-
-/* ── SHORT BUTTONS ──────────────────────────── */
-.btn-modal-short {
-  padding: 10px; border: 1px solid rgba(255,51,85,0.4);
-  border-radius: 7px; background: rgba(255,51,85,0.08);
-  color: var(--red); font-family: 'Rajdhani', sans-serif;
-  font-size: 14px; font-weight: 700; letter-spacing: 1px;
-  cursor: pointer; transition: all .2s;
-}
-.btn-modal-short:hover { background: rgba(255,51,85,0.18); }
-
-.btn-modal-cover {
-  padding: 10px; border: 1px solid rgba(0,212,255,0.4);
-  border-radius: 7px; background: rgba(0,212,255,0.08);
-  color: var(--accent); font-family: 'Rajdhani', sans-serif;
-  font-size: 14px; font-weight: 700; letter-spacing: 1px;
-  cursor: pointer; transition: all .2s;
-}
-.btn-modal-cover:hover { background: rgba(0,212,255,0.18); }
-
-/* ── MARKET SUMMARY BAR ─────────────────────── */
-.market-summary {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-.ms-item   { display:flex; flex-direction:column; gap:2px; cursor:default; }
-.ms-clickable { cursor:pointer; }
-.ms-clickable:hover .ms-val { text-decoration: underline; }
-.ms-label  { font-size:9px; color:var(--dim); letter-spacing:1px; text-transform:uppercase; }
-.ms-val    { font-family:'Share Tech Mono',monospace; font-size:13px; font-weight:700; }
-.ms-divider{ width:1px; height:32px; background:var(--border); margin:0 6px; }
-
-/* ── TOP MOVERS ─────────────────────────────── */
-.top-movers {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-.tm-label  { font-size:10px; color:var(--dim); font-weight:700; letter-spacing:1px; margin-right:4px; }
-.tm-item   {
-  display: flex; align-items: center; gap:8px;
-  padding: 4px 10px; border-radius: 5px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border);
-  cursor: pointer; transition: background .15s;
-}
-.tm-item:hover { background: rgba(255,255,255,0.07); }
-.tm-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:13px; color:#fff; }
-.tm-price  { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--dim); }
-.tm-chg    { font-family:'Share Tech Mono',monospace; font-size:12px; font-weight:700; }
-
-/* ── MARKET CONTROLS ────────────────────────── */
-.market-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-.stock-search {
-  padding: 7px 12px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
-  width: 200px;
-  outline: none;
-  transition: border-color .2s;
-}
-.stock-search:focus { border-color: var(--accent); }
-.sector-tabs { display:flex; gap:4px; flex-wrap:wrap; flex:1; }
-.btn-heatmap {
-  padding: 7px 14px;
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--dim);
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-}
-.btn-heatmap:hover { color: var(--text); border-color: var(--accent); }
-
-/* ── HEATMAP ─────────────────────────────────── */
-.heatmap-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 6px;
-  padding: 4px 0;
-}
-.hm-cell {
-  border-radius: 7px;
-  padding: 10px 8px;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.06);
-  transition: transform .15s, filter .15s;
-  min-height: 72px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3px;
-}
-.hm-cell:hover { transform: scale(1.04); filter: brightness(1.2); }
-.hm-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:13px; color:#fff; }
-.hm-chg    { font-family:'Share Tech Mono',monospace; font-size:12px; font-weight:700; }
-.hm-price  { font-size:10px; color:rgba(255,255,255,0.6); font-family:'Share Tech Mono',monospace; }
-.hm-held   { font-size:9px; color:var(--gold); letter-spacing:1px; margin-top:2px; }
-
-/* ── SORTABLE HEADERS ───────────────────────── */
-.sortable { cursor:pointer; user-select:none; }
-.sortable:hover { color: var(--accent); }
-.sort-icon { font-size:11px; color:var(--dim); margin-left:3px; }
-
-/* ── MODAL CHART HEADER ─────────────────────── */
-.modal-chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.chart-range-btns { display: flex; gap: 4px; }
-.chart-range-btn {
-  padding: 3px 10px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--dim);
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all .2s;
-}
-.chart-range-btn:hover  { border-color: var(--accent); color: var(--accent); }
-.chart-range-btn.active { background: rgba(0,212,255,0.12); border-color: var(--accent); color: var(--accent); }
-
-/* ── RIVAL LINK ─────────────────────────────── */
-.rival-link:hover { color: var(--green) !important; }
-
-/* ═══════════════════════════════════════════════════════
-   TABLET / MOBILE RESPONSIVE
-   ═══════════════════════════════════════════════════════ */
-
-/* ── TABLET LANDSCAPE (≤ 1024px) ────────────── */
-@media (max-width: 1024px) {
-  .main {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-
-  .market-panel {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    overflow-y: visible;
-  }
-
-  .sidebar {
-    display: none; /* auf Tablet durch mobile-nav gesteuert */
-  }
-
-  /* Header kompakter */
-  header {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px 14px;
-  }
-
-  .header-right {
-    flex-wrap: wrap;
-    gap: 8px;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .hdr-box .val { font-size: 16px; }
-
-  /* Tabelle: CHART Spalte ausblenden */
-  .stock-table th:nth-child(6),
-  .stock-table td:nth-child(6) { display: none; }
-
-  /* Market Controls wrappen sauber */
-  .market-controls { gap: 6px; }
-  .stock-search    { width: 100%; }
-  .sector-tabs     { width: 100%; }
-
-  /* Modal volle Breite */
-  .modal { width: 95vw; }
-  .modal-body { grid-template-columns: 1fr; }
-  .modal-trade { border-right: none; border-bottom: 1px solid var(--border); }
-}
-
-/* ── TABLET PORTRAIT + MOBILE (≤ 768px) ─────── */
-@media (max-width: 768px) {
-  /* Header noch kompakter */
-  .logo-text h1  { font-size: 15px; letter-spacing: 1px; }
-  .logo-text p   { display: none; }
-  .logo-icon     { width: 36px; height: 36px; font-size: 11px; }
-
-  .hdr-btns button { font-size: 10px; padding: 4px 8px; }
-  .hdr-box         { padding: 5px 10px; }
-  .hdr-box .val    { font-size: 14px; }
-  .time-display    { display: none; }
-
-  /* Main braucht Platz für Bottom Nav */
-  .main { padding-bottom: 64px; }
-
-  /* Tabelle: nur wichtigste Spalten */
-  .stock-table th:nth-child(2),
-  .stock-table td:nth-child(2) { display: none; } /* SECTOR */
-  .stock-table th:nth-child(5),
-  .stock-table td:nth-child(5) { display: none; } /* 24H */
-
-  .stock-ticker { font-size: 13px; }
-  .stock-price  { font-size: 12px; }
-
-  /* Market Summary Bar scrollen */
-  .market-summary {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Top Movers scrollen */
-  .top-movers {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Heatmap weniger Spalten */
-  .heatmap-grid {
-    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-  }
-
-  /* Modal */
-  .modal        { width: 100vw; max-height: 92vh; border-radius: 12px 12px 0 0; }
-  .modal-stats  { gap: 10px; }
-  .mstat        { font-size: 11px; }
-}
-
-/* ── MOBILE BOTTOM NAV ───────────────────────── */
-.mobile-nav {
-  display: none; /* default: versteckt auf Desktop */
-}
-
-@media (max-width: 1024px) {
-  .mobile-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 58px;
-    background: var(--panel);
-    border-top: 1px solid var(--border);
-    z-index: 150;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-  }
-
-  .mnav-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    background: transparent;
-    border: none;
-    color: var(--dim);
-    cursor: pointer;
-    transition: all .2s;
-    padding: 6px 0;
-  }
-
-  .mnav-btn.active {
-    color: var(--accent);
-    background: rgba(0,212,255,0.06);
-    border-top: 2px solid var(--accent);
-  }
-
-  .mnav-btn:hover:not(.active) { color: var(--text); }
-
-  .mnav-icon  { font-size: 18px; line-height: 1; }
-  .mnav-label {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  /* News Bar über Bottom Nav */
-  .news-bar { bottom: 58px; }
-}
-
-/* ── MOBILE VIEWS ────────────────────────────── */
-@media (max-width: 1024px) {
-  /* Market Panel als View */
-  .market-panel {
-    display: block;
-  }
-
-  /* Sidebar als Overlay-View */
-  .sidebar-mobile-view {
-    display: flex !important;
-    position: fixed;
-    inset: 0;
-    bottom: 116px; /* über news-bar + mobile-nav */
-    top: 110px;    /* unter header + ticker */
-    background: var(--bg);
-    z-index: 120;
-    overflow-y: auto;
-    flex-direction: column;
-  }
-
-  /* Versteckt wenn nicht aktiv */
-  .view-hidden {
-    display: none !important;
-  }
-}
-
+/* ── LOGIN SCREEN ────────────────────────────── */
 #loginScreen {
   position: fixed; inset: 0;
   background: var(--bg);
@@ -926,5 +56,787 @@ canvas#modalChart { width:100%; height:120px; display:block; }
 }
 .btn-discord:hover { opacity: .85; }
 
+/* ── HEADER ─────────────────────────────────── */
+header {
+  background:linear-gradient(135deg,#080c12,#0d1a2a);
+  border-bottom:2px solid var(--accent);
+  padding:10px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow:0 0 30px rgba(0,212,255,0.12);
+  position:sticky; top:0; z-index:50;
+  gap: 12px;
+}
+
+.logo { font-size: 18px; font-weight: 700; letter-spacing: 2px; color: var(--accent); }
+
+.header-left  { display:flex; align-items:center; gap:16px; }
+.header-center { display:flex; align-items:center; gap:20px; }
+.header-right { display:flex; gap:10px; align-items:center; }
+
+.header-time { display:flex; flex-direction:column; line-height:1.3; }
+.header-time span { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--text); }
+.game-date { font-size:10px !important; color:var(--dim) !important; }
+
+.header-stat { display:flex; flex-direction:column; gap:2px; }
+.stat-label  { font-size:9px; color:var(--label); letter-spacing:2px; text-transform:uppercase; }
+.stat-val    { font-family:'Share Tech Mono',monospace; font-size:17px; font-weight:700; color:var(--gold); }
+
+/* Generic small buttons */
+.btn-sm {
+  padding:5px 13px; border-radius:5px;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11px; letter-spacing:1px;
+  cursor:pointer; transition:all .2s; white-space:nowrap; border:1px solid;
+  background:rgba(0,212,255,0.08); border-color:rgba(0,212,255,0.35); color:var(--accent);
+}
+.btn-sm:hover { transform:translateY(-1px); opacity:.85; }
+.btn-danger {
+  background:rgba(180,0,180,0.08) !important;
+  border-color:rgba(200,0,200,0.32) !important;
+  color:#e060e0 !important;
+}
+
+/* Legacy header button classes (kept for compatibility) */
+.hdr-btns { display:flex; flex-direction:column; gap:4px; }
+.hdr-btns button {
+  padding:5px 13px; border-radius:5px;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11px; letter-spacing:1px;
+  cursor:pointer; transition:all .2s; white-space:nowrap; border:1px solid;
+}
+.btn-save      { background:rgba(0,212,255,0.08); border-color:rgba(0,212,255,0.35); color:var(--accent); }
+.btn-reset     { background:rgba(255,51,85,0.07);  border-color:rgba(255,51,85,0.32);  color:#ff6680; }
+.btn-hardreset { background:rgba(180,0,180,0.08); border-color:rgba(200,0,200,0.32); color:#e060e0; }
+.hdr-btns button:hover { transform:translateY(-1px); opacity:.85; }
+
+.hdr-box { border-radius:7px; padding:7px 14px; text-align:right; }
+.hdr-box.cash      { background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.28); }
+.hdr-box.portfolio { background:rgba(0,255,136,0.05); border:1px solid rgba(0,255,136,0.22); }
+.hdr-box .lbl { font-size:10px; color:var(--label); letter-spacing:2px; text-transform:uppercase; }
+.hdr-box .val { font-family:'Share Tech Mono',monospace; font-size:19px; font-weight:700; }
+.hdr-box.cash .val      { color:var(--gold); }
+.hdr-box.portfolio .val { color:var(--green); }
+.time-display { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--dim); text-align:center; line-height:1.9; }
+
+/* ── TICKER ─────────────────────────────────── */
+.ticker-wrap {
+  background:#050810; border-bottom:1px solid var(--border);
+  overflow:hidden; height:30px; display:flex; align-items:center;
+}
+.ticker-label {
+  background:var(--accent); color:#000; font-weight:700;
+  padding:0 12px; height:100%; display:flex; align-items:center;
+  font-size:11px; letter-spacing:2px; flex-shrink:0;
+}
+.ticker-track {
+  display:flex; animation:scroll-ticker 50s linear infinite; white-space:nowrap;
+}
+.ticker-item { padding:0 20px; font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text); }
+.ticker-item strong { color:#fff; }
+@keyframes scroll-ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ── APP LAYOUT (neue 3-Spalten Struktur) ────── */
+.app-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 240px;
+  gap: 0;
+  min-height: calc(100vh - 90px);
+  padding-bottom: 30px;
+}
+
+.sidebar-left,
+.sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+.sidebar-right {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+.main-content {
+  padding: 12px 16px;
+  overflow-y: auto;
+}
+
+.sidebar-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.sidebar-label {
+  font-size: 10px; color: var(--accent); letter-spacing: 2px;
+  text-transform: uppercase; font-weight: 700; margin-bottom: 10px;
+}
+
+/* Legacy .main / .market-panel / .sidebar (alte Klassen neutral halten) */
+.main { display:grid; grid-template-columns:1fr 280px; }
+.market-panel { padding:16px; overflow-y:auto; border-right:1px solid var(--border); }
+.sidebar { display:flex; flex-direction:column; overflow-y:auto; }
+
+/* ── TABS ────────────────────────────────────── */
+.sector-tabs { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:10px; }
+.market-tabs { display:flex; gap:4px; flex-wrap:wrap; }
+.tab {
+  padding:4px 12px; border:1px solid var(--border); border-radius:4px;
+  cursor:pointer; font-size:11px; font-weight:700; letter-spacing:1px;
+  transition:all .2s; background:transparent; color:var(--dim);
+}
+.tab.active              { background:var(--accent); border-color:var(--accent); color:#000; }
+.tab:hover:not(.active)  { border-color:var(--accent); color:var(--accent); }
+
+/* ── TABLE CONTROLS ──────────────────────────── */
+.table-controls {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 10px;
+}
+.search-input {
+  flex: 1;
+  padding: 7px 12px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent); }
+
+/* ── STOCK TABLE ─────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+.stock-table { width:100%; border-collapse:collapse; }
+.stock-table thead tr { background:#080c14; border-bottom:2px solid var(--accent); }
+.stock-table th {
+  padding:9px 10px; text-align:left;
+  font-size:10px; color:var(--accent); letter-spacing:2px; font-weight:700; text-transform:uppercase;
+  cursor: pointer; user-select: none;
+}
+.stock-table th:nth-child(n+3), .stock-table td:nth-child(n+3) { text-align:right; }
+.stock-row { border-bottom:1px solid rgba(30,48,80,0.6); cursor:pointer; transition:background .12s; }
+.stock-row:hover   { background:rgba(0,212,255,0.04); }
+.stock-row.watched td:first-child::before { content:'★ '; color:var(--gold); font-size:12px; }
+.stock-table td { padding:10px 10px; vertical-align:middle; }
+
+.stock-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:14px; color:#fff; }
+.stock-name   { font-size:12px; color:var(--dim); display:block; margin-top:1px; }
+.stock-price  { font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--text); }
+.stock-change { font-family:'Share Tech Mono',monospace; font-size:12px; }
+.up      { color:var(--green); }
+.down    { color:var(--red); }
+.neutral { color:var(--dim); }
+
+/* Flash animations */
+@keyframes flash-up   { 0%,100%{background:transparent} 50%{background:rgba(0,255,136,0.18)} }
+@keyframes flash-down { 0%,100%{background:transparent} 50%{background:rgba(255,51,85,0.18)} }
+.flash-up   { animation:flash-up   .6s ease; }
+.flash-down { animation:flash-down .6s ease; }
+
+.mini-chart { display:flex; align-items:flex-end; gap:2px; height:26px; }
+.mini-bar   { width:4px; border-radius:1px; }
+
+.owned-badge {
+  background:rgba(255,215,0,0.12); border:1px solid var(--gold);
+  color:var(--gold); font-size:10px; padding:1px 4px;
+  border-radius:3px; margin-left:5px;
+  font-family:'Share Tech Mono',monospace; vertical-align:middle;
+}
+
+/* Sector badges */
+.sector { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; letter-spacing:1px; font-weight:700; text-transform:uppercase; }
+.sector-food      { background:rgba(255,140,0,0.13); color:#ffaa40; border:1px solid rgba(255,140,0,0.3); }
+.sector-pharma    { background:rgba(160,80,255,0.13); color:#bf80ff; border:1px solid rgba(160,80,255,0.3); }
+.sector-transport { background:rgba(0,180,255,0.13);  color:#40ccff; border:1px solid rgba(0,180,255,0.3); }
+.sector-finance   { background:rgba(0,255,136,0.09);  color:#40ffaa; border:1px solid rgba(0,255,136,0.25); }
+.sector-energy    { background:rgba(255,200,0,0.11);  color:#ffd040; border:1px solid rgba(255,200,0,0.25); }
+.sector-media     { background:rgba(255,60,130,0.11); color:#ff6699; border:1px solid rgba(255,60,130,0.25); }
+.sector-retail    { background:rgba(100,210,100,0.11);color:#80dd80; border:1px solid rgba(100,210,100,0.25); }
+.sector-tech      { background:rgba(0,212,255,0.11);  color:#40d4ff; border:1px solid rgba(0,212,255,0.25); }
+
+/* ── SIDEBAR SHARED COMPONENTS ───────────────── */
+.sidebar-title { font-size:11px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:10px; }
+
+.watch-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 10px; border-radius:5px; cursor:pointer;
+  background:rgba(255,255,255,0.02); border:1px solid var(--border);
+  margin-bottom:6px; transition:border-color .15s;
+}
+.watch-item:hover { border-color:rgba(0,212,255,0.35); }
+.watch-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:13px; color:#fff; }
+.watch-price  { font-family:'Share Tech Mono',monospace; font-size:13px; }
+.watch-chg    { font-family:'Share Tech Mono',monospace; font-size:11px; }
+.watch-empty  { color:var(--label); font-size:12px; text-align:center; padding:12px 0; }
+
+.portfolio-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 10px; border-radius:5px;
+  background:rgba(255,255,255,0.02); border:1px solid var(--border);
+  margin-bottom:5px; cursor:pointer;
+  transition:border-color .15s, background .15s;
+}
+.portfolio-row:hover { border-color:rgba(0,212,255,0.35); background:rgba(0,212,255,0.04); }
+.portfolio-row-left  { display:flex; flex-direction:column; gap:2px; }
+.portfolio-row-tick  { font-family:'Share Tech Mono',monospace; font-weight:700; color:#fff; font-size:13px; }
+.portfolio-row-qty   { font-size:11px; color:var(--dim); }
+.portfolio-row-right { text-align:right; }
+.portfolio-row-val   { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--text); }
+.portfolio-row-pnl   { font-family:'Share Tech Mono',monospace; font-size:11px; }
+
+/* Limit Orders */
+.orders-panel { padding:14px 16px; border-bottom:1px solid var(--border); }
+.order-item {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:6px 10px; border-radius:5px;
+  background:rgba(255,255,255,0.02); border:1px solid var(--border);
+  margin-bottom:5px; font-size:12px;
+}
+.order-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; color:#fff; }
+.order-meta   { color:var(--dim); font-family:'Share Tech Mono',monospace; font-size:11px; }
+.order-cancel { background:none; border:none; color:var(--red); cursor:pointer; font-size:14px; padding:0 4px; opacity:.7; }
+.order-cancel:hover { opacity:1; }
+
+/* Scoreboard */
+.score-panel { padding:14px 16px; flex:1; }
+.score-grid  { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.score-box {
+  background:rgba(255,255,255,0.02); border:1px solid var(--border);
+  border-radius:6px; padding:10px; text-align:center;
+}
+.score-lbl { font-size:10px; color:var(--label); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+.score-val { font-family:'Share Tech Mono',monospace; font-size:15px; font-weight:700; color:var(--text); }
+
+/* ── STOCK DETAIL MODAL ─────────────────────── */
+.modal-backdrop {
+  position:fixed; inset:0; background:var(--overlay);
+  z-index:200; display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .25s;
+}
+.modal-backdrop.open { opacity:1; pointer-events:all; }
+
+/* Legacy .modal (alte HTML) */
+.modal {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; width:min(820px,95vw); max-height:90vh;
+  overflow-y:auto; box-shadow:0 20px 80px rgba(0,0,0,0.8);
+  transform:translateY(18px) scale(.97); transition:transform .25s;
+  position:relative;
+}
+.modal-backdrop.open .modal { transform:translateY(0) scale(1); }
+
+/* Neue .modal-box Klasse */
+.modal-box {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:12px; width:min(560px,95vw); max-height:90vh;
+  overflow-y:auto; box-shadow:0 20px 80px rgba(0,0,0,0.8);
+  transform:translateY(18px) scale(.97); transition:transform .25s;
+  position:relative; padding:20px 24px;
+}
+.modal-backdrop.open .modal-box { transform:translateY(0) scale(1); }
+
+.modal-close {
+  position:absolute; top:14px; right:16px;
+  background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  border-radius:6px; color:var(--dim); font-size:18px;
+  width:32px; height:32px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; z-index:5;
+}
+.modal-close:hover { background:rgba(255,51,85,0.15); color:var(--red); border-color:var(--red); }
+
+.modal-header {
+  padding-bottom:14px; border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom: 14px;
+}
+.modal-ticker    { font-size:28px; font-weight:700; color:#fff; font-family:'Share Tech Mono',monospace; line-height:1; }
+.modal-name      { font-size:14px; color:var(--dim); margin-top:4px; font-weight:600; }
+.modal-price-wrap { text-align:right; }
+.modal-price-block { text-align:right; }
+.modal-price     { font-size:26px; font-weight:700; font-family:'Share Tech Mono',monospace; }
+.modal-change    { font-size:14px; font-family:'Share Tech Mono',monospace; font-weight:600; margin-top:4px; }
+
+.modal-stats {
+  display:flex; gap:16px; flex-wrap:wrap;
+  margin-bottom:14px; padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.mstat { font-size:12px; color:var(--label); }
+.mstat span { color:#e8f4ff; font-weight:700; font-family:'Share Tech Mono',monospace; margin-left:4px; font-size:13px; }
+.mstat .rival-val { color:var(--accent); }
+
+canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; }
+
+/* Chart range buttons (.crb) */
+.chart-range-btns { display:flex; gap:4px; margin-bottom:14px; }
+.crb {
+  padding:3px 10px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:4px;
+  color:var(--dim);
+  font-family:'Rajdhani',sans-serif;
+  font-weight:700;
+  font-size:11px;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.crb:hover  { border-color:var(--accent); color:var(--accent); }
+.crb.active { background:rgba(0,212,255,0.12); border-color:var(--accent); color:var(--accent); }
+
+/* Legacy chart-range-btn alias */
+.chart-range-btn { padding:3px 10px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:4px; color:var(--dim); font-family:'Rajdhani',sans-serif; font-weight:700; font-size:11px; letter-spacing:1px; cursor:pointer; transition:all .2s; }
+.chart-range-btn:hover  { border-color:var(--accent); color:var(--accent); }
+.chart-range-btn.active { background:rgba(0,212,255,0.12); border-color:var(--accent); color:var(--accent); }
+
+/* Modal sections */
+.modal-section { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+.section-label { font-size:10px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; font-weight:700; margin-bottom:8px; }
+
+.short-row, .limit-row, .stop-row {
+  display:flex; gap:6px; align-items:center; flex-wrap:wrap;
+}
+
+.short-status { font-size:12px; color:var(--dim); margin-top:6px; font-family:'Share Tech Mono',monospace; }
+.alert-status { font-size:12px; color:var(--dim); margin-top:4px; font-family:'Share Tech Mono',monospace; }
+.stop-status  { font-size:12px; color:var(--dim); margin-top:6px; font-family:'Share Tech Mono',monospace; }
+
+/* Trade tabs */
+.trade-tabs2 {
+  display:grid; grid-template-columns:1fr 1fr;
+  border:1px solid var(--border); border-radius:6px; overflow:hidden; margin-bottom:12px;
+}
+.trade-tab2 { padding:9px; text-align:center; cursor:pointer; font-weight:700; font-size:14px; letter-spacing:1px; transition:all .2s; color:var(--dim); background:transparent; border:none; }
+.trade-tab2.buy-active  { background:rgba(0,255,136,0.12); color:#40ffaa; }
+.trade-tab2.sell-active { background:rgba(255,51,85,0.12);  color:#ff6680; }
+
+.m-qty-row { display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+.m-input-label { font-size:11px; color:var(--label); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; display:block; font-weight:600; }
+.m-qty-input {
+  background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:6px; color:#fff; font-family:'Share Tech Mono',monospace;
+  font-size:15px; padding:8px 12px; outline:none; transition:border-color .2s;
+  width:100%;
+}
+.m-qty-input:focus { border-color:var(--accent); }
+.m-qty-btns { display:flex; gap:4px; margin-bottom:10px; }
+.m-qty-btn {
+  flex:1; padding:5px; background:rgba(255,255,255,0.04);
+  border:1px solid var(--border); border-radius:4px;
+  color:var(--dim); font-size:11px; font-weight:600; cursor:pointer; transition:all .2s;
+}
+.m-qty-btn:hover { border-color:var(--accent); color:var(--accent); }
+.m-total {
+  font-family:'Share Tech Mono',monospace; font-size:14px;
+  color:var(--dim); margin-bottom:10px;
+}
+.m-total span { color:var(--gold); font-weight:700; }
+
+/* Legacy m-total box style */
+.m-total-lbl { font-size:12px; color:var(--label); text-transform:uppercase; letter-spacing:1px; }
+.m-total-val { font-family:'Share Tech Mono',monospace; font-size:17px; font-weight:700; color:var(--gold); }
+
+.btn-modal-trade {
+  width:100%; padding:11px; border:none; border-radius:7px;
+  font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700;
+  letter-spacing:2px; cursor:pointer; transition:all .2s; text-transform:uppercase;
+  margin-bottom:4px;
+}
+.btn-modal-buy  { background:linear-gradient(135deg,#00c068,#00ff88); color:#001a0c; box-shadow:0 0 18px rgba(0,255,136,0.2); }
+.btn-modal-sell { background:linear-gradient(135deg,#cc0030,#ff3355); color:#fff;    box-shadow:0 0 18px rgba(255,51,85,0.2); }
+.btn-modal-buy:hover  { box-shadow:0 0 28px rgba(0,255,136,0.45); transform:translateY(-1px); }
+.btn-modal-sell:hover { box-shadow:0 0 28px rgba(255,51,85,0.45);  transform:translateY(-1px); }
+
+.btn-short, .btn-modal-short {
+  padding:8px 14px; border:1px solid rgba(255,51,85,0.4);
+  border-radius:6px; background:rgba(255,51,85,0.08);
+  color:var(--red); font-family:'Rajdhani',sans-serif;
+  font-size:13px; font-weight:700; letter-spacing:1px;
+  cursor:pointer; transition:all .2s;
+}
+.btn-short:hover, .btn-modal-short:hover { background:rgba(255,51,85,0.18); }
+
+.btn-cover, .btn-modal-cover {
+  padding:8px 14px; border:1px solid rgba(0,212,255,0.4);
+  border-radius:6px; background:rgba(0,212,255,0.08);
+  color:var(--accent); font-family:'Rajdhani',sans-serif;
+  font-size:13px; font-weight:700; letter-spacing:1px;
+  cursor:pointer; transition:all .2s;
+}
+.btn-cover:hover, .btn-modal-cover:hover { background:rgba(0,212,255,0.18); }
+
+/* Limit order */
+.limit-select {
+  background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:5px; color:var(--text); font-family:'Share Tech Mono',monospace;
+  font-size:12px; padding:7px 8px; outline:none; cursor:pointer;
+}
+.limit-select:focus { border-color:var(--accent); }
+
+.btn-add-order, .btn-watch + .btn-add-order {
+  padding:7px 12px; background:rgba(0,212,255,0.1);
+  border:1px solid rgba(0,212,255,0.35); border-radius:5px;
+  color:var(--accent); font-family:'Rajdhani',sans-serif;
+  font-weight:700; font-size:12px; letter-spacing:1px;
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.btn-add-order:hover { background:rgba(0,212,255,0.18); }
+
+.stop-loss-row { display:flex; align-items:center; gap:10px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.stop-loss-lbl { font-size:12px; color:var(--label); letter-spacing:1px; white-space:nowrap; text-transform:uppercase; }
+
+.btn-watch {
+  margin-top:12px; width:100%; padding:8px;
+  background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.3);
+  border-radius:5px; color:var(--gold); font-family:'Rajdhani',sans-serif;
+  font-weight:700; font-size:13px; letter-spacing:1px; cursor:pointer; transition:all .2s;
+}
+.btn-watch:hover    { background:rgba(255,215,0,0.14); }
+.btn-watch.watching { background:rgba(255,215,0,0.14); border-color:var(--gold); }
+
+/* ── CONFIRM MODAL ──────────────────────────── */
 .confirm-backdrop        { display:none; }
-.confirm-backdrop.open   { display:flex; }
+.confirm-backdrop.open   {
+  display:flex;
+  position:fixed; inset:0; background:rgba(0,0,0,0.85);
+  z-index:400; align-items:center; justify-content:center;
+}
+.confirm-box {
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:10px; padding:28px 32px; max-width:380px; width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.8);
+  transform:scale(.95); transition:transform .2s;
+  text-align:center;
+}
+.confirm-backdrop.open .confirm-box { transform:scale(1); }
+.confirm-icon  { font-size:36px; margin-bottom:12px; }
+.confirm-title { font-size:18px; font-weight:700; color:#fff; margin-bottom:8px; }
+.confirm-msg   { font-size:14px; color:var(--dim); line-height:1.6; margin-bottom:22px; }
+.confirm-btns  { display:flex; gap:10px; justify-content:center; }
+.confirm-btns button {
+  padding:10px 24px; border-radius:6px;
+  font-family:'Rajdhani',sans-serif; font-weight:700;
+  font-size:14px; letter-spacing:1px; cursor:pointer; transition:all .2s; border:1px solid;
+}
+/* Neue Button-IDs */
+.confirm-btn-yes, .btn-confirm-ok {
+  background:rgba(255,51,85,0.15); border-color:rgba(255,51,85,0.5); color:#ff6680;
+}
+.confirm-btn-yes:hover, .btn-confirm-ok:hover { background:rgba(255,51,85,0.3); }
+.confirm-btn-no, .btn-confirm-cancel {
+  background:rgba(255,255,255,0.06); border-color:var(--border); color:var(--dim);
+}
+.confirm-btn-no:hover, .btn-confirm-cancel:hover { background:rgba(255,255,255,0.1); color:var(--text); }
+
+/* ── NEWS EVENT TOAST ───────────────────────── */
+.news-event-toast {
+  position:fixed; top:80px; right:20px;
+  background:var(--panel2); border:1px solid var(--border);
+  border-left:4px solid var(--gold); border-radius:8px;
+  padding:14px 16px; max-width:320px; min-width:260px;
+  z-index:1000; box-shadow:0 8px 30px rgba(0,0,0,0.6);
+  transform:translateX(120%); transition:transform .3s ease;
+  font-size:13px; color:var(--text); line-height:1.5;
+}
+.news-event-toast.show { transform:translateX(0); }
+.net-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; color:var(--accent); font-size:14px; }
+.net-impact { font-weight:700; font-size:14px; }
+
+/* ── TOAST (id="toastEl") ───────────────────── */
+#toastEl, #toast {
+  position:fixed; bottom:36px; right:20px;
+  background:var(--panel2); border-radius:8px; padding:12px 18px;
+  border-left:4px solid var(--green); font-size:14px; font-weight:600;
+  box-shadow:0 10px 40px rgba(0,0,0,0.7);
+  transform:translateX(160%); transition:transform .3s ease;
+  z-index:500; max-width:320px; color:var(--text);
+}
+#toastEl.show,  #toast.show  { transform:translateX(0); }
+#toastEl.error, #toast.error { border-left-color:var(--red); }
+
+/* ── NEWS BAR ───────────────────────────────── */
+.news-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  background:#050810; border-top:1px solid var(--border);
+  height:26px; display:flex; align-items:center; overflow:hidden; z-index:100;
+}
+.news-wrap { overflow:hidden; flex:1; }
+.news-label { background:var(--red); color:#fff; font-weight:700; padding:0 12px; height:100%; display:flex; align-items:center; font-size:11px; letter-spacing:2px; flex-shrink:0; }
+.news-track { display:flex; animation:scroll-ticker 70s linear infinite; white-space:nowrap; }
+.news-item  { padding:0 36px; font-size:11px; color:var(--dim); font-family:'Share Tech Mono',monospace; }
+.news-item span { color:var(--text); }
+
+/* ── NEWS PENDING ROW ───────────────────────── */
+.stock-row.news-pending { background:rgba(255,215,0,0.04); border-left:3px solid var(--gold); }
+.stock-row.news-pending:hover { background:rgba(255,215,0,0.08); }
+.news-badge {
+  display:inline-block;
+  background:rgba(255,215,0,0.15); border:1px solid rgba(255,215,0,0.5);
+  color:var(--gold); font-size:9px; font-weight:700; letter-spacing:1px;
+  padding:1px 5px; border-radius:3px; margin-left:5px; vertical-align:middle;
+  animation:pulse-gold 1s ease-in-out infinite alternate;
+}
+@keyframes pulse-gold {
+  from { opacity:0.6; }
+  to   { opacity:1; box-shadow:0 0 6px rgba(255,215,0,0.4); }
+}
+@keyframes pulse-countdown {
+  from { opacity:0.6; transform:scale(1);    }
+  to   { opacity:1;   transform:scale(1.08); }
+}
+
+/* ── MARKET SUMMARY BAR ─────────────────────── */
+.market-summary {
+  display:flex; align-items:center; gap:6px;
+  padding:10px 16px; background:var(--panel2);
+  border:1px solid var(--border); border-radius:8px;
+  margin-bottom:10px; flex-wrap:wrap;
+}
+.ms-item      { display:flex; flex-direction:column; gap:2px; cursor:default; }
+.ms-clickable { cursor:pointer; }
+.ms-clickable:hover .ms-val { text-decoration:underline; }
+.ms-label  { font-size:9px; color:var(--dim); letter-spacing:1px; text-transform:uppercase; }
+.ms-val    { font-family:'Share Tech Mono',monospace; font-size:13px; font-weight:700; }
+.ms-divider{ width:1px; height:32px; background:var(--border); margin:0 6px; }
+
+/* ── TOP MOVERS ─────────────────────────────── */
+.top-movers-card {}
+.top-movers {
+  display:flex; align-items:center; gap:8px;
+  flex-wrap:wrap;
+}
+.tm-label  { font-size:10px; color:var(--dim); font-weight:700; letter-spacing:1px; margin-right:4px; }
+.tm-item   {
+  display:flex; align-items:center; gap:8px;
+  padding:4px 10px; border-radius:5px;
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  cursor:pointer; transition:background .15s;
+}
+.tm-item:hover { background:rgba(255,255,255,0.07); }
+.tm-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:13px; color:#fff; }
+.tm-price  { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--dim); }
+.tm-chg    { font-family:'Share Tech Mono',monospace; font-size:12px; font-weight:700; }
+
+/* ── HEATMAP ─────────────────────────────────── */
+.heatmap-view {}
+.heatmap-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+  gap:6px; padding:4px 0;
+}
+.hm-cell {
+  border-radius:7px; padding:10px 8px; cursor:pointer;
+  border:1px solid rgba(255,255,255,0.06);
+  transition:transform .15s, filter .15s;
+  min-height:72px; display:flex; flex-direction:column;
+  justify-content:center; gap:3px;
+}
+.hm-cell:hover { transform:scale(1.04); filter:brightness(1.2); }
+.hm-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:13px; color:#fff; }
+.hm-chg    { font-family:'Share Tech Mono',monospace; font-size:12px; font-weight:700; }
+.hm-price  { font-size:10px; color:rgba(255,255,255,0.6); font-family:'Share Tech Mono',monospace; }
+.hm-held   { font-size:9px; color:var(--gold); letter-spacing:1px; margin-top:2px; }
+
+/* ── SORTABLE HEADERS ───────────────────────── */
+.sortable { cursor:pointer; user-select:none; }
+.sortable:hover { color:var(--accent); }
+.sort-icon { font-size:11px; color:var(--dim); margin-left:3px; }
+
+/* ── TRADE HISTORY ──────────────────────────── */
+.trade-hist-row {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:7px 10px; border-radius:5px;
+  background:rgba(255,255,255,0.02); border:1px solid var(--border);
+  margin-bottom:5px; gap:8px;
+}
+.th-left  { display:flex; flex-direction:column; gap:2px; }
+.th-right { text-align:right; display:flex; flex-direction:column; gap:2px; }
+.th-mode  { display:inline-block; font-size:9px; font-weight:700; letter-spacing:1px; padding:1px 5px; border-radius:3px; }
+.th-mode.buy  { background:rgba(0,255,136,0.12); color:var(--green); border:1px solid rgba(0,255,136,0.3); }
+.th-mode.sell { background:rgba(255,51,85,0.12);  color:var(--red);   border:1px solid rgba(255,51,85,0.3); }
+.th-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; color:#fff; font-size:13px; margin-left:5px; }
+.th-meta   { font-size:11px; color:var(--dim); font-family:'Share Tech Mono',monospace; }
+.th-pnl    { font-family:'Share Tech Mono',monospace; font-size:12px; font-weight:700; }
+.th-fee    { font-size:10px; color:var(--label); font-family:'Share Tech Mono',monospace; }
+.th-time   { font-size:10px; color:var(--dim); font-family:'Share Tech Mono',monospace; }
+
+/* ── SIDEBAR TABS ───────────────────────────── */
+.sidebar-tabs {
+  display:flex; border-bottom:2px solid var(--border);
+  background:var(--panel); position:sticky; top:0; z-index:10; flex-shrink:0;
+}
+.stab {
+  flex:1; padding:10px 4px; background:transparent;
+  border:none; border-bottom:2px solid transparent; margin-bottom:-2px;
+  color:var(--dim); font-family:'Rajdhani',sans-serif; font-weight:700;
+  font-size:10px; letter-spacing:1px; text-transform:uppercase;
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.stab:hover { color:var(--text); }
+.stab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* ── RIVAL LINK ─────────────────────────────── */
+.rival-link:hover { color:var(--green) !important; }
+
+/* ── PROFILE MODAL (legacy) ─────────────────── */
+.profile-backdrop {
+  position:fixed; inset:0; background:rgba(0,0,0,0.9);
+  z-index:600; display:flex; align-items:center; justify-content:center;
+}
+.profile-box {
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:12px; padding:32px; max-width:420px; width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,0.8); text-align:center;
+}
+.profile-title { font-size:24px; font-weight:700; color:#fff; letter-spacing:2px; margin-bottom:6px; }
+.profile-sub   { font-size:13px; color:var(--dim); margin-bottom:24px; }
+.slot-list     { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.slot-btn {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:7px; cursor:pointer; transition:all .2s;
+}
+.slot-btn:hover { border-color:var(--accent); background:rgba(0,212,255,0.05); }
+.slot-name { font-weight:700; color:#fff; font-size:15px; }
+.slot-meta { font-size:12px; color:var(--dim); font-family:'Share Tech Mono',monospace; }
+.slot-actions { display:flex; gap:6px; }
+.slot-del {
+  background:rgba(255,51,85,0.1); border:1px solid rgba(255,51,85,0.3);
+  border-radius:4px; color:#ff6680; font-size:12px;
+  padding:3px 8px; cursor:pointer; transition:all .2s;
+}
+.slot-del:hover { background:rgba(255,51,85,0.25); }
+.btn-new-game {
+  width:100%; padding:12px; background:rgba(0,212,255,0.1);
+  border:1px solid rgba(0,212,255,0.35); border-radius:7px;
+  color:var(--accent); font-family:'Rajdhani',sans-serif;
+  font-weight:700; font-size:15px; letter-spacing:2px;
+  cursor:pointer; transition:all .2s; text-transform:uppercase;
+}
+.btn-new-game:hover { background:rgba(0,212,255,0.2); }
+
+/* ── SCROLLBAR ───────────────────────────────── */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:#050810; }
+::-webkit-scrollbar-thumb { background:#1e3050; border-radius:3px; }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+
+/* ── TABLET LANDSCAPE (≤ 1200px) ────────────── */
+@media (max-width: 1200px) {
+  .app-layout {
+    grid-template-columns: 200px 1fr 200px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-left,
+  .sidebar-right {
+    display: none;
+    border: none;
+  }
+
+  .sidebar-left.visible,
+  .sidebar-right.visible {
+    display: flex;
+  }
+
+  /* Legacy .sidebar – NICHT verstecken */
+  /* .sidebar { display: none; }  ← ENTFERNT */
+
+  header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 14px;
+  }
+
+  .header-right {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stock-table th:nth-child(6),
+  .stock-table td:nth-child(6) { display: none; }
+
+  .modal-box { width: 95vw; }
+  .modal     { width: 95vw; }
+}
+
+/* ── MOBILE (≤ 768px) ───────────────────────── */
+@media (max-width: 768px) {
+  .header-center { display: none; }
+
+  .main-content { padding: 8px; }
+
+  .stock-table th:nth-child(2),
+  .stock-table td:nth-child(2) { display: none; }
+  .stock-table th:nth-child(5),
+  .stock-table td:nth-child(5) { display: none; }
+
+  .stock-ticker { font-size: 13px; }
+  .stock-price  { font-size: 12px; }
+
+  .market-summary {
+    overflow-x: auto; flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .heatmap-grid {
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+  }
+
+  .modal-box { width: 100vw; max-height: 92vh; border-radius: 12px 12px 0 0; }
+  .modal     { width: 100vw; max-height: 92vh; border-radius: 12px 12px 0 0; }
+  .modal-stats { gap: 10px; }
+  .mstat       { font-size: 11px; }
+}
+
+/* ── MOBILE BOTTOM NAV ───────────────────────── */
+.mobile-nav { display: none; }
+
+@media (max-width: 1024px) {
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 58px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    z-index: 150;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+  }
+
+  .mnav-btn {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 3px; background: transparent; border: none;
+    color: var(--dim); cursor: pointer; transition: all .2s; padding: 6px 0;
+  }
+  .mnav-btn.active {
+    color: var(--accent); background: rgba(0,212,255,0.06);
+    border-top: 2px solid var(--accent);
+  }
+  .mnav-btn:hover:not(.active) { color: var(--text); }
+  .mnav-icon  { font-size: 18px; line-height: 1; }
+  .mnav-label { font-family:'Rajdhani',sans-serif; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+
+  .news-bar { bottom: 58px; }
+
+  .sidebar-mobile-view {
+    display: flex !important;
+    position: fixed; inset: 0;
+    bottom: 116px; top: 110px;
+    background: var(--bg); z-index: 120;
+    overflow-y: auto; flex-direction: column;
+  }
+  .view-hidden { display: none !important; }
+}
