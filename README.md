@@ -1,129 +1,130 @@
-# 📈 Los Santos Exchange – LCN
+# 📈 Los Santos Exchange (LSX)
 
-> A GTA V-inspired browser stock market simulation.  
-> Trade stocks, react to breaking news, short sell, set limit orders  
-> and grow your portfolio – all in your browser, no backend required.
+> A real-time stock market simulation game set in the GTA V universe — trade stocks, short sell, react to breaking news, and climb the leaderboard.
 
-![Version](https://img.shields.io/badge/version-2.5-00d4ff)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Platform](https://img.shields.io/badge/platform-Browser%20%2F%20PWA-blueviolet)
+![LSX Banner](https://los-santos-exchange.de/og-image.png)
 
 ---
 
 ## 🎮 Features
 
-### 📊 Market Overview
-- **33 stocks** across 7 sectors: FOOD · PHARMA · FINANCE · TRANSPORT · ENERGY · RETAIL · MEDIA
-- **Live price simulation** with volatility, drift and rival system
-- **Market Summary Bar** – Sentiment, Avg%, Gainers/Losers, TOP & FLOP
-- **Top Movers Panel** – Top 3 by absolute 24H performance
-- **Sortable columns** – PRICE / CHG / 24H / HELD
-- **Live search** – filter by ticker or company name
-- **Heatmap mode** – color-coded grid view by performance intensity
-- **Sector filter tabs** – ALL / FOOD / PHARMA / FINANCE / TRANSPORT / ENERGY / RETAIL / MEDIA
-- **Weekday effects** – MON surge, FRI sell-off, quiet weekends
-
-### 📰 News System
-- **Breaking news events** with **30-second reaction window**
-- Countdown timer + progress bar before price impact
-- 40+ unique news events across all stocks
-- Scrolling news bar at the bottom
-
-### 💹 Trading
-- **Buy / Sell** with quantity presets (1 / 10 / 50 / 100 / MAX)
-- **Limit Orders** – BUY below / SELL above target price
-- **Stop-Loss** – auto-sell at configurable loss percentage
-- **Short Selling** – open/cover shorts with collateral & borrow fees
-- **Insider Tips** – mysterious contact tips every 90s (70% accuracy)
-- **Price Alerts** – notify when a stock hits your target price
-- **Transaction fees** on every trade
-
-### 📱 Stock Detail Modal
-- Live price chart with **15T / 30T / 60T** timeframe toggle
-- Extended stats: HIGH/LOW · ALL-TIME H/L · VOL · MKT CAP · SECTOR
-- **Rival Quick-Link** – click rival ticker to open their modal
-- Short position status with live P&L
-- Limit order & stop-loss setup
-- Watchlist toggle
-
-### 💼 Portfolio & Sidebar
-- **3 Sidebar Tabs**: MARKET · PORTFOLIO · HISTORY
-- Holdings with live P&L per position
-- Short positions panel
-- Net Worth chart (last 60 ticks)
-- Trade History (last 50 trades)
-- Stats: Net Worth · Return · Trades · Realized P&L · Best/Worst Trade
-- Watchlist with live prices
-
-### 💾 Save System
-- **3 save slots** with net worth preview
-- Auto-save every 30 seconds
-- Time compression on load (simulates missed ticks)
-- PWA installable on mobile/tablet
-
-### 📲 Responsive Layout
-- Full **tablet & mobile support** (≤ 1024px)
-- Bottom navigation bar: MARKET · PORTFOLIO · HISTORY
-- Compact header, scrollable panels
-- Touch-optimized modals
+- **60+ GTA V stocks** across 8 sectors (FOOD, FINANCE, TECH, TRANSPORT, ENERGY, RETAIL, PHARMA, MEDIA)
+- **Real-time price simulation** with rival stock correlation, weekday volatility effects and sector news events
+- **Short selling** with daily borrow fees and stop-loss protection
+- **Limit orders & stop-losses** — set it and forget it
+- **Dividend payouts** every 7 game days based on sector
+- **Insider tips** — 70% accuracy, use them wisely
+- **30-second news reaction window** — act before the market does
+- **Heatmap & Top Movers** panel for market overview
+- **Discord OAuth login** — your progress is saved server-side per account
+- **PWA support** — installable on mobile and desktop
+- **Discord Webhook** notifications for big trades and milestones
 
 ---
 
-## 🗂 File Structure
-LSX-Lokal-Storage-Game/
-├── index.html # UI structure – header, market table, modals, sidebar
-├── script.js # Complete game logic (~50KB)
-└── style.css # Dark trading terminal theme (~25KB)
+## 🛠️ Tech Stack
 
-
----
-
-## 🚀 Getting Started
-
-No install required. Just open `index.html` in any modern browser.
-
-```bash
-git clone https://github.com/DrBroty/LSX-Lokal-Storage-Game.git
-cd LSX-Lokal-Storage-Game
-open index.html
-```
-
-Or serve locally:
-```bash
-npx serve .
-# → http://localhost:3000
-```
-
----
-
-## 🗺 Roadmap
-
-| Version | Feature |
+| Layer | Technology |
 |---|---|
-| ✅ v2.1 | News reaction window (30s), Bug fixes |
-| ✅ v2.2 | Extended news events (40+) |
-| ✅ v2.3 | News toast over modal, trade button in toast |
-| ✅ v2.4 | Sidebar tabs, Short selling, Insider tips, Portfolio chart, Trade history, Weekday effects |
-| ✅ v2.5 | Market redesign, Modal improvements, Mobile responsive |
-| 🔜 v2.6 | News history, Candlestick chart, Bull/Bear market phases, Keyboard shortcuts, Speed control |
+| Frontend | Vanilla JS, HTML5, CSS3, Canvas API |
+| Backend | PHP 8, Discord OAuth2 |
+| Storage | Server-side JSON per Discord user |
+| Auth | Discord OAuth2 (`identify` scope) |
+| Hosting | Netcup Webhosting |
+| PWA | Service Worker, Web App Manifest |
 
 ---
 
-## 🛠 Built With
+## 🚀 Setup
 
-- Vanilla JavaScript (no frameworks)
-- HTML5 Canvas (charts)
-- CSS3 (dark theme, animations)
-- LocalStorage (persistence)
-- PWA manifest (installable)
+### 1. Discord App erstellen
+- Gehe zu [discord.com/developers/applications](https://discord.com/developers/applications)
+- Neue App erstellen → OAuth2 → Redirect URI hinzufügen:
+https://deinedomain.de/lsx-proxy/oauth.php
+
+
+### 2. `lsx-proxy/config.php` anlegen
+```php
+<?php
+ini_set('session.cookie_samesite', 'None');
+ini_set('session.cookie_secure',   '1');
+ini_set('session.cookie_httponly', '1');
+session_start();
+
+define('DISCORD_CLIENT_ID',     'DEINE_CLIENT_ID');
+define('DISCORD_CLIENT_SECRET', 'DEIN_CLIENT_SECRET');
+define('DISCORD_REDIRECT_URI',  'https://deinedomain.de/lsx-proxy/oauth.php');
+define('DISCORD_WEBHOOK_URL',   'DEIN_WEBHOOK_URL');
+define('SAVES_DIR',             __DIR__ . '/saves/');
+define('SESSION_SECRET',        'ZUFAELLIGER_STRING');
+
+if (!is_dir(SAVES_DIR)) mkdir(SAVES_DIR, 0755, true);
+```
+
+### 3. Dateien hochladen
+httpdocs/
+├── index.html
+├── style.css
+├── script.js
+├── sw.js
+├── manifest.json
+└── lsx-proxy/
+├── config.php
+├── oauth.php
+├── save.php
+├── load.php
+├── logout.php
+├── webhook.php
+└── saves/ ← wird automatisch erstellt
+
+
+### 4. Testen
+| URL | Erwartete Antwort |
+|---|---|
+| `/lsx-proxy/load.php` | `{"error":"Not logged in"}` |
+| `/lsx-proxy/oauth.php` | Weiterleitung zu Discord |
+| Nach Login: `/lsx-proxy/load.php` | `{"newGame":true}` oder Spielstand |
 
 ---
 
-## 📄 License
+## 💰 Trading Fees
 
-MIT – feel free to fork and build on it.
+| Volumen | Fee |
+|---|---|
+| unter $1.000 | $25 flat |
+| $1.000 – $9.999 | 1.20% |
+| $10.000 – $49.999 | 0.80% |
+| $50.000 – $199.999 | 0.50% |
+| ab $200.000 | 0.25% |
 
 ---
 
-*Los Santos Exchange is a fan project inspired by GTA V's LCN stock market.*  
-*Not affiliated with Rockstar Games.*
+## 📁 Projektstruktur
+script.js — Komplette Spiellogik (Simulation, Trading, UI, News, Save/Load)
+style.css — Dark-Theme UI, responsive
+index.html — Shell, alle DOM-Elemente
+sw.js — Service Worker (Cache First, PHP bypass)
+manifest.json — PWA Manifest
+lsx-proxy/ — PHP Backend (OAuth, Save, Load, Webhook)
+
+
+---
+
+## 🔒 Sicherheit
+
+- Spielstände werden serverseitig unter `saves/<discord_id>.json` gespeichert
+- Kein Spieler kann auf fremde Saves zugreifen
+- Session läuft über PHP mit `SameSite=None; Secure; HttpOnly`
+- Discord Secrets niemals in den Code committen — nur in `config.php` (nicht im Repo)
+
+---
+
+## 📜 Lizenz
+
+This project is for entertainment purposes only.  
+GTA V and all related assets are property of **Rockstar Games**.  
+LSX is a fan-made project with no commercial intent.
+
+---
+
+*Built with 💚 for the streets of Los Santos*
