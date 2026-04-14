@@ -1619,7 +1619,7 @@ async function checkLogin() {
     if (data.user) showUserBadge(data.user);
     document.getElementById('loginScreen').style.display = 'none';
 
-    if (data.newGame) {
+    if (data.newGame || data._hardReset) {
       initState();
     } else {
       const base = defaultState();
@@ -1811,13 +1811,13 @@ document.getElementById('btnHardReset').addEventListener('click', async () => {
   const ok = await showConfirm('🧨', 'Hard Reset', 'Save will be permanently deleted. No undo.');
   if (!ok) return;
   stopTimers();
-  initState();
-  fetch(API + '/save.php', {
+  await fetch(API + '/save.php', {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(defaultState())
-  }).then(() => location.reload());
+    body: JSON.stringify({ ...defaultState(), _hardReset: true }) // ← Flag setzen
+  });
+  location.reload();
 });
 
 document.addEventListener('keydown', e => {
@@ -1928,6 +1928,15 @@ document.getElementById('btnCloseShort').addEventListener('click', () => {
   refreshModal();
 });
 
+document.getElementById('confirmYes').addEventListener('click', () => {
+  document.getElementById('confirmBackdrop').classList.remove('open');
+  if (confirmResolve) { confirmResolve(true); confirmResolve = null; }
+});
+document.getElementById('confirmNo').addEventListener('click', () => {
+  document.getElementById('confirmBackdrop').classList.remove('open');
+  if (confirmResolve) { confirmResolve(false); confirmResolve = null; }
+});
+
 // ── SORTIERUNG ────────────────────────────────────────
 document.querySelector('.stock-table thead').addEventListener('click', e => {
   const th = e.target.closest('.sortable');
@@ -1951,7 +1960,7 @@ document.getElementById('searchInput').addEventListener('input', e => {
 // ── HEATMAP TOGGLE ────────────────────────────────────
 document.getElementById('btnHeatmap').addEventListener('click', () => {
   heatmapMode = !heatmapMode;
-  document.getElementById('tableView').style.display   = heatmapMode ? 'none'  : 'block';
+  document.getElementById('stockTableBody').style.display   = heatmapMode ? 'none'  : 'block';
   document.getElementById('heatmapView').style.display = heatmapMode ? 'grid'  : 'none';
   document.getElementById('btnHeatmap').textContent    = heatmapMode ? '📋 TABLE' : '⬛ HEATMAP';
   if (heatmapMode) renderHeatmap();
@@ -1983,11 +1992,11 @@ function clearPriceAlert(ticker) {
 }
 
 // ── CHART RANGE TOGGLE ────────────────────────────────
-document.querySelector('.chart-range-btns').addEventListener('click', e => {
-  const btn = e.target.closest('.chart-range-btn');
+document.querySelector('.crbs').addEventListener('click', e => {
+  const btn = e.target.closest('.crb');
   if (!btn) return;
   chartRange = parseInt(btn.dataset.range);
-  document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.crb').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   if (modalTicker) drawChart('modalChart', modalTicker, 200, 120);
 });
