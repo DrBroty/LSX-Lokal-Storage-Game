@@ -1,4 +1,5 @@
-const CACHE = 'lsx-v2';
+const CACHE = 'lsx-v3'; // ← hochgezählt von v2
+
 const ASSETS = [
   './',
   './index.html',
@@ -25,6 +26,15 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+
+  // ── PHP / API niemals cachen ──────────────────────────
+  if (url.pathname.includes('.php') || url.pathname.includes('lsx-proxy')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+
+  // ── Assets: Cache First ───────────────────────────────
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
