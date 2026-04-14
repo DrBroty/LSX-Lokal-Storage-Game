@@ -1663,9 +1663,6 @@ async function checkLogin() {
         state.lastMilestone = Math.max(0, ...milestones.filter(m => nw >= m));
       }
 
-      await saveGame(); // sofort persistieren
-
-
       await saveGame();
 
       compressTime();
@@ -1676,11 +1673,17 @@ async function checkLogin() {
     renderAll();
     renderNews();
 
-  } catch(e) {
-    console.error(e);
-    showToast('Verbindung zum Server fehlgeschlagen', true);
-    showLoginScreen();
-  }
+    } catch(e) {
+      console.error(e);
+      // Nur bei Netzwerkfehler zum Login, nicht bei JS-Fehlern
+      if (e instanceof TypeError && e.message.includes('fetch')) {
+        showToast('Verbindung zum Server fehlgeschlagen', true);
+        showLoginScreen();
+      } else {
+        showToast('Fehler beim Laden: ' + e.message, true);
+        // KEIN showLoginScreen() hier
+      }
+    }
 }
 
 // ═══════════════════════════════════════════════════════
