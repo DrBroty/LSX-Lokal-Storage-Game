@@ -548,15 +548,25 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 
 /* ── TOAST (id="toastEl") ───────────────────── */
 #toastEl, #toast {
-  position:fixed; bottom:36px; right:20px;
-  background:var(--panel2); border-radius:8px; padding:12px 18px;
-  border-left:4px solid var(--green); font-size:14px; font-weight:600;
-  box-shadow:0 10px 40px rgba(0,0,0,0.7);
-  transform:translateX(160%); transition:transform .3s ease;
-  z-index:500; max-width:320px; color:var(--text);
+  position: fixed;
+  /* Direkt über der news-bar (26px hoch) — 4px Luft */
+  bottom: 34px;
+  right: 20px;
+  background: var(--panel2);
+  border-radius: 8px;
+  padding: 12px 18px;
+  border-left: 4px solid var(--green);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  transform: translateX(160%);
+  transition: transform .3s ease;
+  z-index: 500;
+  max-width: 320px;
+  color: var(--text);
 }
-#toastEl.show,  #toast.show  { transform:translateX(0); }
-#toastEl.error, #toast.error { border-left-color:var(--red); }
+#toastEl.show,  #toast.show  { transform: translateX(0); }
+#toastEl.error, #toast.error { border-left-color: var(--red); }
 
 /* ── NEWS BAR ───────────────────────────────── */
 .news-bar {
@@ -750,9 +760,6 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
     display: flex;
   }
 
-  /* Legacy .sidebar – NICHT verstecken */
-  /* .sidebar { display: none; }  ← ENTFERNT */
-
   header {
     flex-wrap: wrap;
     gap: 8px;
@@ -769,6 +776,14 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 
   .modal-box { width: 95vw; }
   .modal     { width: 95vw; }
+
+  /* News-Bar wandert über die Mobile-Nav */
+  .news-bar { bottom: 58px; }
+
+  /* Toast über News-Bar (26px) + Mobile-Nav (58px) + 8px Luft */
+  #toastEl, #toast {
+    bottom: 92px;
+  }
 }
 
 /* ── MOBILE (≤ 768px) ───────────────────────── */
@@ -829,8 +844,6 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
   .mnav-icon  { font-size: 18px; line-height: 1; }
   .mnav-label { font-family:'Rajdhani',sans-serif; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
 
-  .news-bar { bottom: 58px; }
-
   .sidebar-mobile-view {
     display: flex !important;
     position: fixed; inset: 0;
@@ -857,49 +870,4 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 #heatmapView[style*="display: grid"],
 #heatmapView[style*="display:grid"] {
   display: grid !important;
-}
-
-/* ── Einzelne Heatmap-Kachel ── */
-.hm-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: 10px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.07);
-  cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease;
-  min-height: 80px;
-  text-align: center;
-}
-
-.hm-cell:hover {
-  transform: scale(1.04);
-  border-color: rgba(0,212,255,0.4);
-}
-
-.hm-ticker {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 1px;
-}
-
-.hm-chg {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.hm-price {
-  font-size: 10px;
-  color: rgba(255,255,255,0.6);
-}
-
-.hm-held {
-  font-size: 9px;
-  color: var(--gold, #ffd700);
-  margin-top: 2px;
 }
