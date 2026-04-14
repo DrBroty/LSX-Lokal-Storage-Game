@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LSX Admin Panel</title>
+  <link rel="stylesheet" href="/assets/css/admin.css"/>
+</head>
+<body>
+
+<h1>📈 LSX ADMIN PANEL</h1>
+
+<!-- Status -->
+<div id="status"></div>
+
+<!-- ── LOAD USER ── -->
+<div class="card">
+  <h2>🔍 LOAD USER</h2>
+  <label>Discord User ID</label>
+  <div class="row">
+    <input id="discordId" type="text" placeholder="z.B. 123456789012345678">
+    <div style="flex:0">
+      <button onclick="loadUser()">LOAD</button>
+      <button class="red" onclick="deleteUser()">DELETE SAVE</button>
+    </div>
+  </div>
+  <div id="userInfo" style="display:none;">
+    <div id="userTags"></div>
+    <div id="saveData"></div>
+  </div>
+</div>
+
+<!-- ── CASH ── -->
+<div class="card" id="cardCash" style="display:none;">
+  <h2>💵 CASH</h2>
+  <div class="row">
+    <div>
+      <label>Aktuelles Cash</label>
+      <input id="currentCash" type="text" disabled>
+    </div>
+    <div>
+      <label>Neuer Wert ($)</label>
+      <input id="newCash" type="number" placeholder="z.B. 500000">
+    </div>
+  </div>
+  <button onclick="setCash()">SET CASH</button>
+  <button class="gray" onclick="addCash(100000)">+$100K</button>
+  <button class="gray" onclick="addCash(500000)">+$500K</button>
+  <button class="gray" onclick="addCash(1000000)">+$1M</button>
+  <button class="red"  onclick="addCash(-100000)">-$100K</button>
+</div>
+
+<!-- ── STATS ── -->
+<div class="card" id="cardStats" style="display:none;">
+  <h2>📊 STATS</h2>
+  <div class="row">
+    <div>
+      <label>Start Cash ($)</label>
+      <input id="statStartCash" type="number">
+    </div>
+    <div>
+      <label>Realized P&L ($)</label>
+      <input id="statPnl" type="number">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Total Trades</label>
+      <input id="statTrades" type="number">
+    </div>
+    <div>
+      <label>Total Fees Paid ($)</label>
+      <input id="statFees" type="number">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>Best Trade ($)</label>
+      <input id="statBest" type="number">
+    </div>
+    <div>
+      <label>Worst Trade ($)</label>
+      <input id="statWorst" type="number">
+    </div>
+  </div>
+  <button onclick="saveStats()">SAVE STATS</button>
+</div>
+
+<!-- ── HOLDINGS ── -->
+<div class="card" id="cardHoldings" style="display:none;">
+  <h2>📦 HOLDINGS</h2>
+  <table class="holdings-table">
+    <thead>
+      <tr>
+        <th>TICKER</th>
+        <th>QTY</th>
+        <th>AVG COST ($)</th>
+        <th>ACTION</th>
+      </tr>
+    </thead>
+    <tbody id="holdingsBody"></tbody>
+  </table>
+  <div style="margin-top:16px;">
+    <h2>➕ HOLDING HINZUFÜGEN</h2>
+    <div class="row">
+      <div>
+        <label>Ticker</label>
+        <input id="addTicker" type="text" placeholder="z.B. MAZE">
+      </div>
+      <div>
+        <label>Qty</label>
+        <input id="addQty" type="number" placeholder="100">
+      </div>
+      <div>
+        <label>Avg Cost ($)</label>
+        <input id="addAvgCost" type="number" placeholder="218.50">
+      </div>
+    </div>
+    <button onclick="addHolding()">ADD HOLDING</button>
+  </div>
+</div>
+
+<!-- ── MILESTONE RESET ── -->
+<div class="card" id="cardMilestone" style="display:none;">
+  <h2>🏆 MILESTONE</h2>
+  <div class="row">
+    <div>
+      <label>lastMilestone ($)</label>
+      <input id="milestoneVal" type="number">
+    </div>
+  </div>
+  <button onclick="saveMilestone()">SET MILESTONE</button>
+  <button class="red" onclick="resetMilestone()">RESET → 0</button>
+</div>
+
+<!-- ── DANGER ZONE ── -->
+<div class="card" id="cardDanger" style="display:none;">
+  <h2>🧨 DANGER ZONE</h2>
+  <button class="red" onclick="resetGame()">FULL GAME RESET</button>
+  <button class="red" onclick="clearHoldings()">CLEAR ALL HOLDINGS</button>
+  <button class="red" onclick="clearShorts()">CLEAR ALL SHORTS</button>
+  <button class="red" onclick="clearOrders()">CLEAR LIMIT ORDERS</button>
+</div>
+
+<script src="/assets/js/admin.js"></script>
+</body>
+</html>
