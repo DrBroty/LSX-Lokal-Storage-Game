@@ -1659,6 +1659,12 @@ async function checkLogin() {
         }
       });
       
+
+        // ← TEMP: in Konsole prüfen
+      console.log('lastMilestone aus Save:', state.lastMilestone);
+      console.log('cash:', state.cash);
+
+
       await saveGame();
 
       compressTime();
