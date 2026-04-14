@@ -1828,15 +1828,6 @@ document.getElementById('btnHardReset').addEventListener('click', async () => {
   }).then(() => location.reload());
 });
 
-document.getElementById('btnConfirmOk').addEventListener('click', () => {
-  document.getElementById('confirmBackdrop').classList.remove('open');
-  if (confirmResolve) { confirmResolve(true); confirmResolve = null; }
-});
-document.getElementById('btnConfirmCancel').addEventListener('click', () => {
-  document.getElementById('confirmBackdrop').classList.remove('open');
-  if (confirmResolve) { confirmResolve(false); confirmResolve = null; }
-});
-
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('stockModal').classList.contains('open')) closeModal();
