@@ -1620,6 +1620,7 @@ function showLoginScreen() {
 async function checkLogin() {
   try {
     const resp = await fetch(API + '/load.php', { credentials: 'include' });
+    console.log('Status:', resp.status); // ← temporär zum Debugge
 
     if (resp.status === 401) {
       showLoginScreen();
@@ -1627,6 +1628,7 @@ async function checkLogin() {
     }
 
     const data = await resp.json();
+    console.log('Data:', data); // ← temporär zum Debuggen
 
     if (data.newGame) {
       initState();
