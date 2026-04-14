@@ -269,14 +269,14 @@ const FEE_TIER_4      = 0.0025;  // 0.25% · ab $200.000
 
 // ── DIVIDENDS ─────────────────────────────────────────
 const DIVIDEND_RATES = {
-  FINANCE:   0.010,  // 1.0% alle 7 Spieltage
-  FOOD:      0.008,  // 0.8%
-  ENERGY:    0.007,  // 0.7%
-  RETAIL:    0.006,  // 0.6%
-  PHARMA:    0.005,  // 0.5%
-  TRANSPORT: 0.004,  // 0.4%
-  MEDIA:     0.003,  // 0.3%
-  TECH:      0.002,  // 0.2%
+  FINANCE:   [0.010, '1.0'],
+  FOOD:      [0.008, '0.8'],
+  ENERGY:    [0.007, '0.7'],
+  RETAIL:    [0.006, '0.6'],
+  PHARMA:    [0.005, '0.5'],
+  TRANSPORT: [0.004, '0.4'],
+  MEDIA:     [0.003, '0.3'],
+  TECH:      [0.002, '0.2'],
 };
 const DIVIDEND_INTERVAL_DAYS = 7;
 
@@ -336,7 +336,7 @@ function defaultState() {
     realizedPnl:    0,
     bestTrade:      0,
     worstTrade:     0,
-    startCash:      100000,
+    startCash:      50000,
     totalFeesPaid:  0,       
     totalDividends: 0,       
     },
@@ -1581,7 +1581,7 @@ function showLoginScreen() {
 async function checkLogin() {
   try {
     const resp = await fetch(API + '/load.php', { credentials: 'include' });
-    console.log('Status:', resp.status); // ← temporär zum Debugge
+    console.log('Status:', resp.status);
 
     if (resp.status === 401) {
       showLoginScreen();
@@ -1589,28 +1589,40 @@ async function checkLogin() {
     }
 
     const data = await resp.json();
-    console.log('Data:', data); // ← temporär zum Debuggen
+    console.log('Data:', data);
 
     if (data.newGame) {
       initState();
     } else {
       const base = defaultState();
       state = { ...base, ...data };
-      // Fehlende Felder nachrüsten (wie loadSlot)
-      if (!state.volumes)         state.volumes        = base.volumes;
-      if (!state.tradeLog)        state.tradeLog       = [];
+
+      if (!state.volumes)         state.volumes         = base.volumes;
+      if (!state.tradeLog)        state.tradeLog        = [];
       if (!state.netWorthHistory) state.netWorthHistory = [];
-      if (!state.shorts)          state.shorts         = {};
-      if (!state.priceAlerts)     state.priceAlerts    = {};
+      if (!state.shorts)          state.shorts          = {};
+      if (!state.priceAlerts)     state.priceAlerts     = {};
+      if (state.lastDividendDay === undefined) state.lastDividendDay = 0;
+
       state.stats = {
         totalTrades:    state.stats?.totalTrades    ?? 0,
         realizedPnl:    state.stats?.realizedPnl    ?? 0,
         bestTrade:      state.stats?.bestTrade      ?? 0,
         worstTrade:     state.stats?.worstTrade     ?? 0,
-        startCash:      state.stats?.startCash      ?? 50000,
+        startCash:      state.stats?.startCash      ?? base.stats.startCash,
         totalFeesPaid:  state.stats?.totalFeesPaid  ?? 0,
         totalDividends: state.stats?.totalDividends ?? 0,
       };
+
+      // Neue Stocks nachrüsten:
+      STOCKS.forEach(s => {
+        if (!state.prices[s.ticker]) {
+          state.prices[s.ticker]    = s.basePrice;
+          state.histories[s.ticker] = [s.basePrice];
+          state.volumes[s.ticker]   = Math.floor(Math.random() * 900000 + 100000);
+        }
+      });
+
       compressTime();
       showToast('📂 Spielstand geladen');
     }
@@ -1620,16 +1632,10 @@ async function checkLogin() {
     renderNews();
 
   } catch(e) {
+    console.error(e);
     showToast('Verbindung zum Server fehlgeschlagen', true);
     showLoginScreen();
   }
-}
-
-// ═══════════════════════════════════════════════════════
-// PROFILE SCREEN OLD
-// ═══════════════════════════════════════════════════════
-function showProfileScreen() {
-  // Ersetzt durch Discord OAuth – siehe checkLogin()
 }
 
 // ═══════════════════════════════════════════════════════
