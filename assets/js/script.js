@@ -1912,15 +1912,15 @@ function fireInsiderTip() {
 }
 
 // Short buttons
-document.getElementById('btnShortOpen').addEventListener('click', () => {
+document.getElementById('btnOpenShort').addEventListener('click', () => {
   if (!modalTicker) return;
-  const qty = parseInt(document.getElementById('mQtyInput').value);
+  const qty = parseInt(document.getElementById('shortQtyInput').value);
   if (!qty || qty < 1) { showToast('Enter a valid quantity', true); return; }
   openShort(modalTicker, qty);
   refreshModal();
 });
 
-document.getElementById('btnShortClose').addEventListener('click', () => {
+document.getElementById('btnCloseShort').addEventListener('click', () => {
   if (!modalTicker) return;
   const sh = state.shorts?.[modalTicker];
   if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
