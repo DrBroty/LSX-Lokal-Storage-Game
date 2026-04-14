@@ -141,6 +141,27 @@ const NEWS_EVENTS = [
 ];
 
 // ═══════════════════════════════════════════════════════
+// FEES AND DIVIDENS (DAYS)
+// ═══════════════════════════════════════════════════════
+
+// ── TRADING FEES ──────────────────────────────────────
+const FEE_FLAT       = 5;       // unter $1.000
+const FEE_STANDARD   = 0.003;   // 0.30%
+const FEE_LARGE      = 0.0015;  // 0.15% ab $10.000
+
+// ── DIVIDENDS ─────────────────────────────────────────
+const DIVIDEND_RATES = {
+  FINANCE:   0.010,  // 1.0% alle 7 Spieltage
+  FOOD:      0.008,  // 0.8%
+  ENERGY:    0.007,  // 0.7%
+  RETAIL:    0.006,  // 0.6%
+  PHARMA:    0.005,  // 0.5%
+  TRANSPORT: 0.004,  // 0.4%
+  MEDIA:     0.003,  // 0.3%
+};
+const DIVIDEND_INTERVAL_DAYS = 7;
+
+// ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
 const SAVE_PREFIX = 'lsx_v2_';
@@ -188,7 +209,17 @@ function defaultState() {
     stopLosses:  {},
     gameDay: 0, gameHour: 8, gameMonth: 0, gameDayOfMonth: 1,
     savedAt: null,
-    stats: { totalTrades:0, realizedPnl:0, bestTrade:0, worstTrade:0, startCash:100000 },
+    // In defaultState() das stats-Objekt ersetzen:
+    stats: {
+    totalTrades:    0,
+    realizedPnl:    0,
+    bestTrade:      0,
+    worstTrade:     0,
+    startCash:      100000,
+    totalFeesPaid:  0,       // NEU
+    totalDividends: 0,       // NEU
+    },
+    lastDividendDay: 0,        // NEU – Spieltag der letzten Ausschüttung
     orderIdSeq: 1,
   };
 }
@@ -255,6 +286,7 @@ function simulateTick(n = 1) {
 
   checkLimitOrders();
   checkStopLosses();
+  checkDividends(); // NEU
   renderAll();
 }
 
@@ -419,6 +451,8 @@ function renderScoreboard() {
     ['RETURN',       (totalReturn>=0?'+':'')+totalReturn.toFixed(1)+'%'],
     ['TRADES',       state.stats.totalTrades],
     ['REALIZED P&L', fmt(state.stats.realizedPnl)],
+    ['DIVIDENDS',    fmt(state.stats.totalDividends)],  // NEU
+    ['FEES PAID',    fmt(state.stats.totalFeesPaid)],   // NEU
     ['BEST TRADE',   fmt(state.stats.bestTrade)],
     ['WORST TRADE',  fmt(Math.abs(state.stats.worstTrade))],
   ];
@@ -551,34 +585,54 @@ function updateWatchBtn() {
 }
 
 // ═══════════════════════════════════════════════════════
+// FEES
+// ═══════════════════════════════════════════════════════
+
+function calcFee(total) {
+  if (total < 1000)  return FEE_FLAT;
+  if (total < 10000) return +(total * FEE_STANDARD).toFixed(2);
+  return +(total * FEE_LARGE).toFixed(2);
+}
+
+
+// ═══════════════════════════════════════════════════════
 // TRADING
 // ═══════════════════════════════════════════════════════
 function executeTrade(ticker, mode, qty) {
   const price = state.prices[ticker];
   const total = qty * price;
+  const fee   = calcFee(total);
+
   if (mode === 'buy') {
-    if (total > state.cash) { showToast('Insufficient funds!', true); return false; }
-    state.cash -= total;
+    if (total + fee > state.cash) {
+      showToast(`Insufficient funds! Need ${fmt(total + fee)} (incl. ${fmt(fee)} fee)`, true);
+      return false;
+    }
+    state.cash -= (total + fee);
     if (!state.holdings[ticker]) state.holdings[ticker] = { qty:0, avgCost:0 };
     const h  = state.holdings[ticker];
     const nt = h.qty * h.avgCost + total;
-    h.qty += qty; h.avgCost = nt / h.qty;
-    showToast(`✓ Bought ${qty} × ${ticker} @ ${fmt(price)}`);
+    h.qty += qty;
+    h.avgCost = nt / h.qty;
+    state.stats.totalFeesPaid += fee;
     state.stats.totalTrades++;
+    showToast(`✓ Bought ${qty} × ${ticker} @ ${fmt(price)} · Fee: ${fmt(fee)}`);
+
   } else {
     if (!state.holdings[ticker] || state.holdings[ticker].qty < qty) {
       showToast('Not enough shares!', true); return false;
     }
     const avg = state.holdings[ticker].avgCost;
-    const pnl = (price - avg) * qty;
-    state.cash += total;
+    const pnl = (price - avg) * qty - fee;
+    state.cash += (total - fee);
     state.holdings[ticker].qty -= qty;
     if (state.holdings[ticker].qty === 0) delete state.holdings[ticker];
-    state.stats.realizedPnl += pnl;
+    state.stats.realizedPnl  += pnl;
+    state.stats.totalFeesPaid += fee;
     if (pnl > state.stats.bestTrade)  state.stats.bestTrade  = pnl;
     if (pnl < state.stats.worstTrade) state.stats.worstTrade = pnl;
     state.stats.totalTrades++;
-    showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)}`);
+    showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
   }
   renderAll();
   return true;
@@ -614,6 +668,34 @@ function checkStopLosses() {
       showNewsEvent(ticker, `Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, -0.02, false);
     }
   });
+}
+
+function checkDividends() {
+  // Nur alle DIVIDEND_INTERVAL_DAYS Spieltage auszahlen
+  const daysSinceLast = state.gameDayOfMonth - (state.lastDividendDay || 0);
+  if (daysSinceLast < DIVIDEND_INTERVAL_DAYS) return;
+
+  let totalPayout = 0;
+  const payouts   = [];
+
+  Object.entries(state.holdings).forEach(([ticker, h]) => {
+    const stock = STOCKS.find(s => s.ticker === ticker);
+    if (!stock) return;
+    const rate    = DIVIDEND_RATES[stock.sector] || 0;
+    if (rate === 0) return;
+    const payout  = +(state.prices[ticker] * h.qty * rate).toFixed(2);
+    if (payout <= 0) return;
+    state.cash += payout;
+    totalPayout += payout;
+    payouts.push(`${ticker} +${fmt(payout)}`);
+    state.stats.totalDividends += payout;
+  });
+
+  if (totalPayout > 0) {
+    state.lastDividendDay = state.gameDayOfMonth;
+    showNewsEvent('💰', `Dividend payout: ${fmt(totalPayout)}`, 0, false);
+    showToast(`💰 Dividends received: ${fmt(totalPayout)}\n${payouts.join(' · ')}`);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -811,14 +893,30 @@ function loadSlot(slot) {
     if (!raw) return false;
     const s = JSON.parse(raw);
     if (!s || !s.prices) return false;
-    state = { ...defaultState(), ...s };
-    // Volumes nachrüsten falls alter Save ohne volumes
-    if (!state.volumes) {
-      state.volumes = {};
-      STOCKS.forEach(st => { state.volumes[st.ticker] = Math.floor(Math.random() * 900000 + 100000); });
-    }
+
+    const base = defaultState();
+    state = { ...base, ...s };
+
+    // Fehlende Felder aus alten Saves nachrüsten
+    if (!state.volumes) state.volumes = base.volumes;
+    if (state.lastDividendDay === undefined) state.lastDividendDay = 0;
+
+    // Stats-Felder einzeln sichern damit keine undefined entstehen
+    state.stats = {
+      totalTrades:    state.stats?.totalTrades    ?? 0,
+      realizedPnl:    state.stats?.realizedPnl    ?? 0,
+      bestTrade:      state.stats?.bestTrade       ?? 0,
+      worstTrade:     state.stats?.worstTrade      ?? 0,
+      startCash:      state.stats?.startCash       ?? 100000,
+      totalFeesPaid:  state.stats?.totalFeesPaid   ?? 0,  // NEU
+      totalDividends: state.stats?.totalDividends  ?? 0,  // NEU
+    };
+
     return true;
-  } catch(e) { localStorage.removeItem(SAVE_PREFIX + slot); return false; }
+  } catch(e) {
+    localStorage.removeItem(SAVE_PREFIX + slot);
+    return false;
+  }
 }
 
 function getSlotMeta(slot) {
