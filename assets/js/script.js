@@ -1807,20 +1807,6 @@ document.getElementById('btnWatch').addEventListener('click', () => {
 
 document.getElementById('btnSave').addEventListener('click', saveGame);
 
-// btnReset ersetzen:
-document.getElementById('btnReset').addEventListener('click', async () => {
-  const ok = await showConfirm('🔄', 'Reset Game', 'Your progress will be reset to $100,000.');
-  if (!ok) return;
-  stopTimers();
-  initState();
-  saveGame();
-  startTimers();
-  renderAll();
-  renderNews();
-  showToast('Game reset');
-});
-
-// btnHardReset ersetzen:
 document.getElementById('btnHardReset').addEventListener('click', async () => {
   const ok = await showConfirm('🧨', 'Hard Reset', 'Save will be permanently deleted. No undo.');
   if (!ok) return;
@@ -1956,7 +1942,7 @@ document.querySelector('.stock-table thead').addEventListener('click', e => {
 });
 
 // ── SUCHE ─────────────────────────────────────────────
-document.getElementById('stockSearch').addEventListener('input', e => {
+document.getElementById('searchInput').addEventListener('input', e => {
   searchQuery = e.target.value;
   if (heatmapMode) renderHeatmap();
   else renderTable();
@@ -2016,14 +2002,6 @@ document.getElementById('btnSetAlert').addEventListener('click', () => {
   const dir = target > state.prices[modalTicker] ? '▲ above' : '▼ below';
   showToast(`🔔 Alert set for ${modalTicker} at ${fmt(target)} (${dir} current)`);
   refreshModal();
-});
-
-// Bei Resize Desktop-Layout wiederherstellen
-window.addEventListener('resize', () => {
-  if (!isMobile()) {
-    document.querySelector('.market-panel').classList.remove('view-hidden');
-    document.querySelector('.sidebar').classList.remove('view-hidden', 'sidebar-mobile-view');
-  }
 });
 
 // ═══════════════════════════════════════════════════════
