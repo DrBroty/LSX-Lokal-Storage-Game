@@ -1753,23 +1753,25 @@ document.getElementById('btnWatch').addEventListener('click', () => {
 
 document.getElementById('btnSave').addEventListener('click', saveGame);
 
+// btnReset ersetzen:
 document.getElementById('btnReset').addEventListener('click', async () => {
-  const ok = await showConfirm('🔄', 'Reset Game', 'Your current progress will be reset to $100,000. This cannot be undone.');
+  const ok = await showConfirm('🔄', 'Reset Game', 'Your progress will be reset to $100,000.');
   if (!ok) return;
   stopTimers();
   initState();
-  saveGame(); // Leeren State auf Server speichern
+  saveGame();
   startTimers();
   renderAll();
   renderNews();
   showToast('Game reset');
 });
 
+// btnHardReset ersetzen:
 document.getElementById('btnHardReset').addEventListener('click', async () => {
-  const ok = await showConfirm('🧨', 'Hard Reset', 'Your save will be permanently deleted. There is no undo.');
+  const ok = await showConfirm('🧨', 'Hard Reset', 'Save will be permanently deleted. No undo.');
   if (!ok) return;
   stopTimers();
-  // Serverseitig löschen
+  initState();
   fetch(API + '/save.php', {
     method: 'POST',
     credentials: 'include',
