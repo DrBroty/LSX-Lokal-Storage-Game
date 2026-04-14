@@ -57,7 +57,7 @@ const NEWS_STATIC = [
 ];
 
 const NEWS_EVENTS = [
-  { msg: 'CEO resigns amid scandal',          impact: -0.15, sector: null },
+  { msg: 'CEO resigns amid scandal',           impact: -0.15, sector: null },
   { msg: 'Record quarterly earnings reported', impact:  0.14, sector: null },
   { msg: 'Government contract awarded',        impact:  0.12, sector: null },
   { msg: 'Product recall announced',           impact: -0.13, sector: null },
@@ -75,6 +75,7 @@ const NEWS_EVENTS = [
 const SAVE_PREFIX = 'lsx_v2_';
 const DAYS   = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const NEWS_REACTION_TIME = 30; // seconds
 
 let state = {};
 let currentFilter = 'ALL';
@@ -84,9 +85,15 @@ let saveIntervalId;
 let priceIntervalId;
 let newsIntervalId;
 let currentSlot   = null;
+let beforeUnloadAdded = false;
+
+// ── Pending news event (30s reaction window) ──
+let pendingNewsEvent   = null; // { ticker, stockObj, eventObj, applyAt }
+let pendingNewsTimer   = null;
+let pendingCountdownId = null;
 
 function defaultState() {
-  const prices = {}, histories = {};
+  const prices = {}, histories = {}, volumes = {};
   STOCKS.forEach(s => {
     const p = +(s.basePrice * (0.85 + Math.random() * 0.3)).toFixed(2);
     prices[s.ticker] = p;
@@ -98,16 +105,18 @@ function defaultState() {
     }
     hist.push(p);
     histories[s.ticker] = hist;
+    // FIX: persistent volume per stock
+    volumes[s.ticker] = Math.floor(Math.random() * 900000 + 100000);
   });
   return {
-    prices, histories,
-    holdings:    {},    // ticker -> { qty, avgCost }
+    prices, histories, volumes,
+    holdings:    {},
     cash:        100000,
-    watchlist:   [],    // [ticker]
-    limitOrders: [],    // { id, ticker, type, price, qty }
-    stopLosses:  {},    // ticker -> pct
+    watchlist:   [],
+    limitOrders: [],
+    stopLosses:  {},
     gameDay: 0, gameHour: 8, gameMonth: 0, gameDayOfMonth: 1,
-    savedAt:     null,
+    savedAt: null,
     stats: { totalTrades:0, realizedPnl:0, bestTrade:0, worstTrade:0, startCash:100000 },
     orderIdSeq: 1,
   };
@@ -123,9 +132,16 @@ function initState() {
 const fmt      = n => '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtShort = n => n >= 1e6 ? '$'+(n/1e6).toFixed(2)+'M' : n >= 1e3 ? '$'+(n/1e3).toFixed(1)+'K' : '$'+n.toFixed(0);
 
-function getPrev(ticker)    { const h=state.histories[ticker]; return h.length<2?state.prices[ticker]:h[h.length-2]; }
-function getChange(ticker)  { const c=state.prices[ticker],p=getPrev(ticker); return ((c-p)/p)*100; }
-function get24h(ticker)     { const h=state.histories[ticker],past=h.length>=12?h[h.length-12]:h[0]; return ((state.prices[ticker]-past)/past)*100; }
+function getPrev(ticker)   { const h=state.histories[ticker]; return h.length<2?state.prices[ticker]:h[h.length-2]; }
+function getChange(ticker) { const c=state.prices[ticker],p=getPrev(ticker); return ((c-p)/p)*100; }
+function get24h(ticker)    { const h=state.histories[ticker],past=h.length>=12?h[h.length-12]:h[0]; return ((state.prices[ticker]-past)/past)*100; }
+
+// Slightly randomize volume each tick so it feels alive, but stays realistic
+function tickVolume(ticker) {
+  const v = state.volumes[ticker];
+  const delta = Math.floor((Math.random() - 0.5) * v * 0.08);
+  state.volumes[ticker] = Math.max(10000, v + delta);
+}
 
 // ═══════════════════════════════════════════════════════
 // PRICE SIMULATION
@@ -141,7 +157,9 @@ function simulateTick(n = 1) {
       state.prices[s.ticker] = np;
       state.histories[s.ticker].push(np);
       if (state.histories[s.ticker].length > 60) state.histories[s.ticker].shift();
+      tickVolume(s.ticker);
 
+      // FIX: Rivals verarbeitet in separatem Pass → kein Überschreiben
       if (s.rival && state.prices[s.rival] !== undefined) {
         updated.add(s.rival);
         const ro = state.prices[s.rival];
@@ -150,6 +168,7 @@ function simulateTick(n = 1) {
         state.prices[s.rival] = rn;
         state.histories[s.rival].push(rn);
         if (state.histories[s.rival].length > 60) state.histories[s.rival].shift();
+        tickVolume(s.rival);
       }
       updated.add(s.ticker);
     });
@@ -168,11 +187,10 @@ function simulateTick(n = 1) {
   renderAll();
 }
 
-// Time compression: simulate missed ticks on load
 function compressTime() {
   if (!state.savedAt) return;
   const elapsed = Date.now() - state.savedAt;
-  const missedTicks = Math.min(Math.floor(elapsed / 4000), 200); // max 200 ticks
+  const missedTicks = Math.min(Math.floor(elapsed / 4000), 200);
   if (missedTicks > 0) {
     simulateTick(missedTicks);
     showToast(`⏩ Simulated ${missedTicks} missed ticks`);
@@ -201,6 +219,9 @@ function renderTable() {
   const filtered = currentFilter === 'ALL' ? STOCKS : STOCKS.filter(s => s.sector === currentFilter);
   const frag = document.createDocumentFragment();
 
+  // Highlight pending news ticker
+  const pendingTicker = pendingNewsEvent ? pendingNewsEvent.ticker : null;
+
   filtered.forEach(s => {
     const chg   = getChange(s.ticker);
     const chg24 = get24h(s.ticker);
@@ -209,10 +230,9 @@ function renderTable() {
     const watched = state.watchlist.includes(s.ticker);
 
     const tr = document.createElement('tr');
-    tr.className = 'stock-row' + (watched ? ' watched' : '');
+    tr.className = 'stock-row' + (watched ? ' watched' : '') + (s.ticker === pendingTicker ? ' news-pending' : '');
     tr.dataset.ticker = s.ticker;
 
-    // Flash animation
     if (prevPrices[s.ticker] !== undefined) {
       if (price > prevPrices[s.ticker])      tr.classList.add('flash-up');
       else if (price < prevPrices[s.ticker]) tr.classList.add('flash-down');
@@ -223,6 +243,7 @@ function renderTable() {
       <td>
         <span class="stock-ticker">${s.ticker}</span>
         ${heldQty > 0 ? `<span class="owned-badge">${heldQty}</span>` : ''}
+        ${s.ticker === pendingTicker ? `<span class="news-badge">📰 NEWS</span>` : ''}
         <span class="stock-name">${s.name}</span>
       </td>
       <td><span class="sector sector-${s.sector.toLowerCase()}">${s.sector}</span></td>
@@ -242,9 +263,11 @@ function renderTable() {
 function makeMiniChart(ticker) {
   const h = state.histories[ticker].slice(-10);
   const min = Math.min(...h), max = Math.max(...h), range = max - min || 1;
+  const last = h[h.length - 1];
   const bars = h.map(v => {
-    const pct = ((v-min)/range*22+4).toFixed(0);
-    const col = v >= h[h.length-1] ? 'var(--red)' : 'var(--green)';
+    const pct = ((v - min) / range * 22 + 4).toFixed(0);
+    // FIX: grün wenn der Balken ÜBER dem letzten Preis liegt (steigend), rot wenn darunter
+    const col = v >= last ? 'var(--green)' : 'var(--red)';
     return `<div class="mini-bar" style="height:${pct}px;background:${col}"></div>`;
   }).join('');
   return `<div class="mini-chart">${bars}</div>`;
@@ -263,27 +286,23 @@ function renderWatchlist() {
   if (!state.watchlist.length) { el.innerHTML = '<div class="watch-empty">No stocks watched.<br>Click a stock → Add to watchlist.</div>'; return; }
   el.innerHTML = state.watchlist.map(ticker => {
     const chg = get24h(ticker); const price = state.prices[ticker];
-    const s = STOCKS.find(x=>x.ticker===ticker);
     return `<div class="watch-item" data-ticker="${ticker}">
       <div><span class="watch-ticker">${ticker}</span><span class="watch-chg ${chg>=0?'up':'down'}" style="margin-left:8px">${chg>=0?'+':''}${chg.toFixed(1)}%</span></div>
       <span class="watch-price ${chg>=0?'up':'down'}">${fmt(price)}</span>
     </div>`;
   }).join('');
 }
-	
+
 function renderPortfolioSidebar() {
   const el = document.getElementById('portfolioEl');
   const entries = Object.entries(state.holdings);
-  if (!entries.length) {
-    el.innerHTML = '<div class="watch-empty">No open positions.</div>';
-    return;
-  }
+  if (!entries.length) { el.innerHTML = '<div class="watch-empty">No open positions.</div>'; return; }
   el.innerHTML = entries.map(([ticker, h]) => {
-    const cur   = state.prices[ticker];
-    const val   = cur * h.qty;
-    const pnl   = (cur - h.avgCost) * h.qty;
-    const pnlPct= (cur - h.avgCost) / h.avgCost * 100;
-    const cls   = pnl >= 0 ? 'up' : 'down';
+    const cur    = state.prices[ticker];
+    const val    = cur * h.qty;
+    const pnl    = (cur - h.avgCost) * h.qty;
+    const pnlPct = (cur - h.avgCost) / h.avgCost * 100;
+    const cls    = pnl >= 0 ? 'up' : 'down';
     return `
       <div class="portfolio-row" data-ticker="${ticker}">
         <div class="portfolio-row-left">
@@ -303,8 +322,8 @@ function renderPortfolioSidebar() {
 document.getElementById('portfolioEl').addEventListener('click', e => {
   const row = e.target.closest('.portfolio-row');
   if (row) openModal(row.dataset.ticker);
-});	
-	
+});
+
 function renderOrders() {
   const el = document.getElementById('ordersEl');
   if (!state.limitOrders.length) { el.innerHTML = '<div class="watch-empty">No active orders.</div>'; return; }
@@ -320,17 +339,17 @@ function renderOrders() {
 }
 
 function renderScoreboard() {
-  const totalVal = Object.entries(state.holdings).reduce((a,[t,h]) => a + h.qty*state.prices[t], 0);
-  const netWorth = state.cash + totalVal;
+  const totalVal   = Object.entries(state.holdings).reduce((a,[t,h]) => a + h.qty*state.prices[t], 0);
+  const netWorth   = state.cash + totalVal;
   const totalReturn = ((netWorth - state.stats.startCash) / state.stats.startCash * 100);
   const el = document.getElementById('scoreGrid');
   const items = [
-    ['NET WORTH',   fmt(netWorth)],
-    ['RETURN',      (totalReturn>=0?'+':'')+totalReturn.toFixed(1)+'%'],
-    ['TRADES',      state.stats.totalTrades],
-    ['REALIZED P&L',fmt(state.stats.realizedPnl)],
-    ['BEST TRADE',  fmt(state.stats.bestTrade)],
-    ['WORST TRADE', fmt(Math.abs(state.stats.worstTrade))],
+    ['NET WORTH',    fmt(netWorth)],
+    ['RETURN',       (totalReturn>=0?'+':'')+totalReturn.toFixed(1)+'%'],
+    ['TRADES',       state.stats.totalTrades],
+    ['REALIZED P&L', fmt(state.stats.realizedPnl)],
+    ['BEST TRADE',   fmt(state.stats.bestTrade)],
+    ['WORST TRADE',  fmt(Math.abs(state.stats.worstTrade))],
   ];
   el.innerHTML = items.map(([lbl,val]) => `
     <div class="score-box">
@@ -359,18 +378,15 @@ function openModal(ticker) {
   refreshModal();
   document.getElementById('mTabBuy').className  = 'trade-tab2 buy-active';
   document.getElementById('mTabSell').className = 'trade-tab2';
-  document.getElementById('btnModalTrade').className = 'btn-modal-trade btn-modal-buy';
+  document.getElementById('btnModalTrade').className   = 'btn-modal-trade btn-modal-buy';
   document.getElementById('btnModalTrade').textContent = 'BUY SHARES';
   document.getElementById('mQtyInput').value = 1;
   updateMTotal();
   document.getElementById('stockModal').classList.add('open');
 
-  // Prefill stop-loss if set
   const sl = state.stopLosses[ticker];
   document.getElementById('stopLossInput').value = sl || '';
   document.getElementById('stopLossStatus').textContent = sl ? `Active: auto-sell at −${sl}% loss` : '';
-
-  // Watch button
   updateWatchBtn();
 }
 
@@ -380,7 +396,7 @@ function closeModal() {
 
 function refreshModal() {
   if (!modalTicker) return;
-  const s = STOCKS.find(x=>x.ticker===modalTicker);
+  const s     = STOCKS.find(x => x.ticker === modalTicker);
   const price = state.prices[modalTicker];
   const chg   = getChange(modalTicker);
   const chg24 = get24h(modalTicker);
@@ -389,18 +405,20 @@ function refreshModal() {
   const lo    = Math.min(...h.slice(-12));
   const held  = state.holdings[modalTicker];
 
+  // FIX: Volumen aus State lesen, nicht random
+  const vol = (state.volumes[modalTicker] || 0).toLocaleString('en-US');
+
   document.getElementById('modalTicker').textContent = s.ticker;
   document.getElementById('modalName').textContent   = s.name + ' · ' + s.sector;
 
   const priceEl = document.getElementById('modalPrice');
-  priceEl.textContent  = fmt(price);
-  priceEl.className    = 'modal-price ' + (chg>=0?'up':'down');
+  priceEl.textContent = fmt(price);
+  priceEl.className   = 'modal-price ' + (chg>=0?'up':'down');
 
   const chgEl = document.getElementById('modalChange');
   chgEl.textContent = (chg24>=0?'+':'')+chg24.toFixed(2)+'% (24H)';
   chgEl.className   = 'modal-change ' + (chg24>=0?'up':'down');
 
-  const vol = (Math.random()*900000+100000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
   document.getElementById('modalStats').innerHTML = `
     <div class="mstat">HIGH <span>${fmt(hi)}</span></div>
     <div class="mstat">LOW  <span>${fmt(lo)}</span></div>
@@ -471,7 +489,7 @@ function executeTrade(ticker, mode, qty) {
     if (total > state.cash) { showToast('Insufficient funds!', true); return false; }
     state.cash -= total;
     if (!state.holdings[ticker]) state.holdings[ticker] = { qty:0, avgCost:0 };
-    const h = state.holdings[ticker];
+    const h  = state.holdings[ticker];
     const nt = h.qty * h.avgCost + total;
     h.qty += qty; h.avgCost = nt / h.qty;
     showToast(`✓ Bought ${qty} × ${ticker} @ ${fmt(price)}`);
@@ -480,8 +498,8 @@ function executeTrade(ticker, mode, qty) {
     if (!state.holdings[ticker] || state.holdings[ticker].qty < qty) {
       showToast('Not enough shares!', true); return false;
     }
-    const avg  = state.holdings[ticker].avgCost;
-    const pnl  = (price - avg) * qty;
+    const avg = state.holdings[ticker].avgCost;
+    const pnl = (price - avg) * qty;
     state.cash += total;
     state.holdings[ticker].qty -= qty;
     if (state.holdings[ticker].qty === 0) delete state.holdings[ticker];
@@ -506,9 +524,9 @@ function checkLimitOrders() {
     if (o.type === 'sell-above' && price >= o.price) fired.push({ ...o, mode:'sell' });
   });
   fired.forEach(o => {
-    state.limitOrders = state.limitOrders.filter(x=>x.id!==o.id);
+    state.limitOrders = state.limitOrders.filter(x => x.id !== o.id);
     executeTrade(o.ticker, o.mode, o.qty);
-    showNewsEvent(o.ticker, `Limit order triggered: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(state.prices[o.ticker])}`, o.mode==='buy'?0.01:-0.01);
+    showNewsEvent(o.ticker, `Limit order triggered: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(state.prices[o.ticker])}`, o.mode==='buy'?0.01:-0.01, false);
   });
 }
 
@@ -522,55 +540,100 @@ function checkStopLosses() {
       const qty = h.qty;
       delete state.stopLosses[ticker];
       executeTrade(ticker, 'sell', qty);
-      showNewsEvent(ticker, `Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, -0.02);
+      showNewsEvent(ticker, `Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, -0.02, false);
     }
   });
 }
 
 // ═══════════════════════════════════════════════════════
-// NEWS EVENTS
+// NEWS EVENTS – 30s REACTION WINDOW
 // ═══════════════════════════════════════════════════════
+
+/**
+ * Kündigt ein News-Event an. Der Kurseffekt wird erst nach NEWS_REACTION_TIME
+ * Sekunden angewendet. Der Spieler sieht Ticker + Richtung und kann vorher handeln.
+ */
 function fireNewsEvent() {
-  const s = STOCKS[Math.floor(Math.random() * STOCKS.length)];
+  // Nur ein pending Event gleichzeitig
+  if (pendingNewsEvent) return;
+
+  const s  = STOCKS[Math.floor(Math.random() * STOCKS.length)];
   const ev = NEWS_EVENTS[Math.floor(Math.random() * NEWS_EVENTS.length)];
-  const old = state.prices[s.ticker];
-  const np  = Math.max(1, +(old * (1 + ev.impact)).toFixed(2));
-  state.prices[s.ticker] = np;
-  state.histories[s.ticker].push(np);
-  showNewsEvent(s.ticker, `${s.name}: ${ev.msg}`, ev.impact);
+
+  pendingNewsEvent = { ticker: s.ticker, stockObj: s, eventObj: ev };
+
+  // Toast mit Countdown anzeigen
+  showNewsEvent(s.ticker, `${s.name}: ${ev.msg}`, ev.impact, true);
+
+  // Countdown-Display updaten
+  let remaining = NEWS_REACTION_TIME;
+  pendingCountdownId = setInterval(() => {
+    remaining--;
+    updateNewsCountdown(remaining);
+    if (remaining <= 0) {
+      clearInterval(pendingCountdownId);
+      pendingCountdownId = null;
+    }
+  }, 1000);
+
+  // Kursänderung nach 30s anwenden
+  pendingNewsTimer = setTimeout(() => {
+    applyPendingNews();
+  }, NEWS_REACTION_TIME * 1000);
+
+  // Zeile in der Tabelle hervorheben
+  renderTable();
+}
+
+function applyPendingNews() {
+  if (!pendingNewsEvent) return;
+  const { ticker, stockObj, eventObj } = pendingNewsEvent;
+
+  const old = state.prices[ticker];
+  const np  = Math.max(1, +(old * (1 + eventObj.impact)).toFixed(2));
+  state.prices[ticker] = np;
+  state.histories[ticker].push(np);
+
+  pendingNewsEvent = null;
+  clearInterval(pendingCountdownId);
+  pendingCountdownId = null;
+  pendingNewsTimer   = null;
+
+  closeNewsToast();
+  showToast(`📰 News applied: ${ticker} ${eventObj.impact >= 0 ? '▲' : '▼'} ${(Math.abs(eventObj.impact)*100).toFixed(1)}%`);
   renderAll();
 }
 
-let newsEventTimer = null;
+let newsEventTimerToast = null;
 
-function showNewsEvent(ticker, msg, impact) {
-  const el = document.getElementById('newsEventToast');
+function showNewsEvent(ticker, msg, impact, withCountdown = false) {
+  const el  = document.getElementById('newsEventToast');
   const dir = impact >= 0 ? '▲' : '▼';
   const col = impact >= 0 ? 'var(--green)' : 'var(--red)';
+  const countdownHtml = withCountdown
+    ? `<div id="newsCountdownRow" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span style="font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;">MARKET REACTS IN</span>
+        <span id="newsCountdownVal" style="font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;color:var(--gold);">${NEWS_REACTION_TIME}s</span>
+       </div>`
+    : '';
 
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
       <div>
         <span class="net-ticker">${ticker}</span>
-        <span class="net-impact" style="color:${col};margin-left:6px">${dir}${(Math.abs(impact)*100).toFixed(1)}%</span><br>
+        <span class="net-impact" style="color:${col};margin-left:6px">${dir}${(Math.abs(impact)*100).toFixed(1)}% INCOMING</span><br>
         <span style="font-size:12px;color:var(--dim);line-height:1.5">${msg}</span>
       </div>
       <button onclick="closeNewsToast()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;line-height:1;padding:0;flex-shrink:0">✕</button>
     </div>
-    <div id="newsProgressBar" style="
-      margin-top:10px;height:3px;border-radius:2px;
-      background:rgba(255,255,255,0.08);overflow:hidden;">
-      <div id="newsProgressFill" style="
-        height:100%;width:100%;border-radius:2px;
-        background:${col};
-        transition:width 30s linear;
-      "></div>
+    ${countdownHtml}
+    <div id="newsProgressBar" style="margin-top:10px;height:3px;border-radius:2px;background:rgba(255,255,255,0.08);overflow:hidden;">
+      <div id="newsProgressFill" style="height:100%;width:100%;border-radius:2px;background:${col};transition:width ${NEWS_REACTION_TIME}s linear;"></div>
     </div>`;
 
   el.classList.add('show');
 
-  // Fortschrittsbalken starten (minimale Verzögerung für CSS-Transition)
-  clearTimeout(newsEventTimer);
+  clearTimeout(newsEventTimerToast);
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const fill = document.getElementById('newsProgressFill');
@@ -578,11 +641,24 @@ function showNewsEvent(ticker, msg, impact) {
     });
   });
 
-  newsEventTimer = setTimeout(() => el.classList.remove('show'), 30000);
+  // Toast bleibt bis Event angewendet wurde (kein auto-close bei countdown)
+  if (!withCountdown) {
+    newsEventTimerToast = setTimeout(() => el.classList.remove('show'), 30000);
+  }
+}
+
+function updateNewsCountdown(remaining) {
+  const el = document.getElementById('newsCountdownVal');
+  if (el) {
+    el.textContent = remaining + 's';
+    if (remaining <= 10) el.style.color = 'var(--red)';
+    else if (remaining <= 20) el.style.color = 'orange';
+    else el.style.color = 'var(--gold)';
+  }
 }
 
 function closeNewsToast() {
-  clearTimeout(newsEventTimer);
+  clearTimeout(newsEventTimerToast);
   document.getElementById('newsEventToast').classList.remove('show');
 }
 
@@ -605,6 +681,11 @@ function loadSlot(slot) {
     const s = JSON.parse(raw);
     if (!s || !s.prices) return false;
     state = { ...defaultState(), ...s };
+    // Volumes nachrüsten falls alter Save ohne volumes
+    if (!state.volumes) {
+      state.volumes = {};
+      STOCKS.forEach(st => { state.volumes[st.ticker] = Math.floor(Math.random() * 900000 + 100000); });
+    }
     return true;
   } catch(e) { localStorage.removeItem(SAVE_PREFIX + slot); return false; }
 }
@@ -624,16 +705,26 @@ function startTimers() {
   if (saveIntervalId)  clearInterval(saveIntervalId);
   if (priceIntervalId) clearInterval(priceIntervalId);
   if (newsIntervalId)  clearInterval(newsIntervalId);
+
   saveIntervalId  = setInterval(saveGame, 30000);
-  priceIntervalId = setInterval(() => { simulateTick(1); }, 4000);
+  priceIntervalId = setInterval(() => simulateTick(1), 4000);
   newsIntervalId  = setInterval(fireNewsEvent, 60000);
-  window.addEventListener('beforeunload', saveGame, { once:false });
+
+  // FIX: beforeunload nur einmal registrieren
+  if (!beforeUnloadAdded) {
+    window.addEventListener('beforeunload', saveGame);
+    beforeUnloadAdded = true;
+  }
 }
 
 function stopTimers() {
   clearInterval(saveIntervalId);
   clearInterval(priceIntervalId);
   clearInterval(newsIntervalId);
+  // Pending news abbrechen
+  if (pendingNewsTimer)   { clearTimeout(pendingNewsTimer);   pendingNewsTimer = null; }
+  if (pendingCountdownId) { clearInterval(pendingCountdownId); pendingCountdownId = null; }
+  pendingNewsEvent = null;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -660,7 +751,7 @@ function showToast(msg, isError=false) {
   t.classList.add('show');
   t.classList.toggle('error', isError);
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.classList.remove('show','error'), 3000);
+  toastTimer = setTimeout(() => t.classList.remove('show','error'), 3000);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -693,9 +784,9 @@ function showProfileScreen() {
   el.querySelectorAll('.slot-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       if (e.target.classList.contains('slot-del')) return;
-      const slot = +btn.dataset.slot;
+      const slot   = +btn.dataset.slot;
       const loaded = loadSlot(slot);
-      currentSlot = slot;
+      currentSlot  = slot;
       if (loaded) {
         document.body.removeChild(el);
         compressTime();
@@ -711,7 +802,6 @@ function showProfileScreen() {
         renderNews();
         showToast('🆕 New game – Slot ' + slot);
       }
-      // Request persistent storage
       if (navigator.storage?.persist) navigator.storage.persist();
     });
   });
@@ -738,39 +828,35 @@ function renderNews() {
 // ═══════════════════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════
-
-// Table click → open modal
 document.getElementById('stockTableBody').addEventListener('click', e => {
   const row = e.target.closest('.stock-row');
   if (row) openModal(row.dataset.ticker);
 });
 
-// Watchlist click → open modal
 document.getElementById('watchlistEl').addEventListener('click', e => {
   const item = e.target.closest('.watch-item');
   if (item) openModal(item.dataset.ticker);
 });
 
-// Sector tabs
 document.getElementById('sectorTabs').addEventListener('click', e => {
   const btn = e.target.closest('.tab');
   if (!btn) return;
   currentFilter = btn.dataset.sector;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   renderTable();
 });
 
-// Modal close
 document.getElementById('modalClose').addEventListener('click', closeModal);
-document.getElementById('stockModal').addEventListener('click', e => { if(e.target===document.getElementById('stockModal')) closeModal(); });
+document.getElementById('stockModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('stockModal')) closeModal();
+});
 
-// Modal trade tabs
 document.getElementById('mTabBuy').addEventListener('click', () => {
   modalMode = 'buy';
   document.getElementById('mTabBuy').className  = 'trade-tab2 buy-active';
   document.getElementById('mTabSell').className = 'trade-tab2';
-  document.getElementById('btnModalTrade').className = 'btn-modal-trade btn-modal-buy';
+  document.getElementById('btnModalTrade').className   = 'btn-modal-trade btn-modal-buy';
   document.getElementById('btnModalTrade').textContent = 'BUY SHARES';
   updateMTotal();
 });
@@ -778,12 +864,11 @@ document.getElementById('mTabSell').addEventListener('click', () => {
   modalMode = 'sell';
   document.getElementById('mTabBuy').className  = 'trade-tab2';
   document.getElementById('mTabSell').className = 'trade-tab2 sell-active';
-  document.getElementById('btnModalTrade').className = 'btn-modal-trade btn-modal-sell';
+  document.getElementById('btnModalTrade').className   = 'btn-modal-trade btn-modal-sell';
   document.getElementById('btnModalTrade').textContent = 'SELL SHARES';
   updateMTotal();
 });
 
-// Modal qty buttons
 document.querySelector('.m-qty-btns').addEventListener('click', e => {
   const btn = e.target.closest('.m-qty-btn');
   if (!btn || !modalTicker) return;
@@ -802,7 +887,6 @@ document.querySelector('.m-qty-btns').addEventListener('click', e => {
 
 document.getElementById('mQtyInput').addEventListener('input', updateMTotal);
 
-// Modal execute trade
 document.getElementById('btnModalTrade').addEventListener('click', () => {
   if (!modalTicker) return;
   const qty = parseInt(document.getElementById('mQtyInput').value);
@@ -811,13 +895,12 @@ document.getElementById('btnModalTrade').addEventListener('click', () => {
   refreshModal();
 });
 
-// Add limit order
 document.getElementById('btnAddOrder').addEventListener('click', () => {
   if (!modalTicker) return;
   const type  = document.getElementById('limitType').value;
   const price = parseFloat(document.getElementById('limitPrice').value);
   const qty   = parseInt(document.getElementById('limitQty').value);
-  if (!price || !qty || qty<1) { showToast('Fill in price and quantity', true); return; }
+  if (!price || !qty || qty < 1) { showToast('Fill in price and quantity', true); return; }
   state.limitOrders.push({ id: state.orderIdSeq++, ticker: modalTicker, type, price, qty });
   document.getElementById('limitPrice').value = '';
   document.getElementById('limitQty').value   = '';
@@ -825,17 +908,15 @@ document.getElementById('btnAddOrder').addEventListener('click', () => {
   renderOrders();
 });
 
-// Cancel limit order
 document.getElementById('ordersEl').addEventListener('click', e => {
   const btn = e.target.closest('.order-cancel');
   if (!btn) return;
   const id = +btn.dataset.orderId;
-  state.limitOrders = state.limitOrders.filter(o=>o.id!==id);
+  state.limitOrders = state.limitOrders.filter(o => o.id !== id);
   renderOrders();
   showToast('Order cancelled');
 });
 
-// Set stop-loss
 document.getElementById('btnSetStopLoss').addEventListener('click', () => {
   if (!modalTicker) return;
   const pct = parseFloat(document.getElementById('stopLossInput').value);
@@ -845,17 +926,15 @@ document.getElementById('btnSetStopLoss').addEventListener('click', () => {
   showToast(`🛡 Stop-loss set for ${modalTicker} at −${pct}%`);
 });
 
-// Watchlist toggle
 document.getElementById('btnWatch').addEventListener('click', () => {
   if (!modalTicker) return;
   const idx = state.watchlist.indexOf(modalTicker);
   if (idx === -1) { state.watchlist.push(modalTicker); showToast('★ Added to watchlist'); }
-  else            { state.watchlist.splice(idx,1);     showToast('Removed from watchlist'); }
+  else            { state.watchlist.splice(idx, 1);    showToast('Removed from watchlist'); }
   updateWatchBtn();
   renderWatchlist();
 });
 
-// Header buttons
 document.getElementById('btnSave').addEventListener('click', saveGame);
 
 document.getElementById('btnReset').addEventListener('click', async () => {
@@ -878,17 +957,15 @@ document.getElementById('btnHardReset').addEventListener('click', async () => {
   location.reload();
 });
 
-// Confirm modal buttons
 document.getElementById('btnConfirmOk').addEventListener('click', () => {
   document.getElementById('confirmBackdrop').classList.remove('open');
-  if (confirmResolve) { confirmResolve(true); confirmResolve=null; }
+  if (confirmResolve) { confirmResolve(true); confirmResolve = null; }
 });
 document.getElementById('btnConfirmCancel').addEventListener('click', () => {
   document.getElementById('confirmBackdrop').classList.remove('open');
-  if (confirmResolve) { confirmResolve(false); confirmResolve=null; }
+  if (confirmResolve) { confirmResolve(false); confirmResolve = null; }
 });
 
-// ESC closes modal
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('stockModal').classList.contains('open')) closeModal();
@@ -899,4 +976,4 @@ document.addEventListener('keydown', e => {
 // BOOT
 // ═══════════════════════════════════════════════════════
 renderNews();
-showProfileScreen(); // Show slot selection on start
+showProfileScreen();
