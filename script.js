@@ -1446,18 +1446,39 @@ function loadSlot(slot) {
     if (state.lastDividendDay === undefined) state.lastDividendDay = 0;
     if (!state.tradeLog)        state.tradeLog        = [];
     if (!state.netWorthHistory) state.netWorthHistory = [];
-    if (!state.shorts) state.shorts = {};
-    if (!state.priceAlerts) state.priceAlerts = {};
+    if (!state.shorts)          state.shorts          = {};
+    if (!state.priceAlerts)     state.priceAlerts     = {};
+
+    // Neue Stocks nachrüsten die im Save noch fehlen
+    STOCKS.forEach(s => {
+      if (state.prices[s.ticker] === undefined) {
+        const p = +(s.basePrice * (0.85 + Math.random() * 0.3)).toFixed(2);
+        state.prices[s.ticker] = p;
+      }
+      if (!state.histories[s.ticker] || state.histories[s.ticker].length === 0) {
+        const hist = [];
+        let hp = state.prices[s.ticker];
+        for (let i = 0; i < 30; i++) {
+          hp = Math.max(1, hp * (1 + (Math.random() - 0.5) * s.vol * 2));
+          hist.push(+hp.toFixed(2));
+        }
+        hist.push(state.prices[s.ticker]);
+        state.histories[s.ticker] = hist;
+      }
+      if (state.volumes[s.ticker] === undefined) {
+        state.volumes[s.ticker] = Math.floor(Math.random() * 900000 + 100000);
+      }
+    });
 
     // Stats-Felder einzeln sichern damit keine undefined entstehen
     state.stats = {
       totalTrades:    state.stats?.totalTrades    ?? 0,
       realizedPnl:    state.stats?.realizedPnl    ?? 0,
-      bestTrade:      state.stats?.bestTrade       ?? 0,
-      worstTrade:     state.stats?.worstTrade      ?? 0,
-      startCash:      state.stats?.startCash       ?? 100000,
-      totalFeesPaid:  state.stats?.totalFeesPaid   ?? 0,  
-      totalDividends: state.stats?.totalDividends  ?? 0,  
+      bestTrade:      state.stats?.bestTrade      ?? 0,
+      worstTrade:     state.stats?.worstTrade     ?? 0,
+      startCash:      state.stats?.startCash      ?? 100000,
+      totalFeesPaid:  state.stats?.totalFeesPaid  ?? 0,
+      totalDividends: state.stats?.totalDividends ?? 0,
     };
 
     return true;
