@@ -54,19 +54,90 @@ const NEWS_STATIC = [
   'Lifeinvader data-breach scandal — <span>LFI</span> -3.4%',
   'Merryweather awarded LSPD contract — <span>MER</span> +2.3%',
   'Vangelico launches new diamond collection — <span>VAG</span> +2.7%',
+    // Diese Zeilen ans bestehende NEWS_STATIC Array anhängen:
+  'GoPostal delivery delays spark customer outrage — <span>GOP</span> under pressure',
+  'Maze Bank posts record profits — <span>MAZE</span> dividend raised',
+  'BobMulét Energy faces environmental fine — <span>BOM</span> falls',
+  'Hijak Motors recalls 40,000 vehicles — <span>HKJ</span> -4.1%',
+  'Pisswasser wins \'Best Lager\' at San Andreas Beer Awards — <span>PISS</span> pops',
+  'GruppeSechs wins Blaine County security contract — <span>GRU</span> +3.8%',
+  'Lifeinvader monthly active users drop 12% — <span>LFI</span> sell-off',
+  'Gold Coast Dev. breaks ground on Vinewood tower — <span>GCD</span> surges',
+  'AugInsurance raises premiums amid crime wave — <span>AUG</span> +2.9%',
+  'TacoBomb hit with food safety violations — <span>TBMB</span> -3.3%',
+  'Worldwide FM loses flagship advertiser — <span>WFM</span> -2.1%',
+  'Vangelico robbery triggers insurance payout dispute — <span>VAG</span> volatile',
+  'BeanMachine expands to 200 new LS locations — <span>BEN</span> +4.5%',
+  'Merryweather loses government security tender — <span>MER</span> drops',
+  'Hammerstein & Faust discovers new offshore oil field — <span>HAF</span> +7.2%',
 ];
 
 const NEWS_EVENTS = [
-  { msg: 'CEO resigns amid scandal',           impact: -0.15, sector: null },
-  { msg: 'Record quarterly earnings reported', impact:  0.14, sector: null },
-  { msg: 'Government contract awarded',        impact:  0.12, sector: null },
-  { msg: 'Product recall announced',           impact: -0.13, sector: null },
-  { msg: 'Hostile takeover bid launched',      impact:  0.18, sector: null },
-  { msg: 'Regulatory fine imposed',            impact: -0.11, sector: null },
-  { msg: 'New market expansion confirmed',     impact:  0.10, sector: null },
-  { msg: 'Major data breach disclosed',        impact: -0.16, sector: null },
-  { msg: 'Analyst upgrade to BUY rating',      impact:  0.09, sector: null },
-  { msg: 'Supply chain disruption reported',   impact: -0.08, sector: null },
+  // ── GLOBAL (sector: null = trifft zufällige Einzelaktie) ──
+  { msg: 'CEO resigns amid scandal',                      impact: -0.15, sector: null },
+  { msg: 'Record quarterly earnings reported',            impact:  0.14, sector: null },
+  { msg: 'Government contract awarded',                   impact:  0.12, sector: null },
+  { msg: 'Product recall announced',                      impact: -0.13, sector: null },
+  { msg: 'Hostile takeover bid launched',                 impact:  0.18, sector: null },
+  { msg: 'Regulatory fine imposed',                       impact: -0.11, sector: null },
+  { msg: 'New market expansion confirmed',                impact:  0.10, sector: null },
+  { msg: 'Major data breach disclosed',                   impact: -0.16, sector: null },
+  { msg: 'Analyst upgrade to BUY rating',                 impact:  0.09, sector: null },
+  { msg: 'Supply chain disruption reported',              impact: -0.08, sector: null },
+  { msg: 'Class action lawsuit filed',                    impact: -0.12, sector: null },
+  { msg: 'CFO steps down amid accounting irregularities', impact: -0.14, sector: null },
+  { msg: 'Factory fire halts production',                 impact: -0.18, sector: null },
+  { msg: 'Credit rating downgraded to junk',              impact: -0.20, sector: null },
+  { msg: 'Earnings miss analyst estimates by 40%',        impact: -0.13, sector: null },
+  { msg: 'Short seller report alleges inflated revenue',  impact: -0.19, sector: null },
+  { msg: 'Blockbuster product launch exceeds forecasts',  impact:  0.16, sector: null },
+  { msg: 'Strategic merger announced with industry giant',impact:  0.20, sector: null },
+  { msg: 'Share buyback program of $500M announced',      impact:  0.11, sector: null },
+  { msg: 'Hedge fund discloses 8% stake acquisition',     impact:  0.15, sector: null },
+
+  // ── FOOD ──────────────────────────────────────────────────
+  { msg: 'Health department shuts down multiple locations across LS', impact: -0.14, sector: 'FOOD' },
+  { msg: 'San Andreas food safety bill raises compliance costs',       impact: -0.10, sector: 'FOOD' },
+  { msg: 'Summer festival season drives record restaurant spending',   impact:  0.12, sector: 'FOOD' },
+  { msg: 'Minimum wage hike squeezes fast food margins',               impact: -0.09, sector: 'FOOD' },
+  { msg: 'Tourism boom in Los Santos boosts F&B revenues',             impact:  0.11, sector: 'FOOD' },
+
+  // ── PHARMA ────────────────────────────────────────────────
+  { msg: 'San Andreas legalises new class of pharmaceuticals',         impact:  0.18, sector: 'PHARMA' },
+  { msg: 'Mass recall of over-the-counter drugs ordered by regulator', impact: -0.17, sector: 'PHARMA' },
+  { msg: 'Clinical trial results exceed expectations across sector',   impact:  0.15, sector: 'PHARMA' },
+  { msg: 'Patent cliff hits pharma — generics flood the market',       impact: -0.13, sector: 'PHARMA' },
+
+  // ── FINANCE ───────────────────────────────────────────────
+  { msg: 'LS Federal Reserve cuts interest rates by 0.5%',             impact:  0.13, sector: 'FINANCE' },
+  { msg: 'LS Federal Reserve hikes rates — borrowing costs surge',     impact: -0.12, sector: 'FINANCE' },
+  { msg: 'Banking stress test results: all LS institutions pass',      impact:  0.10, sector: 'FINANCE' },
+  { msg: 'Fraud scandal rocks San Andreas financial sector',           impact: -0.16, sector: 'FINANCE' },
+  { msg: 'New fintech regulations benefit established banks',          impact:  0.09, sector: 'FINANCE' },
+
+  // ── TRANSPORT ─────────────────────────────────────────────
+  { msg: 'Oil prices spike — airline and transport costs soar',        impact: -0.15, sector: 'TRANSPORT' },
+  { msg: 'Oil prices crash — transport sector margins expand',         impact:  0.14, sector: 'TRANSPORT' },
+  { msg: 'San Andreas airport expansion approved by city council',     impact:  0.12, sector: 'TRANSPORT' },
+  { msg: 'Nationwide logistics strike paralyses delivery networks',    impact: -0.13, sector: 'TRANSPORT' },
+
+  // ── ENERGY ────────────────────────────────────────────────
+  { msg: 'San Andreas green energy bill passes — fossil fuels drop',   impact: -0.14, sector: 'ENERGY' },
+  { msg: 'Cold snap drives record energy demand across the state',     impact:  0.16, sector: 'ENERGY' },
+  { msg: 'New offshore drilling rights approved by SA government',     impact:  0.13, sector: 'ENERGY' },
+  { msg: 'Environmental protesters block major LS pipeline',           impact: -0.11, sector: 'ENERGY' },
+
+  // ── RETAIL ────────────────────────────────────────────────
+  { msg: 'Consumer confidence index hits 5-year high in San Andreas',  impact:  0.12, sector: 'RETAIL' },
+  { msg: 'Recession fears cause LS shoppers to cut discretionary spend',impact: -0.11, sector: 'RETAIL' },
+  { msg: 'Holiday season sales shatter records across LS retail',      impact:  0.15, sector: 'RETAIL' },
+  { msg: 'Online shopping surge threatens LS brick-and-mortar stores', impact: -0.10, sector: 'RETAIL' },
+
+  // ── MEDIA ─────────────────────────────────────────────────
+  { msg: 'LS ad spending surges as election season begins',            impact:  0.13, sector: 'MEDIA' },
+  { msg: 'Streaming wars intensify — traditional media revenues fall', impact: -0.12, sector: 'MEDIA' },
+  { msg: 'New content licensing law benefits LS media companies',      impact:  0.10, sector: 'MEDIA' },
+  { msg: 'Social media blackout protest tanks digital ad revenue',     impact: -0.14, sector: 'MEDIA' },
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -549,23 +620,36 @@ function checkStopLosses() {
 // NEWS EVENTS – 30s REACTION WINDOW
 // ═══════════════════════════════════════════════════════
 
+let newsEventTimerToast = null;
+
 /**
  * Kündigt ein News-Event an. Der Kurseffekt wird erst nach NEWS_REACTION_TIME
  * Sekunden angewendet. Der Spieler sieht Ticker + Richtung und kann vorher handeln.
  */
 function fireNewsEvent() {
-  // Nur ein pending Event gleichzeitig
   if (pendingNewsEvent) return;
 
-  const s  = STOCKS[Math.floor(Math.random() * STOCKS.length)];
   const ev = NEWS_EVENTS[Math.floor(Math.random() * NEWS_EVENTS.length)];
+
+  let s;
+  if (ev.sector) {
+    // Sektor-Event: zufällige Aktie aus dem betroffenen Sektor
+    const sectorStocks = STOCKS.filter(x => x.sector === ev.sector);
+    s = sectorStocks[Math.floor(Math.random() * sectorStocks.length)];
+  } else {
+    // Global: komplett zufällige Aktie
+    s = STOCKS[Math.floor(Math.random() * STOCKS.length)];
+  }
 
   pendingNewsEvent = { ticker: s.ticker, stockObj: s, eventObj: ev };
 
-  // Toast mit Countdown anzeigen
-  showNewsEvent(s.ticker, `${s.name}: ${ev.msg}`, ev.impact, true);
+  // Sektor-Badge im Toast anzeigen
+  const label = ev.sector
+    ? `[${ev.sector}] ${s.name}: ${ev.msg}`
+    : `${s.name}: ${ev.msg}`;
 
-  // Countdown-Display updaten
+  showNewsToast(s.ticker, label, ev.impact, ev.sector);
+
   let remaining = NEWS_REACTION_TIME;
   pendingCountdownId = setInterval(() => {
     remaining--;
@@ -576,92 +660,139 @@ function fireNewsEvent() {
     }
   }, 1000);
 
-  // Kursänderung nach 30s anwenden
-  pendingNewsTimer = setTimeout(() => {
-    applyPendingNews();
-  }, NEWS_REACTION_TIME * 1000);
-
-  // Zeile in der Tabelle hervorheben
+  pendingNewsTimer = setTimeout(applyPendingNews, NEWS_REACTION_TIME * 1000);
   renderTable();
 }
 
 function applyPendingNews() {
   if (!pendingNewsEvent) return;
-  const { ticker, stockObj, eventObj } = pendingNewsEvent;
+  const { ticker, eventObj } = pendingNewsEvent;
 
-  const old = state.prices[ticker];
-  const np  = Math.max(1, +(old * (1 + eventObj.impact)).toFixed(2));
-  state.prices[ticker] = np;
-  state.histories[ticker].push(np);
+  // Kurs anwenden
+  const oldPrice = state.prices[ticker];
+  const newPrice = Math.max(1, +(oldPrice * (1 + eventObj.impact)).toFixed(2));
+  state.prices[ticker] = newPrice;
+  state.histories[ticker].push(newPrice);
+  if (state.histories[ticker].length > 60) state.histories[ticker].shift();
 
-  pendingNewsEvent = null;
+  // Rival mitziehen (invertiert, abgeschwächt)
+  const stockObj = STOCKS.find(s => s.ticker === ticker);
+  if (stockObj?.rival && state.prices[stockObj.rival] !== undefined) {
+    const rivalOld = state.prices[stockObj.rival];
+    const rivalImpact = -eventObj.impact * (0.4 + Math.random() * 0.3);
+    const rivalNew = Math.max(1, +(rivalOld * (1 + rivalImpact)).toFixed(2));
+    state.prices[stockObj.rival] = rivalNew;
+    state.histories[stockObj.rival].push(rivalNew);
+    if (state.histories[stockObj.rival].length > 60) state.histories[stockObj.rival].shift();
+  }
+
+  // State zurücksetzen
+  pendingNewsEvent   = null;
+  pendingNewsTimer   = null;
   clearInterval(pendingCountdownId);
   pendingCountdownId = null;
-  pendingNewsTimer   = null;
 
+  // Feedback & Re-render
+  const dir = eventObj.impact >= 0 ? '▲' : '▼';
   closeNewsToast();
-  showToast(`📰 News applied: ${ticker} ${eventObj.impact >= 0 ? '▲' : '▼'} ${(Math.abs(eventObj.impact)*100).toFixed(1)}%`);
+  showToast(`📰 ${ticker} ${dir} ${(Math.abs(eventObj.impact) * 100).toFixed(1)}% — market reacted`);
   renderAll();
 }
 
-let newsEventTimerToast = null;
-
-function showNewsEvent(ticker, msg, impact, withCountdown = false) {
+function showNewsToast(ticker, msg, impact, sector = null) {
   const el  = document.getElementById('newsEventToast');
   const dir = impact >= 0 ? '▲' : '▼';
   const col = impact >= 0 ? 'var(--green)' : 'var(--red)';
-  const countdownHtml = withCountdown
-    ? `<div id="newsCountdownRow" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-        <span style="font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;">MARKET REACTS IN</span>
-        <span id="newsCountdownVal" style="font-family:'Share Tech Mono',monospace;font-size:18px;font-weight:700;color:var(--gold);">${NEWS_REACTION_TIME}s</span>
-       </div>`
+
+  // Sektor-Badge HTML
+  const sectorBadge = sector
+    ? `<span style="
+        background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);
+        border-radius:3px;color:var(--accent);font-size:9px;font-weight:700;
+        letter-spacing:1px;padding:1px 6px;margin-right:6px;vertical-align:middle;
+        text-transform:uppercase;">${sector} SECTOR</span>`
     : '';
 
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
-      <div>
-        <span class="net-ticker">${ticker}</span>
-        <span class="net-impact" style="color:${col};margin-left:6px">${dir}${(Math.abs(impact)*100).toFixed(1)}% INCOMING</span><br>
-        <span style="font-size:12px;color:var(--dim);line-height:1.5">${msg}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+          ${sectorBadge}
+          <span class="net-ticker">${ticker}</span>
+          <span class="net-impact" style="color:${col};">${dir} ${(Math.abs(impact)*100).toFixed(1)}% INCOMING</span>
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:8px;">${msg}</div>
+        <button
+          onclick="openModal('${ticker}')"
+          style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.35);
+                 border-radius:4px;color:var(--accent);font-family:'Rajdhani',sans-serif;
+                 font-weight:700;font-size:11px;letter-spacing:1px;padding:4px 10px;cursor:pointer;">
+          📊 TRADE ${ticker} NOW
+        </button>
       </div>
-      <button onclick="closeNewsToast()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;line-height:1;padding:0;flex-shrink:0">✕</button>
+      <button
+        onclick="closeNewsToast()"
+        style="background:none;border:none;color:var(--dim);cursor:pointer;
+               font-size:16px;line-height:1;padding:0;flex-shrink:0;">✕</button>
     </div>
-    ${countdownHtml}
-    <div id="newsProgressBar" style="margin-top:10px;height:3px;border-radius:2px;background:rgba(255,255,255,0.08);overflow:hidden;">
-      <div id="newsProgressFill" style="height:100%;width:100%;border-radius:2px;background:${col};transition:width ${NEWS_REACTION_TIME}s linear;"></div>
+    <div id="newsCountdownRow"
+         style="display:flex;justify-content:space-between;align-items:center;
+                margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
+      <span style="font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;">
+        MARKET REACTS IN
+      </span>
+      <span id="newsCountdownVal"
+            style="font-family:'Share Tech Mono',monospace;font-size:20px;
+                   font-weight:700;color:var(--gold);min-width:44px;text-align:right;">
+        ${NEWS_REACTION_TIME}s
+      </span>
+    </div>
+    <div style="margin-top:8px;height:4px;border-radius:2px;
+                background:rgba(255,255,255,0.08);overflow:hidden;">
+      <div id="newsProgressFill"
+           style="height:100%;width:100%;border-radius:2px;
+                  background:${col};
+                  transition:width ${NEWS_REACTION_TIME}s linear;"></div>
     </div>`;
 
   el.classList.add('show');
 
-  clearTimeout(newsEventTimerToast);
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const fill = document.getElementById('newsProgressFill');
       if (fill) fill.style.width = '0%';
     });
   });
-
-  // Toast bleibt bis Event angewendet wurde (kein auto-close bei countdown)
-  if (!withCountdown) {
-    newsEventTimerToast = setTimeout(() => el.classList.remove('show'), 30000);
-  }
 }
-
 function updateNewsCountdown(remaining) {
   const el = document.getElementById('newsCountdownVal');
-  if (el) {
-    el.textContent = remaining + 's';
-    if (remaining <= 10) el.style.color = 'var(--red)';
-    else if (remaining <= 20) el.style.color = 'orange';
-    else el.style.color = 'var(--gold)';
+  if (!el) return;
+
+  el.textContent = remaining + 's';
+
+  if (remaining <= 5) {
+    el.style.color     = 'var(--red)';
+    el.style.animation = 'pulse-countdown 0.4s ease-in-out infinite alternate';
+  } else if (remaining <= 15) {
+    el.style.color     = 'var(--red)';
+    el.style.animation = 'none';
+  } else if (remaining <= 20) {
+    el.style.color     = 'orange';
+    el.style.animation = 'none';
+  } else {
+    el.style.color     = 'var(--gold)';
+    el.style.animation = 'none';
   }
 }
 
 function closeNewsToast() {
   clearTimeout(newsEventTimerToast);
+  newsEventTimerToast = null;
   document.getElementById('newsEventToast').classList.remove('show');
 }
 
+// Spieler schließt Toast manuell → Event läuft still weiter im Hintergrund
+// (pendingNewsEvent bleibt aktiv, Tabellen-Highlight bleibt)
 // ═══════════════════════════════════════════════════════
 // SAVE / LOAD / RESET
 // ═══════════════════════════════════════════════════════
