@@ -278,7 +278,7 @@ const DIVIDEND_RATES = {
   MEDIA:     0.003,  // 0.3%
   TECH:      0.002,  // 0.2%
 };
-const DIVIDEND_INTERVAL_DAYS = 14;
+const DIVIDEND_INTERVAL_DAYS = 7;
 
 // ═══════════════════════════════════════════════════════
 // STATE
@@ -1245,9 +1245,9 @@ function checkStopLosses() {
 }
 
 function checkDividends() {
-  // Nur alle DIVIDEND_INTERVAL_DAYS Spieltage auszahlen
-  const daysSinceLast = state.gameDayOfMonth - (state.lastDividendDay || 0);
-  if (daysSinceLast < DIVIDEND_INTERVAL_DAYS) return;
+  // Alle 14 Spieltage auszahlen
+  if (state.gameDay % DIVIDEND_INTERVAL_DAYS !== 0 || state.gameDay === state.lastDividendDay) return;
+  state.lastDividendDay = state.gameDay;
 
   let totalPayout = 0;
   const payouts   = [];
@@ -1255,20 +1255,37 @@ function checkDividends() {
   Object.entries(state.holdings).forEach(([ticker, h]) => {
     const stock = STOCKS.find(s => s.ticker === ticker);
     if (!stock) return;
-    const rate    = DIVIDEND_RATES[stock.sector] || 0;
+    const rate = DIVIDEND_RATES[stock.sector]?.[0] ?? 0;
     if (rate === 0) return;
-    const payout  = +(state.prices[ticker] * h.qty * rate).toFixed(2);
+    const payout = +(state.prices[ticker] * h.qty * rate).toFixed(2);
     if (payout <= 0) return;
-    state.cash += payout;
-    totalPayout += payout;
-    payouts.push(`${ticker} +${fmt(payout)}`);
+    state.cash          += payout;
+    totalPayout         += payout;
     state.stats.totalDividends += payout;
+    payouts.push({ ticker, payout, rate: (rate * 100).toFixed(1) });
   });
 
-  if (totalPayout > 0) {
-    state.lastDividendDay = state.gameDayOfMonth;
-    showNewsEvent('💰', `Dividend payout: ${fmt(totalPayout)}`, 0, false);
-    showToast(`💰 Dividends received: ${fmt(totalPayout)}\n${payouts.join(' · ')}`);
+  if (totalPayout === 0) return;
+
+  // Aufwändiger Dividend-Toast via showNewsEvent
+  const lines = payouts
+    .map(p => `${p.ticker} +${fmt(p.payout)} (${p.rate}%)`)
+    .join(' · ');
+
+  showNewsEvent(null,
+    `💰 DIVIDEND PAYOUT · ${fmt(totalPayout)} · ${lines}`,
+    0.0, false
+  );
+  showToast(`💰 Dividends received: ${fmt(totalPayout)}`);
+
+  // Discord-Ping wenn Dividende über $5.000
+  if (totalPayout >= 5000) {
+    sendDiscordWebhook({
+      title: '💰 Dividend Income',
+      description: `Received **${fmt(totalPayout)}** in dividends\n${lines}`,
+      color: 0xffd700,
+      timestamp: new Date().toISOString()
+    });
   }
 }
 
