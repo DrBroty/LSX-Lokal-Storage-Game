@@ -1826,16 +1826,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── SIDEBAR TABS ──────────────────────────────────────
-document.querySelector('.sidebar-tabs').addEventListener('click', e => {
-  const btn = e.target.closest('.stab');
-  if (!btn) return;
-  document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.stab-content').forEach(c => c.style.display = 'none');
-  btn.classList.add('active');
-  document.getElementById('stab-' + btn.dataset.tab).style.display = 'block';
-});
-
 // ═══════════════════════════════════════════════════════
 // INSIDER TIPS
 // ═══════════════════════════════════════════════════════
