@@ -246,8 +246,8 @@ const INSIDER_ACCURACY     = 0.60;   // 70% der Tips sind korrekt
 // Short Selling
 // ═══════════════════════════════════════════════════════
 
-const SHORT_FEE_DAILY = 0.005; // 0.5% Leihgebühr pro Spieltag
-const SHORT_MAX_RATIO = 2.0;   // Max 2× Cash als Short-Volumen
+const SHORT_FEE_DAILY = 0.015; // 0.5% Leihgebühr pro Spieltag
+const SHORT_MAX_RATIO = 1.5;   // Max 1.5× Cash als Short-Volumen
 
 
 // ═══════════════════════════════════════════════════════
@@ -261,9 +261,11 @@ const TRADE_LOG_MAX = 30; // Maximale Einträge in der Trade History
 // ═══════════════════════════════════════════════════════
 
 // ── TRADING FEES ──────────────────────────────────────
-const FEE_FLAT       = 5;       // unter $1.000
-const FEE_STANDARD   = 0.003;   // 0.30%
-const FEE_LARGE      = 0.015;  // 1,5% ab $10.000
+const FEE_FLAT        = 25;      // unter $1.000
+const FEE_TIER_1      = 0.012;   // 1.20% · $1.000 – $9.999
+const FEE_TIER_2      = 0.008;   // 0.80% · $10.000 – $49.999
+const FEE_TIER_3      = 0.005;   // 0.50% · $50.000 – $199.999
+const FEE_TIER_4      = 0.0025;  // 0.25% · ab $200.000
 
 // ── DIVIDENDS ─────────────────────────────────────────
 const DIVIDEND_RATES = {
@@ -276,12 +278,11 @@ const DIVIDEND_RATES = {
   MEDIA:     0.003,  // 0.3%
   TECH:      0.002,  // 0.2%
 };
-const DIVIDEND_INTERVAL_DAYS = 7;
+const DIVIDEND_INTERVAL_DAYS = 14;
 
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
-const SAVE_PREFIX = 'lsx_v2_';
 const DAYS   = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const NEWS_REACTION_TIME = 30; // seconds
@@ -294,7 +295,6 @@ let saveIntervalId;
 let priceIntervalId;
 let newsIntervalId;
 let insiderIntervalId; // ← ergänzen
-let currentSlot   = null;
 let beforeUnloadAdded = false;
 
 // ── Pending news event (30s reaction window) ──
@@ -382,7 +382,7 @@ function simulateTick(n = 1) {
         state.gameDay === 5 ? 0.60 :   // SAT – ruhiger Markt
         state.gameDay === 6 ? 0.60 :   // SUN – ruhiger Markt
         1.0;                            // DI–DO normal
-      const drift = (Math.random() - 0.495) * s.vol * dayMod;
+      const drift = (Math.random() - 0.495) * s.vol * dayMod * 0.65;
       const np = Math.max(1, +(old * (1 + drift)).toFixed(2));
       state.prices[s.ticker] = np;
       state.histories[s.ticker].push(np);
@@ -1044,9 +1044,11 @@ function updateWatchBtn() {
 // ═══════════════════════════════════════════════════════
 
 function calcFee(total) {
-  if (total < 1000)  return FEE_FLAT;
-  if (total < 10000) return +(total * FEE_STANDARD).toFixed(2);
-  return +(total * FEE_LARGE).toFixed(2);
+  if (total < 1000)   return FEE_FLAT;
+  if (total < 10000)  return +(total * FEE_TIER_1).toFixed(2);
+  if (total < 50000)  return +(total * FEE_TIER_2).toFixed(2);
+  if (total < 200000) return +(total * FEE_TIER_3).toFixed(2);
+  return +(total * FEE_TIER_4).toFixed(2);
 }
 
 
@@ -1463,71 +1465,13 @@ function saveGame() {
 }
 
 function loadSlot(slot) {
-  try {
-    const raw = localStorage.getItem(SAVE_PREFIX + slot);
-    if (!raw) return false;
-    const s = JSON.parse(raw);
-    if (!s || !s.prices) return false;
-
-    const base = defaultState();
-    state = { ...base, ...s };
-
-    // Fehlende Felder aus alten Saves nachrüsten
-    if (!state.volumes) state.volumes = base.volumes;
-    if (state.lastDividendDay === undefined) state.lastDividendDay = 0;
-    if (!state.tradeLog)        state.tradeLog        = [];
-    if (!state.netWorthHistory) state.netWorthHistory = [];
-    if (!state.shorts)          state.shorts          = {};
-    if (!state.priceAlerts)     state.priceAlerts     = {};
-
-    // Neue Stocks nachrüsten die im Save noch fehlen
-    STOCKS.forEach(s => {
-      if (state.prices[s.ticker] === undefined) {
-        const p = +(s.basePrice * (0.85 + Math.random() * 0.3)).toFixed(2);
-        state.prices[s.ticker] = p;
-      }
-      if (!state.histories[s.ticker] || state.histories[s.ticker].length === 0) {
-        const hist = [];
-        let hp = state.prices[s.ticker];
-        for (let i = 0; i < 30; i++) {
-          hp = Math.max(1, hp * (1 + (Math.random() - 0.5) * s.vol * 2));
-          hist.push(+hp.toFixed(2));
-        }
-        hist.push(state.prices[s.ticker]);
-        state.histories[s.ticker] = hist;
-      }
-      if (state.volumes[s.ticker] === undefined) {
-        state.volumes[s.ticker] = Math.floor(Math.random() * 900000 + 100000);
-      }
-    });
-
-    // Stats-Felder einzeln sichern damit keine undefined entstehen
-    state.stats = {
-      totalTrades:    state.stats?.totalTrades    ?? 0,
-      realizedPnl:    state.stats?.realizedPnl    ?? 0,
-      bestTrade:      state.stats?.bestTrade      ?? 0,
-      worstTrade:     state.stats?.worstTrade     ?? 0,
-      startCash:      state.stats?.startCash      ?? 100000,
-      totalFeesPaid:  state.stats?.totalFeesPaid  ?? 0,
-      totalDividends: state.stats?.totalDividends ?? 0,
-    };
-
-    return true;
-  } catch(e) {
-    localStorage.removeItem(SAVE_PREFIX + slot);
-    return false;
-  }
+  // Ersetzt durch Server-Login via checkLogin()
+  return false;
 }
 
 function getSlotMeta(slot) {
-  try {
-    const raw = localStorage.getItem(SAVE_PREFIX + slot);
-    if (!raw) return null;
-    const s = JSON.parse(raw);
-    const totalVal = Object.entries(s.holdings||{}).reduce((a,[t,h])=>a+(s.prices[t]||0)*h.qty,0);
-    const nw = (s.cash||0)+totalVal;
-    return { savedAt: s.savedAt ? new Date(s.savedAt).toLocaleString('de-DE') : '–', netWorth: fmt(nw) };
-  } catch(e) { return null; }
+  // Ersetzt durch Server-Spielstand
+  return null;
 }
 
 function startTimers() {
@@ -1646,7 +1590,7 @@ async function checkLogin() {
         realizedPnl:    state.stats?.realizedPnl    ?? 0,
         bestTrade:      state.stats?.bestTrade      ?? 0,
         worstTrade:     state.stats?.worstTrade     ?? 0,
-        startCash:      state.stats?.startCash      ?? 100000,
+        startCash:      state.stats?.startCash      ?? 50000,
         totalFeesPaid:  state.stats?.totalFeesPaid  ?? 0,
         totalDividends: state.stats?.totalDividends ?? 0,
       };
@@ -1665,65 +1609,10 @@ async function checkLogin() {
 }
 
 // ═══════════════════════════════════════════════════════
-// PROFILE SCREEN
+// PROFILE SCREEN OLD
 // ═══════════════════════════════════════════════════════
 function showProfileScreen() {
-  const el = document.createElement('div');
-  el.className = 'profile-backdrop';
-  el.id = 'profileScreen';
-
-  const slots = [1,2,3].map(slot => {
-    const meta = getSlotMeta(slot);
-    return `<div class="slot-btn" data-slot="${slot}">
-      <div>
-        <div class="slot-name">SLOT ${slot}</div>
-        <div class="slot-meta">${meta ? `Net Worth: ${meta.netWorth} · Saved: ${meta.savedAt}` : 'Empty – New Game'}</div>
-      </div>
-      ${meta ? `<div class="slot-actions"><button class="slot-del" data-del="${slot}">DELETE</button></div>` : ''}
-    </div>`;
-  }).join('');
-
-  el.innerHTML = `<div class="profile-box">
-    <div class="profile-title">🎮 LOS SANTOS EXCHANGE</div>
-    <div class="profile-sub">Select a save slot to continue or start a new game</div>
-    <div class="slot-list">${slots}</div>
-    <button class="btn-new-game" id="btnNewGame">+ NEW GAME (SLOT 1)</button>
-  </div>`;
-  document.body.appendChild(el);
-
-  el.querySelectorAll('.slot-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      if (e.target.classList.contains('slot-del')) return;
-      const slot   = +btn.dataset.slot;
-      const loaded = loadSlot(slot);
-      currentSlot  = slot;
-      if (loaded) {
-        document.body.removeChild(el);
-        compressTime();
-        startTimers();
-        renderAll();
-        renderNews();
-        showToast('📂 Slot ' + slot + ' geladen');
-      } else {
-        initState();
-        document.body.removeChild(el);
-        startTimers();
-        renderAll();
-        renderNews();
-        showToast('🆕 New game – Slot ' + slot);
-      }
-      if (navigator.storage?.persist) navigator.storage.persist();
-    });
-  });
-
-  el.querySelectorAll('.slot-del').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      e.stopPropagation();
-      const slot = +btn.dataset.del;
-      const ok = await showConfirm('🗑️','Delete Slot '+slot,'This save will be permanently deleted.');
-      if (ok) { localStorage.removeItem(SAVE_PREFIX + slot); document.body.removeChild(el); showProfileScreen(); }
-    });
-  });
+  // Ersetzt durch Discord OAuth – siehe checkLogin()
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1848,23 +1737,28 @@ document.getElementById('btnWatch').addEventListener('click', () => {
 document.getElementById('btnSave').addEventListener('click', saveGame);
 
 document.getElementById('btnReset').addEventListener('click', async () => {
-  const ok = await showConfirm('🔄','Reset Game','Your current progress in Slot '+currentSlot+' will be reset to $100,000. This cannot be undone.');
+  const ok = await showConfirm('🔄', 'Reset Game', 'Your current progress will be reset to $100,000. This cannot be undone.');
   if (!ok) return;
   stopTimers();
-  localStorage.removeItem(SAVE_PREFIX + currentSlot);
   initState();
+  saveGame(); // Leeren State auf Server speichern
   startTimers();
   renderAll();
   renderNews();
-  showToast('🔄 Game reset – Slot ' + currentSlot);
+  showToast('Game reset');
 });
 
 document.getElementById('btnHardReset').addEventListener('click', async () => {
-  const ok = await showConfirm('🧨','Hard Reset','ALL save slots will be permanently deleted. There is no undo.');
+  const ok = await showConfirm('🧨', 'Hard Reset', 'Your save will be permanently deleted. There is no undo.');
   if (!ok) return;
   stopTimers();
-  [1,2,3].forEach(i => localStorage.removeItem(SAVE_PREFIX + i));
-  location.reload();
+  // Serverseitig löschen
+  fetch(API + '/save.php', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(defaultState())
+  }).then(() => location.reload());
 });
 
 document.getElementById('btnConfirmOk').addEventListener('click', () => {
