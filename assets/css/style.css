@@ -14,6 +14,8 @@
   --label:   #6a8fac;
   --overlay: rgba(4,8,16,0.92);
   --card:    #0d1520;
+  /* Hoehe der fixen news-bar */
+  --news-bar-h: 26px;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -22,8 +24,7 @@ body {
   background:var(--bg); color:var(--text);
   font-family:'Rajdhani',sans-serif; font-size:16px;
   min-height:100vh; overflow-x:hidden;
-  /* Platz fuer die fixe news-bar (26px) */
-  padding-bottom: 26px;
+  padding-bottom: var(--news-bar-h);
 }
 
 /* ── LOGIN SCREEN ────────────────────────────── */
@@ -140,8 +141,9 @@ header {
   display: grid;
   grid-template-columns: 240px 1fr 240px;
   gap: 0;
-  min-height: calc(100vh - 90px);
-  padding-bottom: 30px;
+  /* Viewport minus Header (~64px) minus Ticker (30px) minus news-bar */
+  height: calc(100vh - 94px - var(--news-bar-h));
+  overflow: hidden;
 }
 
 .sidebar-left,
@@ -152,6 +154,7 @@ header {
   padding: 12px;
   border-right: 1px solid var(--border);
   overflow-y: auto;
+  height: 100%;
 }
 .sidebar-right {
   border-right: none;
@@ -161,6 +164,7 @@ header {
 .main-content {
   padding: 12px 16px;
   overflow-y: auto;
+  height: 100%;
 }
 
 .sidebar-card {
@@ -550,7 +554,7 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 /* ── TOAST (id="toastEl") ───────────────────── */
 #toastEl, #toast {
   position: fixed;
-  bottom: 34px;
+  bottom: calc(var(--news-bar-h) + 8px);
   right: 20px;
   background: var(--panel2);
   border-radius: 8px;
@@ -572,7 +576,7 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 .news-bar {
   position:fixed; bottom:0; left:0; right:0;
   background:#050810; border-top:1px solid var(--border);
-  height:26px; display:flex; align-items:center; overflow:hidden; z-index:100;
+  height:var(--news-bar-h); display:flex; align-items:center; overflow:hidden; z-index:100;
 }
 .news-wrap { overflow:hidden; flex:1; }
 .news-label { background:var(--red); color:#fff; font-weight:700; padding:0 12px; height:100%; display:flex; align-items:center; font-size:11px; letter-spacing:2px; flex-shrink:0; }
@@ -745,8 +749,11 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 }
 
 @media (max-width: 1024px) {
+  :root { --mobile-nav-h: 58px; }
+
   .app-layout {
     grid-template-columns: 1fr;
+    height: calc(100vh - 94px - var(--mobile-nav-h) - var(--news-bar-h));
   }
 
   .sidebar-left,
@@ -777,14 +784,14 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
   .modal-box { width: 95vw; }
   .modal     { width: 95vw; }
 
-  /* Auf Mobile: news-bar sitzt ueber der Mobile-Nav */
-  .news-bar { bottom: 58px; }
+  /* news-bar sitzt ueber der Mobile-Nav */
+  .news-bar { bottom: var(--mobile-nav-h); }
 
-  /* Body braucht mehr Platz: Mobile-Nav (58px) + News-Bar (26px) */
-  body { padding-bottom: 84px; }
+  body { padding-bottom: calc(var(--mobile-nav-h) + var(--news-bar-h)); }
 
-  /* Toast ueber news-bar + mobile-nav */
-  #toastEl, #toast { bottom: 92px; }
+  #toastEl, #toast {
+    bottom: calc(var(--mobile-nav-h) + var(--news-bar-h) + 8px);
+  }
 }
 
 /* ── MOBILE (≤ 768px) ───────────────────────── */
@@ -824,7 +831,7 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
     display: flex;
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: 58px;
+    height: var(--mobile-nav-h);
     background: var(--panel);
     border-top: 1px solid var(--border);
     z-index: 150;
@@ -848,7 +855,7 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
   .sidebar-mobile-view {
     display: flex !important;
     position: fixed; inset: 0;
-    bottom: 116px; top: 110px;
+    bottom: calc(var(--mobile-nav-h) + var(--news-bar-h)); top: 110px;
     background: var(--bg); z-index: 120;
     overflow-y: auto; flex-direction: column;
   }
