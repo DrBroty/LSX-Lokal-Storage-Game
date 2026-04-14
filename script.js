@@ -1,3 +1,9 @@
+let sortCol = null;
+let sortDir = 'desc';
+let searchQuery = '';
+let heatmapMode = false;
+let chartRange = 30; // aktiver Chart-Zeitraum
+
 // ═══════════════════════════════════════════════════════
 // STOCKS DATA
 // ═══════════════════════════════════════════════════════
@@ -197,6 +203,7 @@ let modalMode     = 'buy';
 let saveIntervalId;
 let priceIntervalId;
 let newsIntervalId;
+let insiderIntervalId; // ← ergänzen
 let currentSlot   = null;
 let beforeUnloadAdded = false;
 
@@ -229,6 +236,7 @@ function defaultState() {
     watchlist:   [],
     limitOrders: [],
     stopLosses:  {},
+    priceAlerts: {}, // ticker -> targetPrice
     tradeLog:        [],   // { time, ticker, mode, qty, price, pnl, fee }
     netWorthHistory: [],   // [{ day, value }]
     gameDay: 0, gameHour: 8, gameMonth: 0, gameDayOfMonth: 1,
@@ -326,7 +334,8 @@ function simulateTick(n = 1) {
 
   checkLimitOrders();
   checkStopLosses();
-  checkDividends();        
+  checkDividends();  
+  checkPriceAlerts();   
   checkShortStopLosses();  
   renderAll();
 }
@@ -354,8 +363,11 @@ function renderAll() {
   renderShortsSidebar();
   renderOrders();
   renderScoreboard();
-  renderTradeHistory();      
-  renderPortfolioChart();    
+  renderTradeHistory();
+  renderPortfolioChart();
+  renderMarketSummary();  // NEU
+  renderTopMovers();      // NEU
+  if (heatmapMode) renderHeatmap(); // NEU
   updateHeader();
   updateGameTime();
   if (modalTicker) refreshModal();
@@ -363,16 +375,41 @@ function renderAll() {
 
 function renderTable() {
   const body = document.getElementById('stockTableBody');
-  const filtered = currentFilter === 'ALL' ? STOCKS : STOCKS.filter(s => s.sector === currentFilter);
+
+  // Filter: Sektor + Suche
+  const query = searchQuery.toLowerCase();
+  let filtered = currentFilter === 'ALL' ? [...STOCKS] : STOCKS.filter(s => s.sector === currentFilter);
+  if (query) filtered = filtered.filter(s =>
+    s.ticker.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)
+  );
+
+  // Sortierung
+  if (sortCol) {
+    filtered.sort((a, b) => {
+      let av, bv;
+      if      (sortCol === 'price') { av = state.prices[a.ticker]; bv = state.prices[b.ticker]; }
+      else if (sortCol === 'chg')   { av = getChange(a.ticker);    bv = getChange(b.ticker); }
+      else if (sortCol === 'chg24') { av = get24h(a.ticker);       bv = get24h(b.ticker); }
+      else if (sortCol === 'held')  {
+        av = (state.holdings[a.ticker]?.qty || 0) * state.prices[a.ticker];
+        bv = (state.holdings[b.ticker]?.qty || 0) * state.prices[b.ticker];
+      }
+      else if (sortCol === 'name') {
+        return sortDir === 'asc'
+          ? a.ticker.localeCompare(b.ticker)
+          : b.ticker.localeCompare(a.ticker);
+      }
+      return sortDir === 'asc' ? av - bv : bv - av;
+    });
+  }
+
+  const pendingTicker = pendingNewsEvent ? pendingNewsEvent.ticker : null;
   const frag = document.createDocumentFragment();
 
-  // Highlight pending news ticker
-  const pendingTicker = pendingNewsEvent ? pendingNewsEvent.ticker : null;
-
   filtered.forEach(s => {
-    const chg   = getChange(s.ticker);
-    const chg24 = get24h(s.ticker);
-    const price = state.prices[s.ticker];
+    const chg    = getChange(s.ticker);
+    const chg24  = get24h(s.ticker);
+    const price  = state.prices[s.ticker];
     const heldQty = state.holdings[s.ticker]?.qty || 0;
     const watched = state.watchlist.includes(s.ticker);
 
@@ -537,6 +574,129 @@ function renderScoreboard() {
     </div>`).join('');
 }
 
+// ═══════════════════════════════════════════════════════
+// MARKET SUMMARY BAR
+// ═══════════════════════════════════════════════════════
+function renderMarketSummary() {
+  const el = document.getElementById('marketSummary');
+  if (!el) return;
+
+  let gainers = 0, losers = 0, totalChg = 0;
+  let topStock = null, topChg = -Infinity;
+  let flopStock = null, flopChg = Infinity;
+
+  STOCKS.forEach(s => {
+    const chg = get24h(s.ticker);
+    totalChg += chg;
+    if (chg > 0) gainers++;
+    else if (chg < 0) losers++;
+    if (chg > topChg)  { topChg = chg;   topStock  = s.ticker; }
+    if (chg < flopChg) { flopChg = chg;  flopStock = s.ticker; }
+  });
+
+  const avgChg   = totalChg / STOCKS.length;
+  const sentiment = avgChg > 0.5 ? '🐂 BULL' : avgChg < -0.5 ? '🐻 BEAR' : '➡ NEUTRAL';
+  const sentCol   = avgChg > 0.5 ? 'var(--green)' : avgChg < -0.5 ? 'var(--red)' : 'var(--dim)';
+
+  el.innerHTML = `
+    <div class="ms-item">
+      <span class="ms-label">MARKET</span>
+      <span class="ms-val" style="color:${sentCol}">${sentiment}</span>
+    </div>
+    <div class="ms-divider"></div>
+    <div class="ms-item">
+      <span class="ms-label">AVG</span>
+      <span class="ms-val ${avgChg>=0?'up':'down'}">${avgChg>=0?'+':''}${avgChg.toFixed(2)}%</span>
+    </div>
+    <div class="ms-divider"></div>
+    <div class="ms-item">
+      <span class="ms-label">▲ GAINERS</span>
+      <span class="ms-val up">${gainers}</span>
+    </div>
+    <div class="ms-item">
+      <span class="ms-label">▼ LOSERS</span>
+      <span class="ms-val down">${losers}</span>
+    </div>
+    <div class="ms-divider"></div>
+    <div class="ms-item ms-clickable" data-ticker="${topStock}">
+      <span class="ms-label">TOP</span>
+      <span class="ms-val up">${topStock} +${topChg.toFixed(1)}%</span>
+    </div>
+    <div class="ms-item ms-clickable" data-ticker="${flopStock}">
+      <span class="ms-label">FLOP</span>
+      <span class="ms-val down">${flopStock} ${flopChg.toFixed(1)}%</span>
+    </div>`;
+
+  el.querySelectorAll('.ms-clickable').forEach(item => {
+    item.addEventListener('click', () => openModal(item.dataset.ticker));
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TOP MOVERS PANEL
+// ═══════════════════════════════════════════════════════
+function renderTopMovers() {
+  const el = document.getElementById('topMovers');
+  if (!el) return;
+
+  const sorted = [...STOCKS].sort((a,b) => Math.abs(get24h(b.ticker)) - Math.abs(get24h(a.ticker)));
+  const top3   = sorted.slice(0, 3);
+
+  el.innerHTML = `
+    <div class="tm-label">🔥 TOP MOVERS</div>
+    ${top3.map(s => {
+      const chg = get24h(s.ticker);
+      return `
+        <div class="tm-item" data-ticker="${s.ticker}">
+          <span class="tm-ticker">${s.ticker}</span>
+          <span class="tm-price">${fmt(state.prices[s.ticker])}</span>
+          <span class="tm-chg ${chg>=0?'up':'down'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span>
+        </div>`;
+    }).join('')}`;
+
+  el.querySelectorAll('.tm-item').forEach(item => {
+    item.addEventListener('click', () => openModal(item.dataset.ticker));
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// HEATMAP
+// ═══════════════════════════════════════════════════════
+function renderHeatmap() {
+  const el = document.getElementById('heatmapView');
+  if (!el) return;
+
+  const filtered = currentFilter === 'ALL'
+    ? STOCKS
+    : STOCKS.filter(s => s.sector === currentFilter);
+
+  const query = searchQuery.toLowerCase();
+  const visible = query
+    ? filtered.filter(s => s.ticker.toLowerCase().includes(query) || s.name.toLowerCase().includes(query))
+    : filtered;
+
+  el.innerHTML = visible.map(s => {
+    const chg  = get24h(s.ticker);
+    const intensity = Math.min(Math.abs(chg) / 10, 1);
+    let bg;
+    if (chg > 0) bg = `rgba(0,255,136,${0.1 + intensity * 0.55})`;
+    else         bg = `rgba(255,51,85,${0.1 + intensity * 0.55})`;
+
+    const held = state.holdings[s.ticker]?.qty || 0;
+    return `
+      <div class="hm-cell" style="background:${bg}" data-ticker="${s.ticker}">
+        <div class="hm-ticker">${s.ticker}</div>
+        <div class="hm-chg ${chg>=0?'up':'down'}">${chg>=0?'+':''}${chg.toFixed(1)}%</div>
+        <div class="hm-price">${fmt(state.prices[s.ticker])}</div>
+        ${held ? `<div class="hm-held">✓ ${held}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  el.querySelectorAll('.hm-cell').forEach(cell => {
+    cell.addEventListener('click', () => openModal(cell.dataset.ticker));
+  });
+}
+
 function renderTradeHistory() {
   const el = document.getElementById('tradeHistoryEl');
   if (!state.tradeLog?.length) {
@@ -651,7 +811,11 @@ function refreshModal() {
   const lo    = Math.min(...h.slice(-12));
   const held  = state.holdings[modalTicker];
 
-  const vol = (state.volumes[modalTicker] || 0).toLocaleString('en-US');
+  const vol    = (state.volumes[modalTicker] || 0).toLocaleString('en-US');
+  const h7d    = state.histories[modalTicker];
+  const hi52   = Math.max(...h7d);
+  const lo52   = Math.min(...h7d);
+  const mktCap = state.prices[modalTicker] * (state.volumes[modalTicker] || 0);
 
   document.getElementById('modalTicker').textContent = s.ticker;
   document.getElementById('modalName').textContent   = s.name + ' · ' + s.sector;
@@ -665,15 +829,65 @@ function refreshModal() {
   chgEl.className   = 'modal-change ' + (chg24>=0?'up':'down');
 
   document.getElementById('modalStats').innerHTML = `
-    <div class="mstat">HIGH <span>${fmt(hi)}</span></div>
-    <div class="mstat">LOW  <span>${fmt(lo)}</span></div>
+    <div class="mstat">HIGH(12) <span>${fmt(hi)}</span></div>
+    <div class="mstat">LOW(12)  <span>${fmt(lo)}</span></div>
+    <div class="mstat">ALL-TIME H <span>${fmt(hi52)}</span></div>
+    <div class="mstat">ALL-TIME L <span>${fmt(lo52)}</span></div>
     <div class="mstat">VOL  <span>${vol}</span></div>
-    <div class="mstat">RIVAL<span class="rival-val">${s.rival||'—'}</span></div>
+    <div class="mstat">MKT CAP <span>${fmtShort(mktCap)}</span></div>
+    <div class="mstat">SECTOR <span style="color:var(--accent)">${s.sector}</span></div>
+    <div class="mstat">RIVAL
+      <span class="rival-val rival-link" data-ticker="${s.rival||''}"
+            style="${s.rival?'cursor:pointer;text-decoration:underline':''}">
+        ${s.rival||'—'}
+      </span>
+    </div>
     ${held ? `<div class="mstat">HELD <span>${held.qty} @ ${fmt(held.avgCost)}</span></div>` : ''}
     ${held ? `<div class="mstat">P&L  <span class="${(price-held.avgCost)>=0?'up':'down'}">${((price-held.avgCost)/held.avgCost*100).toFixed(1)}%</span></div>` : ''}
   `;
 
+  // Rival Quick-Link
+  document.querySelectorAll('.rival-link').forEach(el => {
+    el.addEventListener('click', () => {
+      if (el.dataset.ticker) openModal(el.dataset.ticker);
+    });
+  }); // ← diese Klammer fehlte bei dir
+
   drawChart('modalChart', modalTicker, 200, 120);
+  updateMTotal();
+
+  // Short-Status
+  const shortStatus = document.getElementById('shortStatus');
+  if (shortStatus) {
+    const sh = state.shorts?.[modalTicker];
+    if (sh) {
+      const pnl    = (sh.entryPrice - price) * sh.qty;
+      const pnlPct = ((sh.entryPrice - price) / sh.entryPrice * 100).toFixed(1);
+      shortStatus.innerHTML = `📉 Short: ${sh.qty} @ ${fmt(sh.entryPrice)} · P&L: <span class="${pnl>=0?'up':'down'}">${pnl>=0?'+':''}${fmt(pnl)} (${pnlPct}%)</span>`;
+    } else {
+      shortStatus.textContent = '';
+    }
+  }
+
+  // Preis-Alarm Status
+  const alertStatus = document.getElementById('priceAlertStatus');
+  const alertInput  = document.getElementById('priceAlertInput');
+  if (alertStatus) {
+    const a = state.priceAlerts?.[modalTicker];
+    if (a) {
+      const dir = a > state.prices[modalTicker] ? '▲' : '▼';
+      alertStatus.innerHTML = `🔔 Alert set: ${dir} ${fmt(a)}
+        <span onclick="clearPriceAlert('${modalTicker}')"
+              style="color:var(--red);cursor:pointer;margin-left:8px;">✕ Remove</span>`;
+      if (alertInput) alertInput.value = a;
+    } else {
+      alertStatus.textContent = '';
+      if (alertInput) alertInput.value = '';
+    }
+  }
+    }
+
+  if (modalTicker && state.histories?.[modalTicker]) {  drawChart('modalChart', modalTicker, 200, 120);}
   updateMTotal();
 
   // ── Short-Status anzeigen ──────────────────────── NEU
@@ -688,34 +902,45 @@ function refreshModal() {
       shortStatus.textContent = '';
     }
   }
-}
 
 function drawChart(canvasId, ticker, w, h) {
+  if (!ticker || !state.histories?.[ticker]) return;
   const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
   const ctx    = canvas.getContext('2d');
   const cw     = canvas.parentElement.clientWidth - (canvasId==='modalChart'?48:40);
+  if (cw <= 0) return;
   canvas.width = cw; canvas.height = h;
-  const data  = state.histories[ticker].slice(-30);
+
+  const data  = state.histories[ticker].slice(-chartRange);
+  if (data.length < 2) return;
+
   const min   = Math.min(...data), max = Math.max(...data), range = max-min||1;
   const pad   = 6;
   const isUp  = data[data.length-1] >= data[0];
+
   ctx.clearRect(0,0,cw,h);
+
   const grad = ctx.createLinearGradient(0,0,0,h);
   grad.addColorStop(0, isUp?'rgba(0,255,136,0.22)':'rgba(255,51,85,0.22)');
   grad.addColorStop(1, 'rgba(0,0,0,0)');
+
   const coords = data.map((v,i)=>({
     x:(i/(data.length-1))*(cw-pad*2)+pad,
     y:h-pad-((v-min)/range)*(h-pad*2)
   }));
+
   ctx.beginPath();
   coords.forEach((c,i)=>i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
   const lx=coords[coords.length-1].x, ly=coords[coords.length-1].y;
   ctx.lineTo(lx,h-pad); ctx.lineTo(pad,h-pad); ctx.closePath();
   ctx.fillStyle=grad; ctx.fill();
+
   ctx.beginPath();
   coords.forEach((c,i)=>i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
   ctx.strokeStyle=isUp?'rgba(0,255,136,0.9)':'rgba(255,51,85,0.9)';
   ctx.lineWidth=2; ctx.stroke();
+
   ctx.beginPath(); ctx.arc(lx,ly,4,0,Math.PI*2);
   ctx.fillStyle=isUp?'#00ff88':'#ff3355'; ctx.fill();
 }
@@ -1165,6 +1390,7 @@ function loadSlot(slot) {
     if (!state.tradeLog)        state.tradeLog        = [];
     if (!state.netWorthHistory) state.netWorthHistory = [];
     if (!state.shorts) state.shorts = {};
+    if (!state.priceAlerts) state.priceAlerts = {};
 
     // Stats-Felder einzeln sichern damit keine undefined entstehen
     state.stats = {
@@ -1578,6 +1804,139 @@ document.getElementById('btnShortClose').addEventListener('click', () => {
   if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
   closeShort(modalTicker, sh.qty);
   refreshModal();
+});
+
+// ── SORTIERUNG ────────────────────────────────────────
+document.querySelector('.stock-table thead').addEventListener('click', e => {
+  const th = e.target.closest('.sortable');
+  if (!th) return;
+  const col = th.dataset.col;
+  if (sortCol === col) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  else { sortCol = col; sortDir = 'desc'; }
+  // Icon updaten
+  document.querySelectorAll('.sort-icon').forEach(i => i.textContent = '⇅');
+  th.querySelector('.sort-icon').textContent = sortDir === 'desc' ? '↓' : '↑';
+  renderTable();
+});
+
+// ── SUCHE ─────────────────────────────────────────────
+document.getElementById('stockSearch').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  if (heatmapMode) renderHeatmap();
+  else renderTable();
+});
+
+// ── HEATMAP TOGGLE ────────────────────────────────────
+document.getElementById('btnHeatmap').addEventListener('click', () => {
+  heatmapMode = !heatmapMode;
+  document.getElementById('tableView').style.display   = heatmapMode ? 'none'  : 'block';
+  document.getElementById('heatmapView').style.display = heatmapMode ? 'grid'  : 'none';
+  document.getElementById('btnHeatmap').textContent    = heatmapMode ? '📋 TABLE' : '⬛ HEATMAP';
+  if (heatmapMode) renderHeatmap();
+});
+
+// ═══════════════════════════════════════════════════════
+// PRICE ALERTS
+// ═══════════════════════════════════════════════════════
+function checkPriceAlerts() {
+  Object.entries(state.priceAlerts || {}).forEach(([ticker, target]) => {
+    const price = state.prices[ticker];
+    const h     = state.histories[ticker];
+    const prev  = h.length >= 2 ? h[h.length - 2] : price;
+    // Ausgelöst wenn Kurs die Ziellinie kreuzt
+    const crossed = (prev < target && price >= target) || (prev > target && price <= target);
+    if (crossed) {
+      delete state.priceAlerts[ticker];
+      showToast(`🔔 Price Alert: ${ticker} reached ${fmt(price)}!`);
+      // News-Toast kurz aufblitzen lassen
+      showNewsToast(ticker, `Price alert triggered at ${fmt(price)}`, price >= target ? 0.01 : -0.01, false);
+    }
+  });
+}
+
+function clearPriceAlert(ticker) {
+  delete state.priceAlerts[ticker];
+  showToast(`🔕 Alert removed for ${ticker}`);
+  refreshModal();
+}
+
+// ── CHART RANGE TOGGLE ────────────────────────────────
+document.querySelector('.chart-range-btns').addEventListener('click', e => {
+  const btn = e.target.closest('.chart-range-btn');
+  if (!btn) return;
+  chartRange = parseInt(btn.dataset.range);
+  document.querySelectorAll('.chart-range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (modalTicker) drawChart('modalChart', modalTicker, 200, 120);
+});
+
+// ── PREIS-ALARM ───────────────────────────────────────
+document.getElementById('btnSetAlert').addEventListener('click', () => {
+  if (!modalTicker) return;
+  const target = parseFloat(document.getElementById('priceAlertInput').value);
+  if (!target || target <= 0) { showToast('Enter a valid price', true); return; }
+  if (!state.priceAlerts) state.priceAlerts = {};
+  state.priceAlerts[modalTicker] = target;
+  const dir = target > state.prices[modalTicker] ? '▲ above' : '▼ below';
+  showToast(`🔔 Alert set for ${modalTicker} at ${fmt(target)} (${dir} current)`);
+  refreshModal();
+});
+
+// ═══════════════════════════════════════════════════════
+// MOBILE NAV
+// ═══════════════════════════════════════════════════════
+function isMobile() {
+  return window.innerWidth <= 1024;
+}
+
+function setMobileView(view) {
+  if (!isMobile()) return;
+
+  const market  = document.querySelector('.market-panel');
+  const sidebar = document.querySelector('.sidebar');
+
+  // Alle ausblenden
+  market.classList.add('view-hidden');
+  sidebar.classList.remove('sidebar-mobile-view');
+  sidebar.classList.add('view-hidden');
+
+  if (view === 'market') {
+    market.classList.remove('view-hidden');
+  } else {
+    // Portfolio oder History → Sidebar zeigen, richtigen Tab aktivieren
+    sidebar.classList.remove('view-hidden');
+    sidebar.classList.add('sidebar-mobile-view');
+
+    // Richtigen Sidebar-Tab aktivieren
+    const tabMap = { sidebar: 'portfolio', history: 'history' };
+    const targetTab = tabMap[view] || 'portfolio';
+    document.querySelectorAll('.stab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === targetTab);
+    });
+    document.querySelectorAll('.stab-content').forEach(c => {
+      c.style.display = c.id === 'stab-' + targetTab ? 'block' : 'none';
+    });
+  }
+
+  // Nav Buttons updaten
+  document.querySelectorAll('.mnav-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+}
+
+// Bottom Nav Click
+document.getElementById('mobileNav').addEventListener('click', e => {
+  const btn = e.target.closest('.mnav-btn');
+  if (!btn) return;
+  setMobileView(btn.dataset.view);
+});
+
+// Bei Resize Desktop-Layout wiederherstellen
+window.addEventListener('resize', () => {
+  if (!isMobile()) {
+    document.querySelector('.market-panel').classList.remove('view-hidden');
+    document.querySelector('.sidebar').classList.remove('view-hidden', 'sidebar-mobile-view');
+  }
 });
 
 // ═══════════════════════════════════════════════════════
