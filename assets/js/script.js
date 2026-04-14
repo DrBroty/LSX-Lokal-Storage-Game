@@ -576,6 +576,7 @@ function renderTable() {
 
 function makeMiniChart(ticker) {
   const h = state.histories[ticker].slice(-10);
+  if (h.length === 0) return '';
   const min = Math.min(...h), max = Math.max(...h), range = max - min || 1;
   const last = h[h.length - 1];
   const bars = h.map(v => {
@@ -859,6 +860,7 @@ function renderPortfolioChart() {
   if (!canvas || !state.netWorthHistory?.length) return;
   const ctx  = canvas.getContext('2d');
   const data = state.netWorthHistory.slice(-60);
+  if (data.length < 2) return;
   const cw   = canvas.parentElement.clientWidth - 16;
   const h    = 80;
   canvas.width  = cw;
@@ -938,12 +940,13 @@ function refreshModal() {
   const chg   = getChange(modalTicker);
   const chg24 = get24h(modalTicker);
   const h     = state.histories[modalTicker];
-  const hi    = Math.max(...h.slice(-12));
-  const lo    = Math.min(...h.slice(-12));
+  const hSlice = h.length > 0 ? h.slice(-12) : [price];
+  const hi    = Math.max(...hSlice);
+  const lo    = Math.min(...hSlice);
   const held  = state.holdings[modalTicker];
 
   const vol    = (state.volumes[modalTicker] || 0).toLocaleString('en-US');
-  const h7d    = state.histories[modalTicker];
+  const h7d    = h.length > 0 ? h : [price];
   const hi52   = Math.max(...h7d);
   const lo52   = Math.min(...h7d);
   const mktCap = state.prices[modalTicker] * (state.volumes[modalTicker] || 0);
@@ -1107,7 +1110,7 @@ function executeTrade(ticker, mode, qty) {
     state.cash -= (total + fee);
     if (!state.holdings[ticker]) state.holdings[ticker] = { qty:0, avgCost:0 };
     const h  = state.holdings[ticker];
-    const nt = h.qty * h.avgCost + total;
+    const nt = h.qty * h.avgCost + total + fee;
     h.qty += qty;
     h.avgCost = nt / h.qty;
     state.stats.totalFeesPaid += fee;
@@ -1175,7 +1178,7 @@ function openShort(ticker, qty) {
     state.shorts[ticker] = { qty: 0, entryPrice: 0, collateral: 0 };
   }
   const sh    = state.shorts[ticker];
-  const nt    = sh.qty * sh.entryPrice + total;
+  const nt    = sh.qty * sh.entryPrice + total + fee;
   sh.qty      += qty;
   sh.entryPrice = nt / sh.qty;
   sh.collateral += collateral;
@@ -1747,7 +1750,7 @@ document.querySelector('.m-qty-btns').addEventListener('click', e => {
     if (modalMode === 'buy') {
       document.getElementById('mQtyInput').value = Math.max(1, Math.floor(state.cash / price));
     } else {
-      document.getElementById('mQtyInput').value = Math.max(1, state.holdings[modalTicker]?.qty || 1);
+      document.getElementById('mQtyInput').value = state.holdings[modalTicker]?.qty || 0;
     }
   } else {
     document.getElementById('mQtyInput').value = btn.dataset.qty;
