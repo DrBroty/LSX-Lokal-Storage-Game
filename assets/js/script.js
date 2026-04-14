@@ -69,6 +69,7 @@ function checkMilestone() {
         color:       m >= 1_000_000 ? 0xffd700 : 0x00ff88,
         timestamp:   new Date().toISOString()
       });
+      saveGame(); // ← sofort persistieren
     }
   }
 }
@@ -1507,16 +1508,19 @@ function closeNewsToast() {
 // ═══════════════════════════════════════════════════════
 // SAVE / LOAD / RESET
 // ═══════════════════════════════════════════════════════
-function saveGame() {
+async function saveGame() {
   state.savedAt = Date.now();
-  fetch(API + '/save.php', {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(state)
-  })
-  .then(() => showToast('💾 Gespeichert'))
-  .catch(() => showToast('Speichern fehlgeschlagen', true));
+  try {
+    await fetch(API + '/save.php', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    });
+    showToast('💾 Gespeichert');
+  } catch {
+    showToast('Speichern fehlgeschlagen', true);
+  }
 }
 
 function startTimers() {
@@ -1654,6 +1658,8 @@ async function checkLogin() {
           state.volumes[s.ticker]   = Math.floor(Math.random() * 900000 + 100000);
         }
       });
+      
+      await saveGame();
 
       compressTime();
       showToast('📂 Spielstand geladen');
