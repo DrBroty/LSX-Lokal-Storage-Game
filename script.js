@@ -239,14 +239,14 @@ const NEWS_EVENTS = [
 // Insider Tipps
 // ═══════════════════════════════════════════════════════
 
-const INSIDER_INTERVAL_MS  = 100000;  // alle 90s ein Tip
-const INSIDER_ACCURACY     = 0.60;   // 70% der Tips sind korrekt
+const INSIDER_INTERVAL_MS  = 100000;  // alle 100s ein Tip
+const INSIDER_ACCURACY     = 0.60;   // 60% der Tips sind korrekt
 
 // ═══════════════════════════════════════════════════════
 // Short Selling
 // ═══════════════════════════════════════════════════════
 
-const SHORT_FEE_DAILY = 0.015; // 0.5% Leihgebühr pro Spieltag
+const SHORT_FEE_DAILY = 0.015; // 0.15% Leihgebühr pro Spieltag
 const SHORT_MAX_RATIO = 1.5;   // Max 1.5× Cash als Short-Volumen
 
 
