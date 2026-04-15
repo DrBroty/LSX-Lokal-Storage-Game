@@ -211,6 +211,11 @@ header {
   transition: border-color .2s;
 }
 .search-input:focus { border-color: var(--accent); }
+.search-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: var(--dim);
+  white-space: nowrap;
+}
 
 /* ── STOCK TABLE ─────────────────────────────── */
 .table-wrap { overflow-x: auto; }
@@ -224,7 +229,13 @@ header {
 .stock-table th:nth-child(n+3), .stock-table td:nth-child(n+3) { text-align:right; }
 .stock-row { border-bottom:1px solid rgba(30,48,80,0.6); cursor:pointer; transition:background .12s; }
 .stock-row:hover   { background:rgba(0,212,255,0.04); }
-.stock-row.watched td:first-child::before { content:'★ '; color:var(--gold); font-size:12px; }
+.star-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 16px; line-height: 1; padding: 4px 6px;
+  color: var(--dim); transition: color .15s, transform .15s;
+}
+.star-btn:hover  { color: var(--gold); transform: scale(1.2); }
+.star-btn.active { color: var(--gold); }
 .stock-table td { padding:10px 10px; vertical-align:middle; }
 
 .stock-ticker { font-family:'Share Tech Mono',monospace; font-weight:700; font-size:14px; color:#fff; }
@@ -354,25 +365,71 @@ header {
 .modal-close:hover { background:rgba(255,51,85,0.15); color:var(--red); border-color:var(--red); }
 
 .modal-header {
-  padding-bottom:14px; border-bottom:1px solid var(--border);
+  padding-bottom:12px; border-bottom:1px solid var(--border);
   display:flex; justify-content:space-between; align-items:flex-start;
-  margin-bottom: 14px;
+  margin-bottom:12px; gap:8px;
 }
-.modal-ticker    { font-size:28px; font-weight:700; color:#fff; font-family:'Share Tech Mono',monospace; line-height:1; }
-.modal-name      { font-size:14px; color:var(--dim); margin-top:4px; font-weight:600; }
+.modal-header-left  { flex:1; min-width:0; }
+.modal-header-right { display:flex; align-items:flex-start; gap:10px; flex-shrink:0; }
+.modal-ticker-row   { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.modal-ticker       { font-size:26px; font-weight:700; color:#fff; font-family:'Share Tech Mono',monospace; line-height:1; }
+.modal-sector-badge {
+  font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  padding:2px 8px; border-radius:10px; border:1px solid; opacity:.9;
+}
+.modal-name      { font-size:13px; color:var(--dim); margin-top:4px; font-weight:600; }
 .modal-price-wrap { text-align:right; }
 .modal-price-block { text-align:right; }
-.modal-price     { font-size:26px; font-weight:700; font-family:'Share Tech Mono',monospace; }
-.modal-change    { font-size:14px; font-family:'Share Tech Mono',monospace; font-weight:600; margin-top:4px; }
+.modal-price     { font-size:24px; font-weight:700; font-family:'Share Tech Mono',monospace; }
+.modal-change    { font-size:13px; font-family:'Share Tech Mono',monospace; font-weight:600; margin-top:3px; }
 
+/* Watchlist icon in header */
+.btn-watch-icon {
+  width:34px; height:34px; flex-shrink:0; margin-top:2px;
+  background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.28);
+  border-radius:6px; color:var(--dim); font-size:18px; line-height:1;
+  cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.btn-watch-icon:hover    { background:rgba(255,215,0,0.14); color:var(--gold); border-color:var(--gold); }
+.btn-watch-icon.watching { background:rgba(255,215,0,0.14); color:var(--gold); border-color:var(--gold); }
+
+/* Compact stats grid */
 .modal-stats {
-  display:flex; gap:16px; flex-wrap:wrap;
-  margin-bottom:14px; padding-bottom:14px;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:6px 10px;
+  margin-bottom:10px; padding-bottom:10px;
   border-bottom:1px solid var(--border);
 }
-.mstat { font-size:12px; color:var(--label); }
-.mstat span { color:#e8f4ff; font-weight:700; font-family:'Share Tech Mono',monospace; margin-left:4px; font-size:13px; }
+.mstat { font-size:10px; color:var(--label); line-height:1.4; }
+.mstat span { display:block; color:#e8f4ff; font-weight:700; font-family:'Share Tech Mono',monospace; font-size:12px; }
 .mstat .rival-val { color:var(--accent); }
+
+/* Status pills row */
+.modal-status-row { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+.modal-status-row:empty { margin:0; }
+
+/* Inner tab switcher */
+.modal-inner-tabs {
+  display:grid; grid-template-columns:1fr 1fr;
+  border:1px solid var(--border); border-radius:6px; overflow:hidden;
+  margin-bottom:12px;
+}
+.modal-inner-tab {
+  padding:8px; text-align:center; cursor:pointer;
+  font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px;
+  letter-spacing:2px; text-transform:uppercase;
+  background:transparent; border:none; color:var(--dim); transition:all .2s;
+}
+.modal-inner-tab.active {
+  background:rgba(0,212,255,0.1); color:var(--accent);
+  border-bottom:2px solid var(--accent);
+}
+.modal-inner-tab:hover:not(.active) { color:var(--text); background:rgba(255,255,255,0.03); }
+
+/* Modal panels */
+.modal-panel { animation:fadeIn .15s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 
 canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; }
 
@@ -495,6 +552,7 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 .stop-loss-row { display:flex; align-items:center; gap:10px; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
 .stop-loss-lbl { font-size:12px; color:var(--label); letter-spacing:1px; white-space:nowrap; text-transform:uppercase; }
 
+/* .btn-watch kept as alias for backwards compat but icon variant is primary */
 .btn-watch {
   margin-top:12px; width:100%; padding:8px;
   background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.3);
@@ -805,6 +863,11 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 
 /* ── MOBILE (≤ 768px) ───────────────────────── */
 @media (max-width: 768px) {
+  .btn-sm, .m-qty-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+    min-height: 36px;
+  }
   .header-center { display: none; }
 
   .main-content { padding: 8px; }
@@ -813,6 +876,8 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
   .stock-table td:nth-child(2) { display: none; }
   .stock-table th:nth-child(5),
   .stock-table td:nth-child(5) { display: none; }
+  .stock-table th:last-child,
+  .stock-table td:last-child { display: none; }
 
   .stock-ticker { font-size: 13px; }
   .stock-price  { font-size: 12px; }

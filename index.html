@@ -155,6 +155,7 @@
     <div class="table-controls">
       <input id="searchInput" class="search-input" type="text"
              placeholder="🔍 Search ticker or name…">
+      <span id="searchCount" class="search-count"></span>
       <button id="btnHeatmap" class="btn-sm">🗺 HEATMAP</button>
     </div>
 
@@ -170,6 +171,7 @@
             <th data-sort="chg24">24H% ↕</th>
             <th>CHART</th>
             <th data-sort="held">HELD ↕</th>
+            <th title="Watchlist">☆</th>
           </tr>
         </thead>
         <tbody id="stockTableBody"></tbody>
@@ -220,103 +222,115 @@
 
     <button id="modalClose" class="modal-close">✕</button>
 
+    <!-- ── Header ─────────────────────────────── -->
     <div class="modal-header">
-      <div>
-        <div id="modalTicker" class="modal-ticker"></div>
-        <div id="modalName"   class="modal-name"></div>
+      <div class="modal-header-left">
+        <div class="modal-ticker-row">
+          <span id="modalTicker" class="modal-ticker"></span>
+          <span id="modalSectorBadge" class="modal-sector-badge"></span>
+        </div>
+        <div id="modalName" class="modal-name"></div>
       </div>
-      <div class="modal-price-wrap">
-        <div id="modalPrice"  class="modal-price"></div>
-        <div id="modalChange" class="modal-change"></div>
+      <div class="modal-header-right">
+        <div class="modal-price-wrap">
+          <div id="modalPrice"  class="modal-price"></div>
+          <div id="modalChange" class="modal-change"></div>
+        </div>
+        <button id="btnWatch" class="btn-watch-icon" title="Watchlist">☆</button>
       </div>
     </div>
 
-    <!-- Chart -->
-    <canvas id="modalChart" height="120"></canvas>
-
-    <!-- Chart range -->
+    <!-- ── Chart ──────────────────────────────── -->
+    <canvas id="modalChart" height="90"></canvas>
     <div class="chart-range-btns">
       <button class="crb active" data-range="10">10T</button>
       <button class="crb"        data-range="30">30T</button>
       <button class="crb"        data-range="60">60T</button>
     </div>
 
-    <!-- Stats -->
+    <!-- ── Stats ──────────────────────────────── -->
     <div id="modalStats" class="modal-stats"></div>
 
-    <!-- Short Status -->
-    <div id="shortStatus" class="short-status"></div>
-
-    <!-- Price Alert Status -->
-    <div id="priceAlertStatus" class="alert-status"></div>
-
-    <!-- Trade Tabs -->
-    <div class="trade-tabs2">
-      <button id="mTabBuy"  class="trade-tab2 buy-active">BUY</button>
-      <button id="mTabSell" class="trade-tab2">SELL</button>
+    <!-- ── Active status pills ────────────────── -->
+    <div class="modal-status-row">
+      <div id="shortStatus"      class="short-status"></div>
+      <div id="priceAlertStatus" class="alert-status"></div>
     </div>
 
-    <!-- Quantity -->
-    <div class="m-qty-row">
-      <input id="mQtyInput" class="m-qty-input" type="number" min="1" value="1">
-      <div class="m-qty-btns">
-        <button class="m-qty-btn" data-qty="1">1</button>
-        <button class="m-qty-btn" data-qty="5">5</button>
-        <button class="m-qty-btn" data-qty="10">10</button>
-        <button class="m-qty-btn" data-qty="50">50</button>
-        <button class="m-qty-btn" data-qty="max">MAX</button>
+    <!-- ── Inner tabs: TRADE | ORDERS ─────────── -->
+    <div class="modal-inner-tabs">
+      <button id="mtabTrade"  class="modal-inner-tab active">TRADE</button>
+      <button id="mtabOrders" class="modal-inner-tab">ORDERS</button>
+    </div>
+
+    <!-- ── TRADE panel ────────────────────────── -->
+    <div id="mpanelTrade" class="modal-panel">
+
+      <div class="trade-tabs2">
+        <button id="mTabBuy"  class="trade-tab2 buy-active">BUY</button>
+        <button id="mTabSell" class="trade-tab2">SELL</button>
       </div>
-    </div>
-    <div class="m-total">Total: <span id="mTotal">$0.00</span></div>
 
-    <button id="btnModalTrade" class="btn-modal-trade btn-modal-buy">BUY SHARES</button>
-
-    <!-- Short Sell Section -->
-    <div class="modal-section">
-      <div class="section-label">SHORT SELL</div>
-      <div class="short-row">
-        <input id="shortQtyInput" class="m-qty-input" type="number" min="1" value="1" placeholder="Qty">
-        <button id="btnOpenShort"  class="btn-sm btn-short">SHORT ▼</button>
-        <button id="btnCloseShort" class="btn-sm btn-cover">COVER ▲</button>
+      <div class="m-qty-row">
+        <input id="mQtyInput" class="m-qty-input" type="number" min="1" value="1">
+        <div class="m-qty-btns">
+          <button class="m-qty-btn" data-qty="1">1</button>
+          <button class="m-qty-btn" data-qty="5">5</button>
+          <button class="m-qty-btn" data-qty="10">10</button>
+          <button class="m-qty-btn" data-qty="50">50</button>
+          <button class="m-qty-btn" data-qty="max">MAX</button>
+        </div>
       </div>
-    </div>
+      <div class="m-total">Total: <span id="mTotal">$0.00</span></div>
+      <button id="btnModalTrade" class="btn-modal-trade btn-modal-buy">BUY SHARES</button>
 
-    <!-- Limit Order Section -->
-    <div class="modal-section">
-      <div class="section-label">LIMIT ORDER</div>
-      <div class="limit-row">
-        <select id="limitType" class="limit-select">
-          <option value="buy-below">BUY ≤</option>
-          <option value="sell-above">SELL ≥</option>
-        </select>
-        <input id="limitPrice" class="m-qty-input" type="number" placeholder="Price">
-        <input id="limitQty"   class="m-qty-input" type="number" placeholder="Qty" min="1">
-        <button id="btnAddOrder" class="btn-sm">SET</button>
+      <!-- Short Sell -->
+      <div class="modal-section">
+        <div class="section-label">SHORT SELL</div>
+        <div class="short-row">
+          <input id="shortQtyInput" class="m-qty-input" type="number" min="1" value="1" placeholder="Qty">
+          <button id="btnOpenShort"  class="btn-sm btn-short">SHORT ▼</button>
+          <button id="btnCloseShort" class="btn-sm btn-cover">COVER ▲</button>
+        </div>
       </div>
     </div>
 
-    <!-- Stop Loss Section -->
-    <div class="modal-section">
-      <div class="section-label">STOP-LOSS</div>
-      <div class="stop-row">
-        <input id="stopLossInput" class="m-qty-input" type="number"
-               placeholder="% loss" min="1" max="99">
-        <button id="btnSetStopLoss" class="btn-sm">SET</button>
-      </div>
-      <div id="stopLossStatus" class="stop-status"></div>
-    </div>
+    <!-- ── ORDERS panel ───────────────────────── -->
+    <div id="mpanelOrders" class="modal-panel" style="display:none">
 
-    <!-- Price Alert Section -->
-    <div class="modal-section">
-      <div class="section-label">PRICE ALERT</div>
-      <div class="stop-row">
-        <input id="priceAlertInput" class="m-qty-input" type="number" placeholder="Target $">
-        <button id="btnSetAlert" class="btn-sm">SET</button>
+      <div class="modal-section" style="margin-top:0;padding-top:0;border-top:none;">
+        <div class="section-label">LIMIT ORDER</div>
+        <div class="limit-row">
+          <select id="limitType" class="limit-select">
+            <option value="buy-below">BUY ≤</option>
+            <option value="sell-above">SELL ≥</option>
+          </select>
+          <input id="limitPrice" class="m-qty-input" type="number" placeholder="Price">
+          <input id="limitQty"   class="m-qty-input" type="number" placeholder="Qty" min="1">
+          <button id="btnAddOrder" class="btn-sm">SET</button>
+        </div>
       </div>
-    </div>
 
-    <!-- Watchlist Button -->
-    <button id="btnWatch" class="btn-watch">☆ ADD TO WATCHLIST</button>
+      <div class="modal-section">
+        <div class="section-label">STOP-LOSS</div>
+        <div class="stop-row">
+          <input id="stopLossInput" class="m-qty-input" type="number"
+                 placeholder="% loss" min="1" max="99">
+          <button id="btnSetStopLoss"   class="btn-sm">SET</button>
+          <button id="btnClearStopLoss" class="btn-sm btn-danger" style="display:none">CLEAR</button>
+        </div>
+        <div id="stopLossStatus" class="stop-status"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="section-label">PRICE ALERT</div>
+        <div class="stop-row">
+          <input id="priceAlertInput" class="m-qty-input" type="number" placeholder="Target $">
+          <button id="btnSetAlert" class="btn-sm">SET</button>
+        </div>
+      </div>
+
+    </div><!-- /.modal-panel ORDERS -->
 
   </div>
 </div>
