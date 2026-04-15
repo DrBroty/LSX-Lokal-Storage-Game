@@ -22,15 +22,25 @@ $data = file_exists($file) ? json_decode(file_get_contents($file), true) : ['cou
 if ($now - $data['start'] > 60) $data = ['count' => 0, 'start' => $now];
 $data['count']++;
 file_put_contents($file, json_encode($data));
-if ($data['count'] > 5) { http_response_code(429); exit; }
+if ($data['count'] > 15) { http_response_code(429); exit; }
 
 // ── Payload validieren ────────────────────────────────
 $raw  = file_get_contents('php://input');
 $body = json_decode($raw, true);
 if (!$body || !isset($body['embeds'][0]['title'])) { http_response_code(400); exit; }
 
-$allowed = ['💹 Großer Trade', '🏆 Milestone'];
-$valid   = false;
+$allowed = [
+    '🏆 Milestone',       // Vermögens-Meilensteine
+    '📈 Neues Portfolio', // All-Time High
+    '📈 Großer Kauf',     // Großer BUY-Trade
+    '💹 Großer Verkauf',  // Großer SELL-Trade
+    '💸 Herber Verlust',  // Großer Verlust
+    '🛡 Stop-Loss',       // Stop-Loss ausgelöst
+    '📉 Short gedeckt',   // Short gedeckt
+    '⏱ Limit-Order',     // Limit-Order ausgeführt
+    '💰 Dividenden',      // Dividendenausschüttung
+];
+$valid = false;
 foreach ($allowed as $prefix) {
     if (str_starts_with($body['embeds'][0]['title'], $prefix)) { $valid = true; break; }
 }
