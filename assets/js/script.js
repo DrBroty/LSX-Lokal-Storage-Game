@@ -8,44 +8,7 @@ const API = 'https://los-santos-exchange.de/lsx-proxy';
 // ═══════════════════════════════════════════════════════
 // DISCORD WEBHOOK PROXY
 // ═══════════════════════════════════════════════════════
-const PROXY_URL   = 'https://los-santos-exchange.de/lsx-proxy/webhook.php';
-
-// ── Milestones ─────────────────────────────────────────
-const milestones = [
-  150_000,      // $150K   — Erster großer Schritt
-  200_000,      // $200K
-  300_000,      // $300K
-  500_000,      // $500K   — Halbe Million
-  750_000,      // $750K
-  1_000_000,    // $1M     — Millionär 🏆
-  1_500_000,    // $1.5M
-  2_000_000,    // $2M
-  3_000_000,    // $3M
-  5_000_000,    // $5M     — High Roller
-  7_500_000,    // $7.5M
-  10_000_000,   // $10M    — Mogul 💎
-  25_000_000,   // $25M
-  50_000_000,   // $50M
-  100_000_000,  // $100M   — Legende 👑
-];
-
-const MILESTONE_LABELS = {
-  150_000:     { title: '📈 First Steps',        desc: 'Net Worth über $150K!' },
-  200_000:     { title: '💵 Getting Serious',    desc: 'Net Worth über $200K!' },
-  300_000:     { title: '📊 On The Rise',        desc: 'Net Worth über $300K!' },
-  500_000:     { title: '🔥 Half a Million',     desc: 'Net Worth über $500K!' },
-  750_000:     { title: '💰 Three Quarters',     desc: 'Net Worth über $750K!' },
-  1_000_000:   { title: '🏆 MILLIONAIRE',        desc: 'Net Worth über $1.000.000!' },
-  1_500_000:   { title: '📈 $1.5M Club',         desc: 'Net Worth über $1.5M!' },
-  2_000_000:   { title: '💎 $2M Achieved',       desc: 'Net Worth über $2M!' },
-  3_000_000:   { title: '🚀 $3M Power Trader',   desc: 'Net Worth über $3M!' },
-  5_000_000:   { title: '💼 High Roller',        desc: 'Net Worth über $5M!' },
-  7_500_000:   { title: '🌆 $7.5M Elite',        desc: 'Net Worth über $7.5M!' },
-  10_000_000:  { title: '🏙 Mogul Status',       desc: 'Net Worth über $10M!' },
-  25_000_000:  { title: '✈️ $25M Tycoon',        desc: 'Net Worth über $25M!' },
-  50_000_000:  { title: '🛥 $50M Empire',        desc: 'Net Worth über $50M!' },
-  100_000_000: { title: '👑 LEGENDE',            desc: 'Net Worth über $100M!' },
-};
+const PROXY_URL = 'https://los-santos-exchange.de/lsx-proxy/webhook.php';
 
 function sendDiscordWebhook(embed) {
   fetch(PROXY_URL, {
@@ -55,9 +18,47 @@ function sendDiscordWebhook(embed) {
   }).catch(() => {});
 }
 
-function checkMilestone() {
-  const nw = state.cash + Object.entries(state.holdings)
+// Spielzeit als lesbarer Footer-String
+function gameTimeStr() {
+  return `LSX · ${DAYS[state.gameDay]}, ${state.gameDayOfMonth}. ${MONTHS[state.gameMonth]} · ${state.gameHour.toString().padStart(2,'0')}:00`;
+}
+
+// Net Worth berechnen
+function getNetWorth() {
+  return state.cash + Object.entries(state.holdings)
     .reduce((a, [t, h]) => a + h.qty * state.prices[t], 0);
+}
+
+// ── Milestones ─────────────────────────────────────────
+const milestones = [
+  150_000, 200_000, 300_000, 500_000, 750_000,
+  1_000_000, 1_500_000, 2_000_000, 3_000_000,
+  5_000_000, 7_500_000, 10_000_000, 25_000_000,
+  50_000_000, 100_000_000,
+];
+
+const MILESTONE_LABELS = {
+  150_000:     { title: '🏆 Milestone — $150K',    emoji: '📈' },
+  200_000:     { title: '🏆 Milestone — $200K',    emoji: '💵' },
+  300_000:     { title: '🏆 Milestone — $300K',    emoji: '📊' },
+  500_000:     { title: '🏆 Milestone — $500K',    emoji: '🔥' },
+  750_000:     { title: '🏆 Milestone — $750K',    emoji: '💰' },
+  1_000_000:   { title: '🏆 Milestone — MILLIONÄR',emoji: '🥂' },
+  1_500_000:   { title: '🏆 Milestone — $1.5M',   emoji: '📈' },
+  2_000_000:   { title: '🏆 Milestone — $2M',      emoji: '💎' },
+  3_000_000:   { title: '🏆 Milestone — $3M',      emoji: '🚀' },
+  5_000_000:   { title: '🏆 Milestone — High Roller $5M', emoji: '💼' },
+  7_500_000:   { title: '🏆 Milestone — $7.5M',   emoji: '🌆' },
+  10_000_000:  { title: '🏆 Milestone — Mogul $10M', emoji: '🏙' },
+  25_000_000:  { title: '🏆 Milestone — Tycoon $25M', emoji: '✈️' },
+  50_000_000:  { title: '🏆 Milestone — Empire $50M', emoji: '🛥' },
+  100_000_000: { title: '🏆 Milestone — LEGENDE $100M', emoji: '👑' },
+};
+
+function checkMilestone() {
+  const nw = getNetWorth();
+  const totalReturn = ((nw - state.stats.startCash) / state.stats.startCash * 100);
+  const portVal = nw - state.cash;
 
   for (const m of milestones) {
     if (nw >= m && state.lastMilestone < m) {
@@ -65,12 +66,48 @@ function checkMilestone() {
       const label = MILESTONE_LABELS[m];
       sendDiscordWebhook({
         title:       label.title,
-        description: `${label.desc}\nAktuell: **${fmt(nw)}**`,
+        description: `${label.emoji} Ein neues Vermögens-Milestone wurde erreicht!`,
         color:       m >= 1_000_000 ? 0xffd700 : 0x00ff88,
-        timestamp:   new Date().toISOString()
+        fields: [
+          { name: 'Net Worth',  value: `**${fmt(nw)}**`,                        inline: true },
+          { name: 'Return',     value: `**${totalReturn>=0?'+':''}${totalReturn.toFixed(1)}%**`, inline: true },
+          { name: 'Cash',       value: fmt(state.cash),                          inline: true },
+          { name: 'Portfolio',  value: fmt(portVal),                             inline: true },
+          { name: 'Trades',     value: `${state.stats.totalTrades}`,             inline: true },
+          { name: 'Realized P&L', value: `${state.stats.realizedPnl>=0?'+':''}${fmt(state.stats.realizedPnl)}`, inline: true },
+        ],
+        footer:    { text: gameTimeStr() },
+        timestamp: new Date().toISOString(),
       });
-      saveGame(); // ← sofort persistieren
+      saveGame();
     }
+  }
+}
+
+// ── Portfolio All-Time High ─────────────────────────────
+function checkNetWorthATH() {
+  const nw = getNetWorth();
+  const prev = state.stats.netWorthATH ?? state.stats.startCash;
+  // Nur melden wenn mind. $10K über bisherigem ATH und mind. $100K gesamt
+  if (nw > prev + 10_000 && nw >= 100_000) {
+    const gain = nw - prev;
+    const gainPct = (gain / prev * 100).toFixed(1);
+    state.stats.netWorthATH = nw;
+    sendDiscordWebhook({
+      title:       '📈 Neues Portfolio All-Time High!',
+      description: `Dein Net Worth hat einen neuen Höchststand erreicht.`,
+      color:       0x00d4ff,
+      fields: [
+        { name: 'Neues ATH',   value: `**${fmt(nw)}**`,     inline: true },
+        { name: 'Vorheriges',  value: fmt(prev),             inline: true },
+        { name: 'Zuwachs',     value: `+${fmt(gain)} (+${gainPct}%)`, inline: true },
+      ],
+      footer:    { text: gameTimeStr() },
+      timestamp: new Date().toISOString(),
+    });
+  } else if (nw > prev) {
+    // Stille Aktualisierung ohne Webhook
+    state.stats.netWorthATH = nw;
   }
 }
 
@@ -375,8 +412,9 @@ function defaultState() {
     bestTrade:      0,
     worstTrade:     0,
     startCash:      50000,
-    totalFeesPaid:  0,       
-    totalDividends: 0,       
+    totalFeesPaid:  0,
+    totalDividends: 0,
+    netWorthATH:    50000,
     },
     lastDividendDay: 0,
     lastMilestone: 0,   // ← NEU
@@ -467,6 +505,7 @@ function simulateTick(n = 1) {
   checkPriceAlerts();   
   checkShortStopLosses();  
   checkMilestone();
+  checkNetWorthATH();
   renderAll();
 }
 
@@ -1141,6 +1180,23 @@ function executeTrade(ticker, mode, qty) {
     state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'BUY', qty, price, pnl: null, fee});
     if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
     showToast(`✓ Bought ${qty} × ${ticker} @ ${fmt(price)} · Fee: ${fmt(fee)}`);
+    if (total >= 10_000) {
+      sendDiscordWebhook({
+        title:       `📈 Großer Kauf — ${ticker}`,
+        description: `Position im Wert von **${fmt(total)}** eröffnet.`,
+        color:       0x00ff88,
+        fields: [
+          { name: 'Aktie',  value: ticker,       inline: true },
+          { name: 'Stück',  value: `${qty}`,     inline: true },
+          { name: 'Kurs',   value: fmt(price),   inline: true },
+          { name: 'Total',  value: fmt(total),   inline: true },
+          { name: 'Fee',    value: fmt(fee),      inline: true },
+          { name: 'Cash danach', value: fmt(state.cash), inline: true },
+        ],
+        footer:    { text: gameTimeStr() },
+        timestamp: new Date().toISOString(),
+      });
+    }
 
   } else {
     if (!state.holdings[ticker] || state.holdings[ticker].qty < qty) {
@@ -1159,12 +1215,26 @@ function executeTrade(ticker, mode, qty) {
     state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'SELL', qty, price, pnl, fee});
 if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
     showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
-    if (total >= 10000) {
+    if (total >= 10_000 || pnl <= -3_000) {
+      const isBigLoss = pnl <= -3_000;
       sendDiscordWebhook({
-        title: '💹 Großer Trade — ' + ticker,
-        description: `**SELL** ${qty} × ${ticker} @ ${fmt(price)}\nP&L: **${pnl >= 0 ? '+' : ''}${fmt(pnl)}**`,
+        title:       isBigLoss && total < 10_000
+          ? `💸 Herber Verlust — ${ticker}`
+          : `💹 Großer Verkauf — ${ticker}`,
+        description: isBigLoss
+          ? `Position mit **${fmt(Math.abs(pnl))} Verlust** geschlossen.`
+          : `Position über **${fmt(total)}** verkauft.`,
         color: pnl >= 0 ? 0x00ff88 : 0xff3355,
-        timestamp: new Date().toISOString()
+        fields: [
+          { name: 'Aktie',  value: ticker,                                       inline: true },
+          { name: 'Stück',  value: `${qty}`,                                     inline: true },
+          { name: 'Kurs',   value: fmt(price),                                   inline: true },
+          { name: 'Total',  value: fmt(total),                                   inline: true },
+          { name: 'P&L',    value: `**${pnl>=0?'+':''}${fmt(pnl)}**`,           inline: true },
+          { name: 'Fee',    value: fmt(fee),                                     inline: true },
+        ],
+        footer:    { text: gameTimeStr() },
+        timestamp: new Date().toISOString(),
       });
     }
   }
@@ -1248,6 +1318,25 @@ function closeShort(ticker, qty) {
   if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
 
   showToast(`✓ Covered ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)}`);
+  if (Math.abs(pnl) >= 1_000) {
+    sendDiscordWebhook({
+      title:       `📉 Short gedeckt — ${ticker}`,
+      description: pnl >= 0
+        ? `Short-Position mit **${fmt(pnl)} Gewinn** geschlossen. 🎯`
+        : `Short-Position mit **${fmt(Math.abs(pnl))} Verlust** geschlossen.`,
+      color: pnl >= 0 ? 0x00ff88 : 0xff3355,
+      fields: [
+        { name: 'Aktie',    value: ticker,                              inline: true },
+        { name: 'Stück',    value: `${qty}`,                           inline: true },
+        { name: 'Einstieg', value: fmt(sh.entryPrice),                 inline: true },
+        { name: 'Gedeckt @',value: fmt(price),                         inline: true },
+        { name: 'P&L',      value: `**${pnl>=0?'+':''}${fmt(pnl)}**`, inline: true },
+        { name: 'Fee',      value: fmt(fee),                           inline: true },
+      ],
+      footer:    { text: gameTimeStr() },
+      timestamp: new Date().toISOString(),
+    });
+  }
   renderAll();
   return true;
 }
@@ -1289,8 +1378,21 @@ function checkLimitOrders() {
   });
   fired.forEach(o => {
     state.limitOrders = state.limitOrders.filter(x => x.id !== o.id);
+    const execPrice = state.prices[o.ticker];
     executeTrade(o.ticker, o.mode, o.qty);
-    showNewsEvent(o.ticker, `Limit order triggered: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(state.prices[o.ticker])}`, o.mode==='buy'?0.01:-0.01, false);
+    showNewsEvent(o.ticker, `Limit order triggered: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(execPrice)}`, o.mode==='buy'?0.01:-0.01, false);
+    sendDiscordWebhook({
+      title:       `⏱ Limit-Order ausgeführt — ${o.ticker}`,
+      description: `Order automatisch ausgelöst.`,
+      color:       o.mode === 'buy' ? 0x00ff88 : 0x00d4ff,
+      fields: [
+        { name: 'Typ',      value: o.type === 'buy-below' ? `BUY ≤ ${fmt(o.price)}` : `SELL ≥ ${fmt(o.price)}`, inline: true },
+        { name: 'Stück',    value: `${o.qty}`,     inline: true },
+        { name: 'Ausgeführt @', value: fmt(execPrice), inline: true },
+      ],
+      footer:    { text: gameTimeStr() },
+      timestamp: new Date().toISOString(),
+    });
   });
 }
 
@@ -1302,9 +1404,26 @@ function checkStopLosses() {
     const lossPct = ((price - h.avgCost) / h.avgCost) * 100;
     if (lossPct <= -pct) {
       const qty = h.qty;
+      const sellPrice = state.prices[ticker];
+      const pnlEst = (sellPrice - h.avgCost) * qty;
       delete state.stopLosses[ticker];
       executeTrade(ticker, 'sell', qty);
       showNewsEvent(ticker, `Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, -0.02, false);
+      sendDiscordWebhook({
+        title:       `🛡 Stop-Loss ausgelöst — ${ticker}`,
+        description: `Automatischer Verkauf bei **−${Math.abs(lossPct).toFixed(1)}%** Verlust.`,
+        color:       0xff3355,
+        fields: [
+          { name: 'Aktie',     value: ticker,                                     inline: true },
+          { name: 'Verkauft',  value: `${qty} Stück`,                             inline: true },
+          { name: 'Kurs',      value: fmt(sellPrice),                             inline: true },
+          { name: 'Einstieg',  value: fmt(h.avgCost),                             inline: true },
+          { name: 'Verlust',   value: `**${fmt(pnlEst)}**`,                       inline: true },
+          { name: 'Schwelle',  value: `−${pct}%`,                                 inline: true },
+        ],
+        footer:    { text: gameTimeStr() },
+        timestamp: new Date().toISOString(),
+      });
     }
   });
 }
@@ -1343,13 +1462,22 @@ function checkDividends() {
   );
   showToast(`💰 Dividends received: ${fmt(totalPayout)}`);
 
-  // Discord-Ping wenn Dividende über $5.000
-  if (totalPayout >= 5000) {
+  // Discord-Ping wenn Dividende über $1.000
+  if (totalPayout >= 1_000) {
+    const fields = payouts
+      .sort((a, b) => b.payout - a.payout)
+      .slice(0, 6) // max 6 Felder (Discord-Limit)
+      .map(p => ({ name: p.ticker, value: `+${fmt(p.payout)}\n(${p.rate}% Yield)`, inline: true }));
+
+    fields.push({ name: 'GESAMT', value: `**+${fmt(totalPayout)}**`, inline: false });
+
     sendDiscordWebhook({
-      title: '💰 Dividend Income',
-      description: `Received **${fmt(totalPayout)}** in dividends\n${lines}`,
-      color: 0xffd700,
-      timestamp: new Date().toISOString()
+      title:       '💰 Dividenden erhalten!',
+      description: `Ausschüttung für ${payouts.length} Position${payouts.length !== 1 ? 'en' : ''}.`,
+      color:       0xffd700,
+      fields,
+      footer:    { text: gameTimeStr() },
+      timestamp: new Date().toISOString(),
     });
   }
 }
