@@ -565,13 +565,27 @@ function renderTable() {
       <td class="stock-change ${chg>0?'up':chg<0?'down':'neutral'}">${chg>0?'+':''}${chg.toFixed(2)}%</td>
       <td class="stock-change ${chg24>0?'up':'down'}">${chg24>0?'+':''}${chg24.toFixed(2)}%</td>
       <td>${makeMiniChart(s.ticker)}</td>
-      <td>${heldQty > 0 ? fmtShort(heldQty * price) : '<span style="color:var(--muted)">–</span>'}</td>`;
+      <td>${heldQty > 0 ? fmtShort(heldQty * price) : '<span style="color:var(--muted)">–</span>'}</td>
+      <td><button class="star-btn" data-ticker="${s.ticker}" title="${watched ? 'Remove from watchlist' : 'Add to watchlist'}">${watched ? '★' : '☆'}</button></td>`;
 
     frag.appendChild(tr);
   });
 
   body.innerHTML = '';
   body.appendChild(frag);
+
+  // Suchergebnis-Zähler
+  const countEl = document.getElementById('searchCount');
+  if (countEl) {
+    if (searchQuery) {
+      countEl.textContent = filtered.length === 0
+        ? 'No results'
+        : `${filtered.length} / ${STOCKS.length}`;
+      countEl.style.display = '';
+    } else {
+      countEl.style.display = 'none';
+    }
+  }
 }
 
 function makeMiniChart(ticker) {
@@ -920,11 +934,17 @@ function openModal(ticker) {
   document.getElementById('btnModalTrade').textContent = 'BUY SHARES';
   document.getElementById('mQtyInput').value = 1;
   updateMTotal();
+  // Inner tabs zurücksetzen
+  document.getElementById('mpanelTrade').style.display  = '';
+  document.getElementById('mpanelOrders').style.display = 'none';
+  document.getElementById('mtabTrade').classList.add('active');
+  document.getElementById('mtabOrders').classList.remove('active');
   document.getElementById('stockModal').classList.add('open');
 
   const sl = state.stopLosses[ticker];
   document.getElementById('stopLossInput').value = sl || '';
   document.getElementById('stopLossStatus').textContent = sl ? `Active: auto-sell at −${sl}% loss` : '';
+  document.getElementById('btnClearStopLoss').style.display = sl ? '' : 'none';
   updateWatchBtn();
 }
 
@@ -952,7 +972,12 @@ function refreshModal() {
   const mktCap = state.prices[modalTicker] * (state.volumes[modalTicker] || 0);
 
   document.getElementById('modalTicker').textContent = s.ticker;
-  document.getElementById('modalName').textContent   = s.name + ' · ' + s.sector;
+  document.getElementById('modalName').textContent   = s.name;
+  const badge = document.getElementById('modalSectorBadge');
+  if (badge) {
+    badge.textContent = s.sector;
+    badge.className = `modal-sector-badge sector sector-${s.sector.toLowerCase()}`;
+  }
 
   const priceEl = document.getElementById('modalPrice');
   priceEl.textContent = fmt(price);
@@ -963,21 +988,17 @@ function refreshModal() {
   chgEl.className   = 'modal-change ' + (chg24 >= 0 ? 'up' : 'down');
 
   document.getElementById('modalStats').innerHTML = `
-    <div class="mstat">HIGH(12) <span>${fmt(hi)}</span></div>
-    <div class="mstat">LOW(12)  <span>${fmt(lo)}</span></div>
-    <div class="mstat">ALL-TIME H <span>${fmt(hi52)}</span></div>
-    <div class="mstat">ALL-TIME L <span>${fmt(lo52)}</span></div>
-    <div class="mstat">VOL  <span>${vol}</span></div>
-    <div class="mstat">MKT CAP <span>${fmtShort(mktCap)}</span></div>
-    <div class="mstat">SECTOR <span style="color:var(--accent)">${s.sector}</span></div>
-    <div class="mstat">RIVAL
-      <span class="rival-val rival-link" data-ticker="${s.rival || ''}"
-            style="${s.rival ? 'cursor:pointer;text-decoration:underline' : ''}">
-        ${s.rival || '—'}
-      </span>
-    </div>
-    ${held ? `<div class="mstat">HELD <span>${held.qty} @ ${fmt(held.avgCost)}</span></div>` : ''}
-    ${held ? `<div class="mstat">P&L  <span class="${(price - held.avgCost) >= 0 ? 'up' : 'down'}">${((price - held.avgCost) / held.avgCost * 100).toFixed(1)}%</span></div>` : ''}
+    <div class="mstat">HIGH(12)<span>${fmt(hi)}</span></div>
+    <div class="mstat">LOW(12)<span>${fmt(lo)}</span></div>
+    <div class="mstat">ATH<span>${fmt(hi52)}</span></div>
+    <div class="mstat">ATL<span>${fmt(lo52)}</span></div>
+    <div class="mstat">VOLUMEN<span>${vol}</span></div>
+    <div class="mstat">MKT CAP<span>${fmtShort(mktCap)}</span></div>
+    <div class="mstat">RIVAL<span class="rival-val rival-link" data-ticker="${s.rival || ''}"
+          style="${s.rival ? 'cursor:pointer;text-decoration:underline' : ''}">${s.rival || '—'}</span></div>
+    ${held
+      ? `<div class="mstat">P&L<span class="${(price-held.avgCost)>=0?'up':'down'}">${((price-held.avgCost)/held.avgCost*100).toFixed(1)}% (${held.qty}×)</span></div>`
+      : `<div class="mstat">GEHALTEN<span style="color:var(--dim)">—</span></div>`}
   `;
 
   // Rival Quick-Link
@@ -1073,10 +1094,12 @@ function updateMTotal() {
 function updateWatchBtn() {
   const btn = document.getElementById('btnWatch');
   if (state.watchlist.includes(modalTicker)) {
-    btn.textContent = '★ REMOVE FROM WATCHLIST';
+    btn.textContent = '★';
+    btn.title = 'Remove from watchlist';
     btn.classList.add('watching');
   } else {
-    btn.textContent = '☆ ADD TO WATCHLIST';
+    btn.textContent = '☆';
+    btn.title = 'Add to watchlist';
     btn.classList.remove('watching');
   }
 }
@@ -1702,6 +1725,17 @@ function renderNews() {
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════
 document.getElementById('stockTableBody').addEventListener('click', e => {
+  const star = e.target.closest('.star-btn');
+  if (star) {
+    e.stopPropagation();
+    const ticker = star.dataset.ticker;
+    const idx = state.watchlist.indexOf(ticker);
+    if (idx === -1) { state.watchlist.push(ticker); showToast('★ ' + ticker + ' added to watchlist'); }
+    else            { state.watchlist.splice(idx, 1); showToast(ticker + ' removed from watchlist'); }
+    renderWatchlist();
+    renderTable();
+    return;
+  }
   const row = e.target.closest('.stock-row');
   if (row) openModal(row.dataset.ticker);
 });
@@ -1723,6 +1757,19 @@ document.getElementById('sectorTabs').addEventListener('click', e => {
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('stockModal').addEventListener('click', e => {
   if (e.target === document.getElementById('stockModal')) closeModal();
+});
+
+document.getElementById('mtabTrade').addEventListener('click', () => {
+  document.getElementById('mpanelTrade').style.display  = '';
+  document.getElementById('mpanelOrders').style.display = 'none';
+  document.getElementById('mtabTrade').classList.add('active');
+  document.getElementById('mtabOrders').classList.remove('active');
+});
+document.getElementById('mtabOrders').addEventListener('click', () => {
+  document.getElementById('mpanelTrade').style.display  = 'none';
+  document.getElementById('mpanelOrders').style.display = '';
+  document.getElementById('mtabOrders').classList.add('active');
+  document.getElementById('mtabTrade').classList.remove('active');
 });
 
 document.getElementById('mTabBuy').addEventListener('click', () => {
@@ -1796,7 +1843,17 @@ document.getElementById('btnSetStopLoss').addEventListener('click', () => {
   if (!pct || pct < 1 || pct > 99) { showToast('Enter a % between 1–99', true); return; }
   state.stopLosses[modalTicker] = pct;
   document.getElementById('stopLossStatus').textContent = `Active: auto-sell at −${pct}% loss`;
+  document.getElementById('btnClearStopLoss').style.display = '';
   showToast(`🛡 Stop-loss set for ${modalTicker} at −${pct}%`);
+});
+
+document.getElementById('btnClearStopLoss').addEventListener('click', () => {
+  if (!modalTicker) return;
+  delete state.stopLosses[modalTicker];
+  document.getElementById('stopLossInput').value = '';
+  document.getElementById('stopLossStatus').textContent = '';
+  document.getElementById('btnClearStopLoss').style.display = 'none';
+  showToast(`🛡 Stop-loss removed for ${modalTicker}`);
 });
 
 document.getElementById('btnWatch').addEventListener('click', () => {
@@ -1927,7 +1984,10 @@ document.getElementById('btnCloseShort').addEventListener('click', () => {
   if (!modalTicker) return;
   const sh = state.shorts?.[modalTicker];
   if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
-  closeShort(modalTicker, sh.qty);
+  const inputVal = parseInt(document.getElementById('shortQtyInput').value);
+  const qty = (!inputVal || inputVal >= sh.qty) ? sh.qty : inputVal;
+  if (qty < 1) { showToast('Enter a valid quantity', true); return; }
+  closeShort(modalTicker, qty);
   refreshModal();
 });
 
