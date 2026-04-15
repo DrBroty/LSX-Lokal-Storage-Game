@@ -220,8 +220,6 @@
 <div id="stockModal" class="modal-backdrop">
   <div class="modal-box">
 
-    <button id="modalClose" class="modal-close">✕</button>
-
     <!-- ── Header ─────────────────────────────── -->
     <div class="modal-header">
       <div class="modal-header-left">
@@ -236,7 +234,10 @@
           <div id="modalPrice"  class="modal-price"></div>
           <div id="modalChange" class="modal-change"></div>
         </div>
-        <button id="btnWatch" class="btn-watch-icon" title="Watchlist">☆</button>
+        <div class="modal-header-actions">
+          <button id="btnWatch"    class="btn-watch-icon" title="Watchlist">☆</button>
+          <button id="modalClose"  class="modal-close">✕</button>
+        </div>
       </div>
     </div>
 
