@@ -1,27 +1,22 @@
-// ── Admin-Key via Prompt (nicht in der URL) ───────────
-// Wird einmalig abgefragt und im sessionStorage gecached
-let ADMIN_KEY = sessionStorage.getItem('lsx_admin_key') || '';
-if (!ADMIN_KEY) {
-  ADMIN_KEY = prompt('Admin Key eingeben:') || '';
-  if (ADMIN_KEY) sessionStorage.setItem('lsx_admin_key', ADMIN_KEY);
-}
-
 const ADMIN_API = '/lsx-proxy/admin.php';
-let saveState  = null;
-let currentId  = null;
+let saveState = null;
+let currentId = null;
+let csrfToken = '';
 
-// ── Gemeinsame Fetch-Funktion (Key immer als Header) ──
+// ── Gemeinsame Fetch-Funktion ─────────────────────────
 async function adminFetch(body) {
   return fetch(ADMIN_API, {
-    method:  'POST',
+    method:      'POST',
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'X-Admin-Key':  ADMIN_KEY,
+      'X-CSRF-Token': csrfToken,
     },
     body: JSON.stringify(body),
   });
 }
 
+// ── Status-Meldung ────────────────────────────────────
 function showStatus(msg, ok = true) {
   const el = document.getElementById('status');
   el.textContent   = msg;
@@ -30,7 +25,124 @@ function showStatus(msg, ok = true) {
   setTimeout(() => el.style.display = 'none', 4000);
 }
 
-// ── USER LADEN ────────────────────────────────────────
+// ── Auth Check beim Start ─────────────────────────────
+async function checkAdminAuth() {
+  const gate  = document.getElementById('authGate');
+  const panel = document.getElementById('adminPanel');
+  const msg   = document.getElementById('authMsg');
+  const loginBtn = document.getElementById('btnDiscordLogin');
+
+  try {
+    // CSRF-Token zuerst laden via load.php
+    const loadResp = await fetch('/lsx-proxy/load.php', { credentials: 'include' });
+
+    if (loadResp.status === 401) {
+      msg.textContent = 'Please login with Discord first.';
+      loginBtn.style.display = 'flex';
+      return;
+    }
+
+    const loadData = await loadResp.json();
+    if (loadData.user?.csrf) csrfToken = loadData.user.csrf;
+
+    // Admin-Check
+    const resp = await adminFetch({ action: 'check' });
+
+    if (resp.status === 401) {
+      msg.textContent = 'Please login with Discord first.';
+      loginBtn.style.display = 'flex';
+      return;
+    }
+
+    if (resp.status === 403) {
+      msg.textContent = '⛔ Access denied — you are not an admin.';
+      msg.style.color = '#ff3355';
+      return;
+    }
+
+    const data = await resp.json();
+
+    // ── Zugang gewährt ────────────────────────────────
+    gate.style.display  = 'none';
+    panel.style.display = 'block';
+
+    // User im Header anzeigen
+    document.getElementById('adminUser').innerHTML = `
+      <img src="${data.avatar || ''}" alt="">
+      <span>${data.username}</span>
+      <span class="admin-badge">ADMIN</span>
+    `;
+
+    // User-Liste automatisch laden
+    loadUserList();
+
+  } catch (e) {
+    msg.textContent = 'Connection error. Is the server running?';
+    msg.style.color = '#ff3355';
+  }
+}
+
+// ── User-Liste laden ──────────────────────────────────
+async function loadUserList() {
+  const resp = await adminFetch({ action: 'list' });
+  if (!resp.ok) return showStatus('Fehler beim Laden der User-Liste', false);
+  const list = await resp.json();
+  renderUserList(list);
+}
+
+function renderUserList(list) {
+  const tbody = document.getElementById('userListBody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="table-empty">Keine Saves gefunden</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(u => `
+    <tr>
+      <td>
+        <div class="player-cell">
+          <img class="player-avatar" src="${u.avatar || ''}" alt="" onerror="this.style.display='none'">
+          <div>
+            <div class="player-name">${u.username || '?'}</div>
+            <div class="player-id">${u.id}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="nw-value ${u.netWorth >= 1_000_000 ? 'nw-million' : 'nw-normal'}">
+        $${(u.netWorth || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+      </span></td>
+      <td style="color:var(--dim);font-family:monospace">
+        $${(u.cash || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+      </td>
+      <td style="color:var(--dim)">${u.trades || 0}</td>
+      <td style="color:var(--dim)">${u.gameDay || 0}</td>
+      <td>
+        <div class="btn-row">
+          <button onclick="quickLoad('${u.id}')">LOAD</button>
+          <button class="btn-red" onclick="quickDelete('${u.id}')">DELETE</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function quickLoad(id) {
+  document.getElementById('discordId').value = id;
+  await loadUser();
+  document.getElementById('cardCash').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function quickDelete(id) {
+  if (!confirm(`Save für ${id} löschen?`)) return;
+  const resp   = await adminFetch({ action: 'delete', id });
+  const result = await resp.json();
+  if (result.ok) {
+    showStatus('✅ Save gelöscht');
+    loadUserList();
+  } else {
+    showStatus('❌ Fehler', false);
+  }
+}
+
+// ── User laden ────────────────────────────────────────
 async function loadUser() {
   const id = document.getElementById('discordId').value.trim();
   if (!id) return showStatus('Bitte Discord ID eingeben', false);
@@ -44,82 +156,35 @@ async function loadUser() {
   showStatus(`✅ User ${id} geladen`);
 }
 
-// ── USER LISTE LADEN ──────────────────────────────────
-async function loadUserList() {
-  const resp = await adminFetch({ action: 'list' });
-  if (!resp.ok) return showStatus('Fehler beim Laden der User-Liste', false);
-  const list = await resp.json();
-  renderUserList(list);
-}
-
-function renderUserList(list) {
-  const card = document.getElementById('cardUserList');
-  if (!card) return;
-  card.style.display = 'block';
-  const tbody = document.getElementById('userListBody');
-  if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="color:#888;padding:8px">Keine Saves gefunden</td></tr>';
-    return;
-  }
-  tbody.innerHTML = list.map(u => `
-    <tr>
-      <td><code style="color:#00d4ff">${u.id}</code></td>
-      <td>${u.username || '?'}</td>
-      <td style="color:${u.netWorth >= 1000000 ? '#ffd700' : '#00ff88'}">
-        $${(u.netWorth || 0).toLocaleString('en-US', {maximumFractionDigits: 0})}
-      </td>
-      <td>${u.gameDay || 0}</td>
-      <td>
-        <button onclick="quickLoad('${u.id}')">LOAD</button>
-        <button class="red" onclick="quickDelete('${u.id}')">DELETE</button>
-      </td>
-    </tr>`).join('');
-}
-
-async function quickLoad(id) {
-  document.getElementById('discordId').value = id;
-  await loadUser();
-  document.getElementById('cardCash').scrollIntoView({ behavior: 'smooth' });
-}
-
-async function quickDelete(id) {
-  if (!confirm(`Save für ${id} löschen?`)) return;
-  const resp = await adminFetch({ action: 'delete', id });
-  const result = await resp.json();
-  result.ok ? showStatus('✅ Save gelöscht') : showStatus('❌ Fehler', false);
-  loadUserList();
-}
-
-// ── RENDER ────────────────────────────────────────────
+// ── Render ────────────────────────────────────────────
 function renderAll() {
   document.getElementById('userInfo').style.display = 'block';
   document.getElementById('userTags').innerHTML = `
-    <span class="tag">💰 $${(saveState.cash || 0).toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+    <span class="tag">💰 $${(saveState.cash || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
     <span class="tag">📦 ${Object.keys(saveState.holdings || {}).length} Holdings</span>
     <span class="tag">📉 ${Object.keys(saveState.shorts || {}).length} Shorts</span>
     <span class="tag">📋 ${(saveState.limitOrders || []).length} Orders</span>
-    <span class="tag">🏆 Milestone: $${(saveState.lastMilestone || 0).toLocaleString()}</span>
+    <span class="tag">🏆 $${(saveState.lastMilestone || 0).toLocaleString()}</span>
     <span class="tag">📅 Day ${saveState.gameDay ?? '-'}</span>
   `;
   document.getElementById('saveData').textContent =
-    JSON.stringify(saveState, null, 2).slice(0, 1000) + '\n...';
+    JSON.stringify(saveState, null, 2).slice(0, 800) + '\n...';
 
   ['cardCash', 'cardStats', 'cardHoldings', 'cardMilestone', 'cardDanger']
     .forEach(id => document.getElementById(id).style.display = 'block');
 
   document.getElementById('currentCash').value =
-    '$' + (saveState.cash || 0).toLocaleString('en-US', {minimumFractionDigits: 2});
+    '$' + (saveState.cash || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
   document.getElementById('newCash').value = saveState.cash || 0;
 
   const s = saveState.stats || {};
   document.getElementById('statStartCash').value = s.startCash     || 0;
   document.getElementById('statPnl').value        = s.realizedPnl   || 0;
   document.getElementById('statTrades').value     = s.totalTrades   || 0;
-  document.getElementById('statFees').value        = s.totalFeesPaid || 0;
-  document.getElementById('statBest').value        = s.bestTrade     || 0;
-  document.getElementById('statWorst').value       = s.worstTrade    || 0;
-
-  document.getElementById('milestoneVal').value = saveState.lastMilestone || 0;
+  document.getElementById('statFees').value       = s.totalFeesPaid || 0;
+  document.getElementById('statBest').value       = s.bestTrade     || 0;
+  document.getElementById('statWorst').value      = s.worstTrade    || 0;
+  document.getElementById('milestoneVal').value   = saveState.lastMilestone || 0;
 
   renderHoldings();
 }
@@ -128,33 +193,33 @@ function renderHoldings() {
   const body = document.getElementById('holdingsBody');
   const h    = saveState.holdings || {};
   if (!Object.keys(h).length) {
-    body.innerHTML = '<tr><td colspan="4" style="color:#888;padding:8px">Keine Holdings</td></tr>';
+    body.innerHTML = '<tr><td colspan="4" class="table-empty">Keine Holdings</td></tr>';
     return;
   }
   body.innerHTML = Object.entries(h).map(([ticker, data]) => `
     <tr>
-      <td><strong>${ticker}</strong></td>
+      <td><strong style="color:#fff">${ticker}</strong></td>
       <td><input type="number" value="${data.qty}"
            onchange="updateHolding('${ticker}','qty',this.value)"></td>
       <td><input type="number" value="${data.avgCost}"
            onchange="updateHolding('${ticker}','avgCost',this.value)"></td>
-      <td><button class="red" onclick="removeHolding('${ticker}')">✕</button></td>
+      <td><button class="btn-red" onclick="removeHolding('${ticker}')">✕</button></td>
     </tr>`).join('');
 }
 
-// ── SAVE ──────────────────────────────────────────────
+// ── Save ──────────────────────────────────────────────
 async function save() {
-  const resp = await adminFetch({ action: 'save', id: currentId, state: saveState });
+  const resp   = await adminFetch({ action: 'save', id: currentId, state: saveState });
   const result = await resp.json();
   if (result.ok) {
     showStatus('✅ Gespeichert');
     renderAll();
   } else {
-    showStatus('❌ Fehler beim Speichern: ' + (result.error || ''), false);
+    showStatus('❌ Fehler: ' + (result.error || ''), false);
   }
 }
 
-// ── CASH ──────────────────────────────────────────────
+// ── Cash ──────────────────────────────────────────────
 function setCash() {
   const val = parseFloat(document.getElementById('newCash').value);
   if (isNaN(val)) return showStatus('Ungültiger Wert', false);
@@ -166,7 +231,7 @@ function addCash(amount) {
   save();
 }
 
-// ── STATS ─────────────────────────────────────────────
+// ── Stats ─────────────────────────────────────────────
 function saveStats() {
   saveState.stats = {
     startCash:      parseFloat(document.getElementById('statStartCash').value) || 0,
@@ -180,7 +245,7 @@ function saveStats() {
   save();
 }
 
-// ── HOLDINGS ──────────────────────────────────────────
+// ── Holdings ──────────────────────────────────────────
 function updateHolding(ticker, field, value) {
   if (!saveState.holdings?.[ticker]) return;
   saveState.holdings[ticker][field] = parseFloat(value);
@@ -199,7 +264,7 @@ function addHolding() {
   save();
 }
 
-// ── MILESTONE ─────────────────────────────────────────
+// ── Milestone ─────────────────────────────────────────
 function saveMilestone() {
   saveState.lastMilestone = parseFloat(document.getElementById('milestoneVal').value) || 0;
   save();
@@ -209,7 +274,7 @@ function resetMilestone() {
   save();
 }
 
-// ── DANGER ZONE ───────────────────────────────────────
+// ── Danger Zone ───────────────────────────────────────
 function clearHoldings() {
   if (!confirm('Alle Holdings löschen?')) return;
   saveState.holdings = {};
@@ -231,18 +296,20 @@ function resetGame() {
   save();
 }
 
-// ── DELETE USER ───────────────────────────────────────
+// ── Delete User ───────────────────────────────────────
 async function deleteUser() {
   const id = document.getElementById('discordId').value.trim();
   if (!id) return showStatus('Bitte Discord ID eingeben', false);
-  if (!confirm(`Save-Datei für ${id} permanent löschen?`)) return;
-
-  const resp = await adminFetch({ action: 'delete', id });
+  if (!confirm(`Save für ${id} permanent löschen?`)) return;
+  const resp   = await adminFetch({ action: 'delete', id });
   const result = await resp.json();
-  result.ok ? showStatus('✅ Save gelöscht') : showStatus('❌ Fehler', false);
+  if (result.ok) {
+    showStatus('✅ Save gelöscht');
+    loadUserList();
+  } else {
+    showStatus('❌ Fehler', false);
+  }
 }
 
-// ── Auto-Load User-Liste beim Start ───────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  if (ADMIN_KEY) loadUserList();
-});
+// ── Boot ──────────────────────────────────────────────
+checkAdminAuth();

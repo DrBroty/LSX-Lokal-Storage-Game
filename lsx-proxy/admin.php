@@ -1,18 +1,36 @@
 <?php
 require_once 'config.php';
 
-// ── Admin-Key NUR via POST-Header, nie als GET-Parameter ─
-// Aufruf: fetch('/lsx-proxy/admin.php', { headers: { 'X-Admin-Key': '...' } })
-$ADMIN_PASSWORD = getenv('LSX_ADMIN_KEY') ?: 'UCJtwc5WRVFnTncgcAgrHa77cz2eqhmW8XNe';
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: https://los-santos-exchange.de');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Credentials: true');
 
-$auth = $_SERVER['HTTP_X_ADMIN_KEY'] ?? '';
-if (!hash_equals($ADMIN_PASSWORD, $auth)) {
-    http_response_code(403);
-    echo json_encode(['error' => 'Forbidden']);
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204); exit;
+}
+
+// ── Auth: Discord-Session + Whitelist ────────────────
+if (!isset($_SESSION['discord_id'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Not logged in']);
     exit;
 }
 
-header('Content-Type: application/json');
+if (!in_array($_SESSION['discord_id'], ADMIN_IDS, true)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Not an admin']);
+    exit;
+}
+
+// ── CSRF ─────────────────────────────────────────────
+$csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Invalid CSRF token']);
+    exit;
+}
 
 $body   = json_decode(file_get_contents('php://input'), true);
 $action = $body['action'] ?? '';
@@ -35,9 +53,8 @@ if ($action === 'load') {
         echo json_encode(['error' => 'Bad request']);
         exit;
     }
-    // Größenlimit auch im Admin
     $json = json_encode($state);
-    if (strlen($json) > 1024 * 1024) { // 1 MB Limit für Admin
+    if (strlen($json) > 1024 * 1024) {
         http_response_code(413);
         echo json_encode(['error' => 'State too large']);
         exit;
@@ -50,7 +67,6 @@ if ($action === 'load') {
     echo json_encode(['ok' => true]);
 
 } elseif ($action === 'list') {
-    // ── Alle Saves auflisten (für Admin-Übersicht) ────
     $saves = [];
     foreach (glob(SAVES_DIR . '*.json') as $f) {
         $data = json_decode(file_get_contents($f), true);
@@ -63,14 +79,25 @@ if ($action === 'load') {
         $saves[] = [
             'id'       => $discordId,
             'username' => $data['user']['username'] ?? '?',
+            'avatar'   => $data['user']['avatar']   ?? '',
             'netWorth' => round($nw, 2),
+            'cash'     => round($data['cash'] ?? 0, 2),
             'gameDay'  => $data['gameDay'] ?? 0,
+            'trades'   => $data['stats']['totalTrades'] ?? 0,
             'savedAt'  => $data['savedAt'] ?? 0,
         ];
     }
-    // Sortiert nach Net Worth
     usort($saves, fn($a, $b) => $b['netWorth'] <=> $a['netWorth']);
     echo json_encode($saves);
+
+} elseif ($action === 'check') {
+    // Prüft ob der aktuelle User Admin ist — für das Frontend
+    echo json_encode([
+        'ok'       => true,
+        'username' => $_SESSION['discord_username'],
+        'avatar'   => $_SESSION['discord_avatar'],
+        'id'       => $_SESSION['discord_id'],
+    ]);
 
 } else {
     http_response_code(400);

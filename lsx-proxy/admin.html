@@ -8,157 +8,149 @@
 </head>
 <body>
 
-<h1>📈 LSX ADMIN PANEL</h1>
-
-<!-- Status -->
-<div id="status"></div>
-
-<!-- ── USER LISTE ── -->
-<div class="card" id="cardUserList" style="display:none;">
-  <h2>👥 ALL PLAYERS</h2>
-  <button onclick="loadUserList()" class="gray">🔄 REFRESH</button>
-  <table class="holdings-table" style="margin-top:12px;">
-    <thead>
-      <tr>
-        <th>DISCORD ID</th>
-        <th>USERNAME</th>
-        <th>NET WORTH</th>
-        <th>DAY</th>
-        <th>ACTION</th>
-      </tr>
-    </thead>
-    <tbody id="userListBody"></tbody>
-  </table>
+<!-- ── AUTH GATE (wird ausgeblendet wenn Admin) ── -->
+<div id="authGate">
+  <div class="auth-box">
+    <div class="auth-logo">📈 LSX ADMIN</div>
+    <div id="authMsg" class="auth-msg">Checking access...</div>
+    <a href="/lsx-proxy/oauth.php" class="auth-login" id="btnDiscordLogin" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 71 55" fill="currentColor">
+        <path d="M60.1 4.9A58.5 58.5 0 0 0 45.5.4a40 40 0 0 0-1.8 3.6 54.1 54.1 0 0 0-16.3 0A38 38 0 0 0 25.6.4 58.4 58.4 0 0 0 11 4.9C1.6 19-1 32.7.3 46.3a58.9 58.9 0 0 0 17.9 9 42 42 0 0 0 3.7-6 38.3 38.3 0 0 1-5.8-2.8l1.4-1.1a42 42 0 0 0 36 0l1.4 1.1a38.4 38.4 0 0 1-5.8 2.8 42 42 0 0 0 3.6 6 58.7 58.7 0 0 0 17.9-9C72 30.5 68.7 16.9 60.1 4.9ZM23.8 38c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Zm23.4 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2 6.5 3.2 6.4 7.2c0 4-2.8 7.2-6.4 7.2Z"/>
+      </svg>
+      LOGIN WITH DISCORD
+    </a>
+  </div>
 </div>
 
-<!-- ── LOAD USER ── -->
-<div class="card">
-  <h2>🔍 LOAD USER BY ID</h2>
-  <label>Discord User ID</label>
-  <div class="row">
-    <input id="discordId" type="text" placeholder="z.B. 123456789012345678">
-    <div style="flex:0">
+<!-- ── MAIN PANEL (versteckt bis Auth OK) ── -->
+<div id="adminPanel" style="display:none">
+
+  <div class="admin-header">
+    <div class="admin-logo">📈 LSX ADMIN PANEL</div>
+    <div id="adminUser" class="admin-user"></div>
+  </div>
+
+  <div id="status"></div>
+
+  <!-- ── USER LISTE ── -->
+  <div class="card">
+    <div class="card-header">
+      <h2>👥 ALL PLAYERS</h2>
+      <button class="btn-gray" onclick="loadUserList()">🔄 REFRESH</button>
+    </div>
+    <table class="data-table" id="userListTable">
+      <thead>
+        <tr>
+          <th>PLAYER</th>
+          <th>NET WORTH</th>
+          <th>CASH</th>
+          <th>TRADES</th>
+          <th>DAY</th>
+          <th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody id="userListBody">
+        <tr><td colspan="6" class="table-empty">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── LOAD USER ── -->
+  <div class="card">
+    <h2>🔍 LOAD USER BY ID</h2>
+    <div class="input-row">
+      <input id="discordId" type="text" placeholder="Discord User ID (z.B. 123456789012345678)">
       <button onclick="loadUser()">LOAD</button>
-      <button class="red" onclick="deleteUser()">DELETE SAVE</button>
+      <button class="btn-red" onclick="deleteUser()">DELETE SAVE</button>
+    </div>
+    <div id="userInfo" style="display:none;">
+      <div id="userTags" class="tag-row"></div>
+      <pre id="saveData" class="save-preview"></pre>
     </div>
   </div>
-  <div id="userInfo" style="display:none;">
-    <div id="userTags"></div>
-    <div id="saveData"></div>
-  </div>
-</div>
 
-<!-- ── CASH ── -->
-<div class="card" id="cardCash" style="display:none;">
-  <h2>💵 CASH</h2>
-  <div class="row">
-    <div>
-      <label>Aktuelles Cash</label>
-      <input id="currentCash" type="text" disabled>
-    </div>
-    <div>
-      <label>Neuer Wert ($)</label>
-      <input id="newCash" type="number" placeholder="z.B. 500000">
-    </div>
-  </div>
-  <button onclick="setCash()">SET CASH</button>
-  <button class="gray" onclick="addCash(100000)">+$100K</button>
-  <button class="gray" onclick="addCash(500000)">+$500K</button>
-  <button class="gray" onclick="addCash(1000000)">+$1M</button>
-  <button class="red"  onclick="addCash(-100000)">-$100K</button>
-</div>
-
-<!-- ── STATS ── -->
-<div class="card" id="cardStats" style="display:none;">
-  <h2>📊 STATS</h2>
-  <div class="row">
-    <div>
-      <label>Start Cash ($)</label>
-      <input id="statStartCash" type="number">
-    </div>
-    <div>
-      <label>Realized P&L ($)</label>
-      <input id="statPnl" type="number">
-    </div>
-  </div>
-  <div class="row">
-    <div>
-      <label>Total Trades</label>
-      <input id="statTrades" type="number">
-    </div>
-    <div>
-      <label>Total Fees Paid ($)</label>
-      <input id="statFees" type="number">
-    </div>
-  </div>
-  <div class="row">
-    <div>
-      <label>Best Trade ($)</label>
-      <input id="statBest" type="number">
-    </div>
-    <div>
-      <label>Worst Trade ($)</label>
-      <input id="statWorst" type="number">
-    </div>
-  </div>
-  <button onclick="saveStats()">SAVE STATS</button>
-</div>
-
-<!-- ── HOLDINGS ── -->
-<div class="card" id="cardHoldings" style="display:none;">
-  <h2>📦 HOLDINGS</h2>
-  <table class="holdings-table">
-    <thead>
-      <tr>
-        <th>TICKER</th>
-        <th>QTY</th>
-        <th>AVG COST ($)</th>
-        <th>ACTION</th>
-      </tr>
-    </thead>
-    <tbody id="holdingsBody"></tbody>
-  </table>
-  <div style="margin-top:16px;">
-    <h2>➕ HOLDING HINZUFÜGEN</h2>
-    <div class="row">
-      <div>
-        <label>Ticker</label>
-        <input id="addTicker" type="text" placeholder="z.B. MAZE">
+  <!-- ── CASH ── -->
+  <div class="card" id="cardCash" style="display:none;">
+    <h2>💵 CASH</h2>
+    <div class="input-row">
+      <div class="input-group">
+        <label>Aktuelles Cash</label>
+        <input id="currentCash" type="text" disabled>
       </div>
-      <div>
-        <label>Qty</label>
-        <input id="addQty" type="number" placeholder="100">
-      </div>
-      <div>
-        <label>Avg Cost ($)</label>
-        <input id="addAvgCost" type="number" placeholder="218.50">
+      <div class="input-group">
+        <label>Neuer Wert ($)</label>
+        <input id="newCash" type="number" placeholder="z.B. 500000">
       </div>
     </div>
-    <button onclick="addHolding()">ADD HOLDING</button>
-  </div>
-</div>
-
-<!-- ── MILESTONE RESET ── -->
-<div class="card" id="cardMilestone" style="display:none;">
-  <h2>🏆 MILESTONE</h2>
-  <div class="row">
-    <div>
-      <label>lastMilestone ($)</label>
-      <input id="milestoneVal" type="number">
+    <div class="btn-row">
+      <button onclick="setCash()">SET CASH</button>
+      <button class="btn-gray" onclick="addCash(100000)">+$100K</button>
+      <button class="btn-gray" onclick="addCash(500000)">+$500K</button>
+      <button class="btn-gray" onclick="addCash(1000000)">+$1M</button>
+      <button class="btn-red"  onclick="addCash(-100000)">-$100K</button>
     </div>
   </div>
-  <button onclick="saveMilestone()">SET MILESTONE</button>
-  <button class="red" onclick="resetMilestone()">RESET → 0</button>
-</div>
 
-<!-- ── DANGER ZONE ── -->
-<div class="card" id="cardDanger" style="display:none;">
-  <h2>🧨 DANGER ZONE</h2>
-  <button class="red" onclick="resetGame()">FULL GAME RESET</button>
-  <button class="red" onclick="clearHoldings()">CLEAR ALL HOLDINGS</button>
-  <button class="red" onclick="clearShorts()">CLEAR ALL SHORTS</button>
-  <button class="red" onclick="clearOrders()">CLEAR LIMIT ORDERS</button>
-</div>
+  <!-- ── STATS ── -->
+  <div class="card" id="cardStats" style="display:none;">
+    <h2>📊 STATS</h2>
+    <div class="input-row">
+      <div class="input-group"><label>Start Cash ($)</label><input id="statStartCash" type="number"></div>
+      <div class="input-group"><label>Realized P&L ($)</label><input id="statPnl" type="number"></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label>Total Trades</label><input id="statTrades" type="number"></div>
+      <div class="input-group"><label>Total Fees Paid ($)</label><input id="statFees" type="number"></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label>Best Trade ($)</label><input id="statBest" type="number"></div>
+      <div class="input-group"><label>Worst Trade ($)</label><input id="statWorst" type="number"></div>
+    </div>
+    <button onclick="saveStats()">SAVE STATS</button>
+  </div>
+
+  <!-- ── HOLDINGS ── -->
+  <div class="card" id="cardHoldings" style="display:none;">
+    <h2>📦 HOLDINGS</h2>
+    <table class="data-table">
+      <thead><tr><th>TICKER</th><th>QTY</th><th>AVG COST ($)</th><th>ACTION</th></tr></thead>
+      <tbody id="holdingsBody"></tbody>
+    </table>
+    <div style="margin-top:16px;">
+      <h2>➕ HOLDING HINZUFÜGEN</h2>
+      <div class="input-row">
+        <div class="input-group"><label>Ticker</label><input id="addTicker" type="text" placeholder="z.B. MAZE"></div>
+        <div class="input-group"><label>Qty</label><input id="addQty" type="number" placeholder="100"></div>
+        <div class="input-group"><label>Avg Cost ($)</label><input id="addAvgCost" type="number" placeholder="218.50"></div>
+      </div>
+      <button onclick="addHolding()">ADD HOLDING</button>
+    </div>
+  </div>
+
+  <!-- ── MILESTONE ── -->
+  <div class="card" id="cardMilestone" style="display:none;">
+    <h2>🏆 MILESTONE</h2>
+    <div class="input-row">
+      <div class="input-group"><label>lastMilestone ($)</label><input id="milestoneVal" type="number"></div>
+    </div>
+    <div class="btn-row">
+      <button onclick="saveMilestone()">SET MILESTONE</button>
+      <button class="btn-red" onclick="resetMilestone()">RESET → 0</button>
+    </div>
+  </div>
+
+  <!-- ── DANGER ZONE ── -->
+  <div class="card" id="cardDanger" style="display:none;">
+    <h2>🧨 DANGER ZONE</h2>
+    <div class="btn-row">
+      <button class="btn-red" onclick="resetGame()">FULL GAME RESET</button>
+      <button class="btn-red" onclick="clearHoldings()">CLEAR ALL HOLDINGS</button>
+      <button class="btn-red" onclick="clearShorts()">CLEAR ALL SHORTS</button>
+      <button class="btn-red" onclick="clearOrders()">CLEAR LIMIT ORDERS</button>
+    </div>
+  </div>
+
+</div><!-- /#adminPanel -->
 
 <script src="/assets/js/admin.js"></script>
 </body>
