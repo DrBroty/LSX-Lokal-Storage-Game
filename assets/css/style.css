@@ -966,3 +966,210 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 #heatmapView[style*="display:grid"] {
   display: grid !important;
 }
+
+/* ═══════════════════════════════════════════════════════
+   LSX style.additions.css
+   An das Ende von style.css anhängen!
+   ═══════════════════════════════════════════════════════ */
+
+/* ── IMPROVEMENT #3 — User Badge Klasse ─────────────── */
+.user-badge-visible {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── IMPROVEMENT #2 — Skeleton Loading Screen ────────── */
+#skeletonScreen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: none;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px;
+  z-index: 9998;
+}
+.skeleton-logo {
+  font-size: 20px; font-weight: 700;
+  letter-spacing: 3px; color: var(--accent);
+  opacity: 0.8;
+}
+.skeleton-spinner {
+  width: 36px; height: 36px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+.skeleton-msg {
+  font-size: 12px; color: var(--dim);
+  letter-spacing: 1px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── B — HAUPT-TABS (Market/Portfolio/Orders/Stats) ─── */
+.main-tabs {
+  display: flex;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  gap: 0;
+  position: sticky; top: 0; z-index: 40;
+}
+.main-tab-btn {
+  padding: 12px 20px;
+  background: transparent; border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--dim);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; font-size: 12px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; transition: all .2s;
+  white-space: nowrap;
+}
+.main-tab-btn:hover { color: var(--text); }
+.main-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.main-tab-btn .tab-icon { margin-right: 6px; font-size: 14px; }
+
+/* Tab-Sections */
+#sectionPortfolio,
+#sectionOrders,
+#sectionStats {
+  display: none;
+}
+
+/* Portfolio Section — volle Breite mit mehr Platz */
+#sectionPortfolio {
+  padding: 16px;
+}
+.portfolio-full {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.portfolio-full .sidebar-card {
+  height: fit-content;
+}
+@media (max-width: 768px) {
+  .portfolio-full { grid-template-columns: 1fr; }
+}
+
+/* Stats Section */
+#sectionStats {
+  padding: 16px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.stat-card-label {
+  font-size: 9px; color: var(--label);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.stat-card-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 20px; font-weight: 700;
+  color: var(--text);
+}
+
+/* Orders Section */
+#sectionOrders {
+  padding: 16px;
+}
+.orders-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 768px) {
+  .orders-grid { grid-template-columns: 1fr; }
+}
+
+/* ── D — MODAL QUICK-ACTIONS ─────────────────────────── */
+.modal-quick-actions {
+  margin: 12px 0;
+  padding: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.quick-actions-label {
+  font-size: 9px; color: var(--label);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.quick-btns-row {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.quick-btn {
+  padding: 6px 14px;
+  border-radius: 5px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; font-size: 12px; letter-spacing: .5px;
+  cursor: pointer; transition: all .15s; border: 1px solid;
+}
+.quick-buy {
+  background: rgba(0,255,136,0.08);
+  border-color: rgba(0,255,136,0.3);
+  color: var(--green);
+}
+.quick-buy:hover { background: rgba(0,255,136,0.18); }
+.quick-sell {
+  background: rgba(255,51,85,0.08);
+  border-color: rgba(255,51,85,0.3);
+  color: var(--red);
+}
+.quick-sell:hover { background: rgba(255,51,85,0.18); }
+.quick-btn.disabled {
+  opacity: .3; cursor: not-allowed;
+}
+
+/* Modal leicht größer für Quick-Actions */
+.modal-box {
+  width: min(620px, 95vw) !important;
+}
+
+/* ── HEADER — Collapsible Sidebar Toggle ─────────────── */
+.btn-sidebar-toggle {
+  display: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: var(--dim); cursor: pointer;
+  font-size: 16px; line-height: 1;
+  transition: all .2s;
+}
+.btn-sidebar-toggle:hover { color: var(--accent); border-color: var(--accent); }
+@media (max-width: 1024px) {
+  .btn-sidebar-toggle { display: block; }
+}
+
+/* ── SIDEBAR COLLAPSED STATE ─────────────────────────── */
+.sidebar-left.collapsed,
+.sidebar-right.collapsed {
+  display: none;
+}
+
+/* ── PORTFOLIO TAB — Net Worth Chart groß ────────────── */
+#sectionPortfolio canvas#portfolioChart {
+  height: 200px !important;
+}
+
+/* ── STATS — Trade History volle Breite ──────────────── */
+#sectionStats .trade-hist-row {
+  background: rgba(255,255,255,0.02);
+}
