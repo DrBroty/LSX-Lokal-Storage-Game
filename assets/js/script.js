@@ -1,3 +1,4 @@
+let csrfToken = ''; // Global, wird von checkLogin gesetzt
 let sortCol = null;
 let sortDir = 'desc';
 let searchQuery = '';
@@ -13,8 +14,12 @@ const PROXY_URL = 'https://los-santos-exchange.de/lsx-proxy/webhook.php';
 function sendDiscordWebhook(embed) {
   fetch(PROXY_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ embeds: [embed] })
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify({ embeds: [embed] }),
   }).catch(() => {});
 }
 
@@ -26,7 +31,7 @@ function gameTimeStr() {
 // Net Worth berechnen
 function getNetWorth() {
   return state.cash + Object.entries(state.holdings)
-    .reduce((a, [t, h]) => a + h.qty * state.prices[t], 0);
+    .reduce((a, [t, h]) => a + h.qty * (state.prices[t] ?? 0), 0);
 }
 
 // ── Milestones ─────────────────────────────────────────
@@ -1163,41 +1168,49 @@ function executeTrade(ticker, mode, qty) {
   const price = state.prices[ticker];
   const total = qty * price;
   const fee   = calcFee(total);
-
+ 
   if (mode === 'buy') {
     if (total + fee > state.cash) {
       showToast(`Insufficient funds! Need ${fmt(total + fee)} (incl. ${fmt(fee)} fee)`, true);
       return false;
     }
     state.cash -= (total + fee);
-    if (!state.holdings[ticker]) state.holdings[ticker] = { qty:0, avgCost:0 };
+    if (!state.holdings[ticker]) state.holdings[ticker] = { qty: 0, avgCost: 0 };
     const h  = state.holdings[ticker];
-    const nt = h.qty * h.avgCost + total + fee;
-    h.qty += qty;
-    h.avgCost = nt / h.qty;
+ 
+    // FIX: avgCost = nur Kaufpreis (ohne Fee), so wie es Standard ist
+    // Fee wird separat in totalFeesPaid getrackt
+    const newTotal = h.qty * h.avgCost + total;
+    h.qty    += qty;
+    h.avgCost = newTotal / h.qty;
+ 
     state.stats.totalFeesPaid += fee;
     state.stats.totalTrades++;
-    state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'BUY', qty, price, pnl: null, fee});
+    state.tradeLog.unshift({
+      time: `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2, '0')}:00`,
+      ticker, mode: 'BUY', qty, price, pnl: null, fee,
+    });
     if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
     showToast(`✓ Bought ${qty} × ${ticker} @ ${fmt(price)} · Fee: ${fmt(fee)}`);
+ 
     if (total >= 10_000) {
       sendDiscordWebhook({
         title:       `📈 Großer Kauf — ${ticker}`,
         description: `Position im Wert von **${fmt(total)}** eröffnet.`,
         color:       0x00ff88,
         fields: [
-          { name: 'Aktie',  value: ticker,       inline: true },
-          { name: 'Stück',  value: `${qty}`,     inline: true },
-          { name: 'Kurs',   value: fmt(price),   inline: true },
-          { name: 'Total',  value: fmt(total),   inline: true },
-          { name: 'Fee',    value: fmt(fee),      inline: true },
+          { name: 'Aktie',       value: ticker,         inline: true },
+          { name: 'Stück',       value: `${qty}`,       inline: true },
+          { name: 'Kurs',        value: fmt(price),     inline: true },
+          { name: 'Total',       value: fmt(total),     inline: true },
+          { name: 'Fee',         value: fmt(fee),       inline: true },
           { name: 'Cash danach', value: fmt(state.cash), inline: true },
         ],
         footer:    { text: gameTimeStr() },
         timestamp: new Date().toISOString(),
       });
     }
-
+ 
   } else {
     if (!state.holdings[ticker] || state.holdings[ticker].qty < qty) {
       showToast('Not enough shares!', true); return false;
@@ -1207,18 +1220,22 @@ function executeTrade(ticker, mode, qty) {
     state.cash += (total - fee);
     state.holdings[ticker].qty -= qty;
     if (state.holdings[ticker].qty === 0) delete state.holdings[ticker];
-    state.stats.realizedPnl  += pnl;
-    state.stats.totalFeesPaid += fee;
+    state.stats.realizedPnl    += pnl;
+    state.stats.totalFeesPaid  += fee;
     if (pnl > state.stats.bestTrade)  state.stats.bestTrade  = pnl;
     if (pnl < state.stats.worstTrade) state.stats.worstTrade = pnl;
     state.stats.totalTrades++;
-    state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'SELL', qty, price, pnl, fee});
-if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
-    showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
+    state.tradeLog.unshift({
+      time: `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2, '0')}:00`,
+      ticker, mode: 'SELL', qty, price, pnl, fee,
+    });
+    if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
+    showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl >= 0 ? '+' : ''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
+ 
     if (total >= 10_000 || pnl <= -3_000) {
       const isBigLoss = pnl <= -3_000;
       sendDiscordWebhook({
-        title:       isBigLoss && total < 10_000
+        title: isBigLoss && total < 10_000
           ? `💸 Herber Verlust — ${ticker}`
           : `💹 Großer Verkauf — ${ticker}`,
         description: isBigLoss
@@ -1226,12 +1243,12 @@ if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
           : `Position über **${fmt(total)}** verkauft.`,
         color: pnl >= 0 ? 0x00ff88 : 0xff3355,
         fields: [
-          { name: 'Aktie',  value: ticker,                                       inline: true },
-          { name: 'Stück',  value: `${qty}`,                                     inline: true },
-          { name: 'Kurs',   value: fmt(price),                                   inline: true },
-          { name: 'Total',  value: fmt(total),                                   inline: true },
-          { name: 'P&L',    value: `**${pnl>=0?'+':''}${fmt(pnl)}**`,           inline: true },
-          { name: 'Fee',    value: fmt(fee),                                     inline: true },
+          { name: 'Aktie',  value: ticker,                           inline: true },
+          { name: 'Stück',  value: `${qty}`,                         inline: true },
+          { name: 'Kurs',   value: fmt(price),                       inline: true },
+          { name: 'Total',  value: fmt(total),                       inline: true },
+          { name: 'P&L',    value: `**${pnl >= 0 ? '+' : ''}${fmt(pnl)}**`, inline: true },
+          { name: 'Fee',    value: fmt(fee),                         inline: true },
         ],
         footer:    { text: gameTimeStr() },
         timestamp: new Date().toISOString(),
@@ -1345,6 +1362,11 @@ function closeShort(ticker, qty) {
 function checkShortFees() {
   Object.entries(state.shorts).forEach(([ticker, sh]) => {
     const dailyFee = +(state.prices[ticker] * sh.qty * SHORT_FEE_DAILY).toFixed(2);
+    if (state.cash < dailyFee) {
+      // Nicht genug Cash → Warnung anzeigen, aber trotzdem abziehen
+      // (Cash kann negativ werden als Penalty)
+      showToast(`⚠️ Insufficient cash for short fee on ${ticker}! Consider covering.`, true);
+    }
     state.cash -= dailyFee;
     state.stats.totalFeesPaid += dailyFee;
   });
@@ -1664,21 +1686,28 @@ function closeNewsToast() {
 // ═══════════════════════════════════════════════════════
 async function saveGame() {
   state.savedAt = Date.now();
-
-    // Sicherheitsnetz: niemals undefined speichern
   if (state.lastMilestone === undefined) state.lastMilestone = 0;
-
+ 
   try {
     await fetch(API + '/save.php', {
       method: 'POST',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(state)
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      body: JSON.stringify(state),
     });
     showToast('💾 Gespeichert');
   } catch {
     showToast('Speichern fehlgeschlagen', true);
   }
+}
+
+function saveGameBeacon() {
+  state.savedAt = Date.now();
+  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+  navigator.sendBeacon(API + '/save.php', blob);
 }
 
 function startTimers() {
@@ -1693,7 +1722,7 @@ function startTimers() {
   insiderIntervalId  = setInterval(fireInsiderTip, INSIDER_INTERVAL_MS);
 
   if (!beforeUnloadAdded) {
-    window.addEventListener('beforeunload', saveGame);
+    window.addEventListener('beforeunload', saveGameBeacon);
     beforeUnloadAdded = true;
   }
 }
@@ -1742,13 +1771,13 @@ function showLoginScreen() {
 
 function showUserBadge(user) {
   if (!user) return;
-  const badge  = document.getElementById('userBadge');
-  const avatar = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
-  document.getElementById('userAvatar').src         = avatar;
-  document.getElementById('userName').textContent   = user.username;
-  badge.style.display     = 'flex';
-  badge.style.alignItems  = 'center';
-  badge.style.gap         = '8px';
+  const badge = document.getElementById('userBadge');
+  // FIX: Avatar ist bereits vollständige URL aus oauth.php / load.php
+  document.getElementById('userAvatar').src       = user.avatar || '';
+  document.getElementById('userName').textContent = user.username || '';
+  badge.style.display    = 'flex';
+  badge.style.alignItems = 'center';
+  badge.style.gap        = '8px';
 }
 
 document.getElementById('btnLogout').addEventListener('click', async () => {
@@ -1757,9 +1786,9 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
 });
 
 async function checkLogin() {
+  
   try {
     const resp = await fetch(API + '/load.php', { credentials: 'include' });
-    console.log('Status:', resp.status);
 
     if (resp.status === 401) {
       showLoginScreen();
@@ -1767,7 +1796,11 @@ async function checkLogin() {
     }
 
     const data = await resp.json();
-    console.log('Data:', data);
+
+    // FIX: CSRF-Token aus Response speichern
+    if (data.user?.csrf) {
+      csrfToken = data.user.csrf;
+    }
 
     // User-Badge anzeigen & Login-Screen verstecken
     if (data.user) showUserBadge(data.user);
@@ -1806,14 +1839,10 @@ async function checkLogin() {
       });
       
 
-      // STATT:
-      if (state.lastMilestone === undefined) state.lastMilestone = 0;
-
-      // SO:
+      // FIX: nur EIN lastMilestone-Block (der korrekte)
       if (state.lastMilestone === undefined) {
-        // Höchsten bereits überschrittenen Milestone berechnen
         const nw = (state.cash || 0) + Object.entries(state.holdings || {})
-          .reduce((a, [t, h]) => a + h.qty * (state.prices?.[t] || 0), 0);
+          .reduce((a, [t, h]) => a + h.qty * (state.prices?.[t] ?? 0), 0);
         state.lastMilestone = Math.max(0, ...milestones.filter(m => nw >= m));
       }
 
@@ -1827,17 +1856,15 @@ async function checkLogin() {
     renderAll();
     renderNews();
 
-    } catch(e) {
-      console.error(e);
-      // Nur bei Netzwerkfehler zum Login, nicht bei JS-Fehlern
-      if (e instanceof TypeError && e.message.includes('fetch')) {
-        showToast('Verbindung zum Server fehlgeschlagen', true);
-        showLoginScreen();
-      } else {
-        showToast('Fehler beim Laden: ' + e.message, true);
-        // KEIN showLoginScreen() hier
-      }
+    } catch (e) {
+    // FIX: kein console.error, nur User-facing Toast
+    if (e instanceof TypeError && e.message.includes('fetch')) {
+      showToast('Verbindung zum Server fehlgeschlagen', true);
+      showLoginScreen();
+    } else {
+      showToast('Fehler beim Laden: ' + e.message, true);
     }
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1923,7 +1950,9 @@ document.querySelector('.m-qty-btns').addEventListener('click', e => {
   if (btn.dataset.qty === 'max') {
     const price = state.prices[modalTicker];
     if (modalMode === 'buy') {
-      document.getElementById('mQtyInput').value = Math.max(1, Math.floor(state.cash / price));
+      let qty = Math.floor(state.cash / price);
+      while (qty > 0 && qty * price + calcFee(qty * price) > state.cash) qty--;
+      document.getElementById('mQtyInput').value = Math.max(1, qty);
     } else {
       document.getElementById('mQtyInput').value = state.holdings[modalTicker]?.qty || 0;
     }
