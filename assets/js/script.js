@@ -381,6 +381,8 @@ let beforeUnloadAdded = false;
 let pendingNewsEvent   = null; // { ticker, stockObj, eventObj, applyAt }
 let pendingNewsTimer   = null;
 let pendingCountdownId = null;
+const newsTickerCooldown = new Map();
+const NEWS_COOLDOWN_MS   = 120_000;
 
 function defaultState() {
   const prices = {}, histories = {}, volumes = {};
@@ -1516,28 +1518,37 @@ let newsEventTimerToast = null;
  */
 function fireNewsEvent() {
   if (pendingNewsEvent) return;
-
+ 
   const ev = NEWS_EVENTS[Math.floor(Math.random() * NEWS_EVENTS.length)];
-
+ 
   let s;
-  if (ev.sector) {
-    // Sektor-Event: zufällige Aktie aus dem betroffenen Sektor
-    const sectorStocks = STOCKS.filter(x => x.sector === ev.sector);
-    s = sectorStocks[Math.floor(Math.random() * sectorStocks.length)];
-  } else {
-    // Global: komplett zufällige Aktie
-    s = STOCKS[Math.floor(Math.random() * STOCKS.length)];
-  }
-
+  let attempts = 0;
+  do {
+    if (ev.sector) {
+      const sectorStocks = STOCKS.filter(x => x.sector === ev.sector);
+      s = sectorStocks[Math.floor(Math.random() * sectorStocks.length)];
+    } else {
+      s = STOCKS[Math.floor(Math.random() * STOCKS.length)];
+    }
+    attempts++;
+    // Nach 10 Versuchen Cooldown ignorieren (Fallback)
+    if (attempts >= 10) break;
+  } while (
+    newsTickerCooldown.has(s.ticker) &&
+    Date.now() - newsTickerCooldown.get(s.ticker) < NEWS_COOLDOWN_MS
+  );
+ 
+  // Cooldown setzen
+  newsTickerCooldown.set(s.ticker, Date.now());
+ 
   pendingNewsEvent = { ticker: s.ticker, stockObj: s, eventObj: ev };
-
-  // Sektor-Badge im Toast anzeigen
+ 
   const label = ev.sector
     ? `[${ev.sector}] ${s.name}: ${ev.msg}`
     : `${s.name}: ${ev.msg}`;
-
+ 
   showNewsToast(s.ticker, label, ev.impact, ev.sector);
-
+ 
   let remaining = NEWS_REACTION_TIME;
   pendingCountdownId = setInterval(() => {
     remaining--;
@@ -1547,7 +1558,7 @@ function fireNewsEvent() {
       pendingCountdownId = null;
     }
   }, 1000);
-
+ 
   pendingNewsTimer = setTimeout(applyPendingNews, NEWS_REACTION_TIME * 1000);
   renderTable();
 }
@@ -1769,15 +1780,26 @@ function showLoginScreen() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
+function showSkeleton() {
+  const el = document.getElementById('skeletonScreen');
+  if (el) el.style.display = 'flex';
+  document.querySelector('.app-layout')?.style.setProperty('visibility', 'hidden');
+  document.querySelector('header')?.style.setProperty('opacity', '0.3');
+}
+
+function hideSkeleton() {
+  const el = document.getElementById('skeletonScreen');
+  if (el) el.style.display = 'none';
+  document.querySelector('.app-layout')?.style.setProperty('visibility', 'visible');
+  document.querySelector('header')?.style.setProperty('opacity', '1');
+}
+
 function showUserBadge(user) {
   if (!user) return;
   const badge = document.getElementById('userBadge');
-  // FIX: Avatar ist bereits vollständige URL aus oauth.php / load.php
   document.getElementById('userAvatar').src       = user.avatar || '';
   document.getElementById('userName').textContent = user.username || '';
-  badge.style.display    = 'flex';
-  badge.style.alignItems = 'center';
-  badge.style.gap        = '8px';
+  badge.classList.add('user-badge-visible');
 }
 
 document.getElementById('btnLogout').addEventListener('click', async () => {
@@ -1786,7 +1808,7 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
 });
 
 async function checkLogin() {
-  
+  showSkeleton();
   try {
     const resp = await fetch(API + '/load.php', { credentials: 'include' });
 
@@ -1819,15 +1841,7 @@ async function checkLogin() {
       if (!state.priceAlerts)     state.priceAlerts     = {};
       if (state.lastDividendDay  === undefined) state.lastDividendDay  = 0;
 
-      state.stats = {
-        totalTrades:    state.stats?.totalTrades    ?? 0,
-        realizedPnl:    state.stats?.realizedPnl    ?? 0,
-        bestTrade:      state.stats?.bestTrade      ?? 0,
-        worstTrade:     state.stats?.worstTrade     ?? 0,
-        startCash:      state.stats?.startCash      ?? base.stats.startCash,
-        totalFeesPaid:  state.stats?.totalFeesPaid  ?? 0,
-        totalDividends: state.stats?.totalDividends ?? 0,
-      };
+      state.stats = mergeStats(state.stats, base.stats);
 
       // Neue Stocks nachrüsten
       STOCKS.forEach(s => {
@@ -1855,17 +1869,18 @@ async function checkLogin() {
     startTimers();
     renderAll();
     renderNews();
+    hideSkeleton();
 
-    } catch (e) {
-    // FIX: kein console.error, nur User-facing Toast
-    if (e instanceof TypeError && e.message.includes('fetch')) {
-      showToast('Verbindung zum Server fehlgeschlagen', true);
-      showLoginScreen();
-    } else {
-      showToast('Fehler beim Laden: ' + e.message, true);
+    } catch(e) {
+        hideSkeleton();
+        if (e instanceof TypeError && e.message.includes('fetch')) {
+          showToast('Verbindung zum Server fehlgeschlagen', true);
+          showLoginScreen();
+        } else {
+          showToast('Fehler beim Laden: ' + e.message, true);
+        }
+      }
     }
-  }
-}
 
 // ═══════════════════════════════════════════════════════
 // NEWS BOTTOM BAR
@@ -2237,6 +2252,94 @@ document.getElementById('btnSetAlert').addEventListener('click', () => {
   showToast(`🔔 Alert set for ${modalTicker} at ${fmt(target)} (${dir} current)`);
   refreshModal();
 });
+
+let activeMainTab = 'market';
+ 
+function switchMainTab(tab) {
+  activeMainTab = tab;
+ 
+  // Alle Tab-Buttons updaten
+  document.querySelectorAll('.main-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+ 
+  // Sektionen ein-/ausblenden
+  const sections = {
+    market:    ['#sectionMarket'],
+    portfolio: ['#sectionPortfolio'],
+    orders:    ['#sectionOrders'],
+    stats:     ['#sectionStats'],
+  };
+ 
+  Object.entries(sections).forEach(([key, ids]) => {
+    ids.forEach(id => {
+      const el = document.querySelector(id);
+      if (el) el.style.display = key === tab ? '' : 'none';
+    });
+  });
+ 
+  // Sidebar anpassen
+  const sidebarLeft  = document.querySelector('.sidebar-left');
+  const sidebarRight = document.querySelector('.sidebar-right');
+ 
+  if (tab === 'market') {
+    if (sidebarLeft)  sidebarLeft.style.display  = '';
+    if (sidebarRight) sidebarRight.style.display = '';
+  } else if (tab === 'portfolio') {
+    if (sidebarLeft)  sidebarLeft.style.display  = 'none';
+    if (sidebarRight) sidebarRight.style.display = '';
+  } else if (tab === 'orders') {
+    if (sidebarLeft)  sidebarLeft.style.display  = 'none';
+    if (sidebarRight) sidebarRight.style.display = '';
+  } else if (tab === 'stats') {
+    if (sidebarLeft)  sidebarLeft.style.display  = '';
+    if (sidebarRight) sidebarRight.style.display = 'none';
+  }
+}
+
+function updateQuickActions() {
+  if (!modalTicker) return;
+  const price    = state.prices[modalTicker];
+  const held     = state.holdings[modalTicker]?.qty || 0;
+  const maxBuy   = (() => {
+    let qty = Math.floor(state.cash / price);
+    while (qty > 0 && qty * price + calcFee(qty * price) > state.cash) qty--;
+    return Math.max(0, qty);
+  })();
+ 
+  // Quick-Buy Buttons
+  const buyBtns = document.getElementById('quickBuyBtns');
+  if (buyBtns) {
+    buyBtns.innerHTML = [1, 5, 10, 50].map(n => `
+      <button class="quick-btn quick-buy ${maxBuy < n ? 'disabled' : ''}"
+              onclick="${maxBuy >= n ? `executeTrade('${modalTicker}','buy',${n});refreshModal()` : ''}">
+        +${n}
+      </button>`).join('') + `
+      <button class="quick-btn quick-buy ${maxBuy < 1 ? 'disabled' : ''}"
+              onclick="${maxBuy >= 1 ? `executeTrade('${modalTicker}','buy',${maxBuy});refreshModal()` : ''}">
+        MAX
+      </button>`;
+  }
+ 
+  // Quick-Sell Buttons
+  const sellBtns = document.getElementById('quickSellBtns');
+  if (sellBtns) {
+    if (held > 0) {
+      sellBtns.innerHTML = [1, 5, 10].filter(n => n <= held).map(n => `
+        <button class="quick-btn quick-sell"
+                onclick="executeTrade('${modalTicker}','sell',${n});refreshModal()">
+          -${n}
+        </button>`).join('') + `
+        <button class="quick-btn quick-sell"
+                onclick="executeTrade('${modalTicker}','sell',${held});refreshModal()">
+          SELL ALL
+        </button>`;
+      sellBtns.style.display = '';
+    } else {
+      sellBtns.style.display = 'none';
+    }
+  }
+}
 
 // ═══════════════════════════════════════════════════════
 // BOOT
