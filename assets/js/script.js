@@ -22,6 +22,8 @@ function lsxLog(level, context, message, data = {}) {
     })),
   ];
 
+  // Nur senden wenn CSRF-Token bereits gesetzt (nach Login)
+  if (!csrfToken) return;
   fetch(PROXY_URL, {
     method: 'POST',
     credentials: 'include',
@@ -1785,7 +1787,7 @@ function checkLimitOrders() {
     state.limitOrders = state.limitOrders.filter(x => x.id !== o.id);
     const execPrice = state.prices[o.ticker];
     executeTrade(o.ticker, o.mode, o.qty);
-    showNewsEvent(o.ticker, `Limit order triggered: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(execPrice)}`, o.mode==='buy'?0.01:-0.01, false);
+    showToast(`⏱ Limit order executed: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(execPrice)}`);
     sendDiscordWebhook({
       title:       `⏱ Limit-Order ausgeführt — ${o.ticker}`,
       description: `Order automatisch ausgelöst.`,
@@ -1813,7 +1815,7 @@ function checkStopLosses() {
       const pnlEst = (sellPrice - h.avgCost) * qty;
       delete state.stopLosses[ticker];
       executeTrade(ticker, 'sell', qty);
-      showNewsEvent(ticker, `Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, -0.02, false);
+      showToast(`🛡 Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, true);
       sendDiscordWebhook({
         title:       `🛡 Stop-Loss ausgelöst — ${ticker}`,
         description: `Automatischer Verkauf bei **−${Math.abs(lossPct).toFixed(1)}%** Verlust.`,
@@ -1859,12 +1861,12 @@ function checkDividends() {
 
   if (totalPayout === 0) return;
 
-  // Aufwändiger Dividend-Toast via showNewsEvent
+  // Dividend-Toast anzeigen
   const lines = payouts
     .map(p => `${p.ticker} +${fmt(p.payout)} (${p.rate}%)`)
     .join(' · ');
 
-  showNewsEvent(null,
+  showNewsToast(null,
     `💰 DIVIDEND PAYOUT · ${fmt(totalPayout)} · ${lines}`,
     0.0, false
   );
