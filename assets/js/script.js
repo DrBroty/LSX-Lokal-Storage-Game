@@ -340,12 +340,12 @@ const TRADE_LOG_MAX = 30; // Maximale Einträge in der Trade History
 // FEES AND DIVIDENS (DAYS)
 // ═══════════════════════════════════════════════════════
 
-// ── TRADING FEES ──────────────────────────────────────
-const FEE_FLAT        = 25;      // unter $1.000
-const FEE_TIER_1      = 0.012;   // 1.20% · $1.000 – $9.999
-const FEE_TIER_2      = 0.008;   // 0.80% · $10.000 – $49.999
-const FEE_TIER_3      = 0.005;   // 0.50% · $50.000 – $199.999
-const FEE_TIER_4      = 0.0025;  // 0.25% · ab $200.000
+// ── TRADING FEES (erhöht für mehr Challenge) ──────────
+const FEE_FLAT        = 50;      // unter $1.000          (war: $25)
+const FEE_TIER_1      = 0.020;   // 2.00% · $1.000–$9.999    (war: 1.20%)
+const FEE_TIER_2      = 0.015;   // 1.50% · $10.000–$49.999  (war: 0.80%)
+const FEE_TIER_3      = 0.010;   // 1.00% · $50.000–$199.999 (war: 0.50%)
+const FEE_TIER_4      = 0.006;   // 0.60% · ab $200.000       (war: 0.25%)
 
 // ── DIVIDENDS ─────────────────────────────────────────
 const DIVIDEND_RATES = {
@@ -392,7 +392,7 @@ function defaultState() {
     const hist = [];
     let hp = p;
     for (let i = 0; i < 30; i++) {
-      hp = Math.max(1, hp * (1 + (Math.random()-.5) * s.vol * 2));
+      hp = Math.max(s.basePrice * 0.10, hp * (1 + (Math.random()-.5) * s.vol * 2));
       hist.push(+hp.toFixed(2));
     }
     hist.push(p);
@@ -404,7 +404,7 @@ function defaultState() {
     prices, histories, volumes,
     holdings:    {},
     shorts: {},  // ticker -> { qty, entryPrice, collateral }
-    cash:        50000,
+    cash:        10000,
     watchlist:   [],
     limitOrders: [],
     stopLosses:  {},
@@ -418,12 +418,13 @@ function defaultState() {
     realizedPnl:    0,
     bestTrade:      0,
     worstTrade:     0,
-    startCash:      50000,
+    startCash:      10000,
     totalFeesPaid:  0,
     totalDividends: 0,
-    netWorthATH:    50000,
+    netWorthATH:    10000,
     },
-    lastDividendDay: 0,
+    lastDividendDay: 0,   // FIX: wird durch totalGameDays ersetzt
+    totalGameDays:   0,   // FIX: globaler Spieltag-Zähler für Dividenden
     lastMilestone: 0,   // ← NEU
     orderIdSeq: 1,
   };
@@ -494,12 +495,13 @@ function simulateTick(n = 1) {
       updated.add(s.ticker);
     });
 
-    // Spielzeit pro Tick vorantreiben (4s realtime = 1 Spielstunde)
+    // FIX #1 (gameHour): Spielzeit pro Tick vorantreiben (4s realtime = 1 Spielstunde)
     state.gameHour++;
     if (state.gameHour >= 24) {
       state.gameHour = 6;
       state.gameDay  = (state.gameDay + 1) % 7;
       state.gameDayOfMonth++;
+      state.totalGameDays = (state.totalGameDays || 0) + 1; // FIX #3 (Dividenden): globaler Counter
       if (state.gameDayOfMonth > 28) {
         state.gameDayOfMonth = 1;
         state.gameMonth = (state.gameMonth + 1) % 12;
@@ -549,12 +551,224 @@ function renderAll() {
   renderScoreboard();
   renderTradeHistory();
   renderPortfolioChart();
-  renderMarketSummary();  // NEU
-  renderTopMovers();      // NEU
-  if (heatmapMode) renderHeatmap(); // NEU
+  renderMarketSummary();
+  renderTopMovers();
+  if (heatmapMode) renderHeatmap();
+  // FIX #2 (Tab-Sektionen): Tab-spezifische Elemente mitrendern
+  renderTabSections();
   updateHeader();
   updateGameTime();
   if (modalTicker) refreshModal();
+}
+
+// FIX #2 (Tab-Sektionen): befüllt Portfolio/Orders/Stats Tab-Inhalte
+function renderTabSections() {
+  // ── PORTFOLIO TAB ──────────────────────────────
+  const portFull  = document.getElementById('portfolioElFull');
+  const shortFull = document.getElementById('shortsElFull');
+  const chartFull = document.getElementById('portfolioChartFull');
+
+  if (portFull) {
+    const entries = Object.entries(state.holdings);
+    portFull.innerHTML = entries.length ? entries.map(([ticker, h]) => {
+      const cur = state.prices[ticker];
+      const val = cur * h.qty;
+      const pnl = (cur - h.avgCost) * h.qty;
+      const pct = (cur - h.avgCost) / h.avgCost * 100;
+      const cls = pnl >= 0 ? 'up' : 'down';
+      return `<div class="portfolio-row" data-ticker="${ticker}" style="cursor:pointer">
+        <div class="portfolio-row-left">
+          <div class="portfolio-row-tick">${ticker}</div>
+          <div class="portfolio-row-qty">${h.qty} @ ${fmt(h.avgCost)}</div>
+        </div>
+        <div class="portfolio-row-right">
+          <div class="portfolio-row-val">${fmt(val)}</div>
+          <div class="portfolio-row-pnl ${cls}">${pnl>=0?'+':''}${fmt(pnl)} (${pct.toFixed(1)}%)</div>
+        </div>
+      </div>`;
+    }).join('') : '<div class="watch-empty">No open positions.</div>';
+    portFull.onclick = e => {
+      const row = e.target.closest('.portfolio-row');
+      if (row) openModal(row.dataset.ticker);
+    };
+  }
+
+  if (shortFull) {
+    const entries = Object.entries(state.shorts || {});
+    shortFull.innerHTML = entries.length ? entries.map(([ticker, sh]) => {
+      const cur = state.prices[ticker];
+      const pnl = (sh.entryPrice - cur) * sh.qty;
+      const pct = (sh.entryPrice - cur) / sh.entryPrice * 100;
+      const cls = pnl >= 0 ? 'up' : 'down';
+      return `<div class="portfolio-row" data-ticker="${ticker}" style="cursor:pointer">
+        <div class="portfolio-row-left">
+          <div class="portfolio-row-tick"><span style="color:var(--red);font-size:10px;margin-right:4px;">▼</span>${ticker}</div>
+          <div class="portfolio-row-qty">${sh.qty} @ ${fmt(sh.entryPrice)}</div>
+        </div>
+        <div class="portfolio-row-right">
+          <div class="portfolio-row-val">${fmt(cur * sh.qty)}</div>
+          <div class="portfolio-row-pnl ${cls}">${pnl>=0?'+':''}${fmt(pnl)} (${pct.toFixed(1)}%)</div>
+        </div>
+      </div>`;
+    }).join('') : '<div class="watch-empty">No open shorts.</div>';
+    shortFull.onclick = e => {
+      const row = e.target.closest('.portfolio-row');
+      if (row) openModal(row.dataset.ticker);
+    };
+  }
+
+  if (chartFull && state.netWorthHistory?.length > 1) {
+    const ctx = chartFull.getContext('2d');
+    const data = state.netWorthHistory.slice(-120);
+    const cw = chartFull.parentElement.clientWidth - 24;
+    const h  = 160;
+    chartFull.width  = cw;
+    chartFull.height = h;
+    const min = Math.min(...data), max = Math.max(...data), range = max - min || 1;
+    const pad = 6;
+    const isUp = data[data.length-1] >= data[0];
+    const col  = isUp ? 'rgba(0,255,136,0.9)' : 'rgba(255,51,85,0.9)';
+    ctx.clearRect(0,0,cw,h);
+    const coords = data.map((v,i) => ({
+      x: (i/(data.length-1))*(cw-pad*2)+pad,
+      y: h-pad-((v-min)/range)*(h-pad*2)
+    }));
+    const grad = ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0, isUp?'rgba(0,255,136,0.18)':'rgba(255,51,85,0.18)');
+    grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();
+    coords.forEach((c,i) => i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
+    ctx.lineTo(coords[coords.length-1].x,h-pad);
+    ctx.lineTo(pad,h-pad);
+    ctx.closePath();
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath();
+    coords.forEach((c,i) => i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
+    ctx.strokeStyle=col; ctx.lineWidth=2; ctx.stroke();
+  }
+
+  // ── ORDERS TAB ────────────────────────────────
+  const ordersFull = document.getElementById('ordersElFull');
+  if (ordersFull) {
+    ordersFull.innerHTML = state.limitOrders.length
+      ? state.limitOrders.map(o => `
+        <div class="order-item">
+          <div>
+            <span class="order-ticker">${o.ticker}</span>
+            <span class="order-meta" style="margin-left:8px">${o.type==='buy-below'?'BUY ≤':'SELL ≥'} ${fmt(o.price)} × ${o.qty}</span>
+          </div>
+          <button class="order-cancel" data-order-id="${o.id}">✕</button>
+        </div>`).join('')
+      : '<div class="watch-empty">No active limit orders.</div>';
+    ordersFull.onclick = e => {
+      const btn = e.target.closest('.order-cancel');
+      if (!btn) return;
+      state.limitOrders = state.limitOrders.filter(o => o.id !== +btn.dataset.orderId);
+      renderTabSections();
+      showToast('Order cancelled');
+    };
+  }
+
+  const slEl = document.getElementById('stopLossesEl');
+  if (slEl) {
+    const entries = Object.entries(state.stopLosses || {});
+    slEl.innerHTML = entries.length
+      ? entries.map(([ticker, pct]) => {
+          const isShort = ticker.startsWith('short_');
+          const label   = isShort ? ticker.replace('short_','') + ' (SHORT)' : ticker;
+          return `<div class="order-item">
+            <div>
+              <span class="order-ticker">${label}</span>
+              <span class="order-meta" style="margin-left:8px">Stop at −${pct}%</span>
+            </div>
+            <button class="order-cancel" data-sl-ticker="${ticker}">✕</button>
+          </div>`;
+        }).join('')
+      : '<div class="watch-empty">No active stop-losses.</div>';
+    slEl.onclick = e => {
+      const btn = e.target.closest('.order-cancel');
+      if (!btn) return;
+      delete state.stopLosses[btn.dataset.slTicker];
+      renderTabSections();
+      showToast('Stop-loss removed');
+    };
+  }
+
+  const alertEl = document.getElementById('priceAlertsEl');
+  if (alertEl) {
+    const entries = Object.entries(state.priceAlerts || {});
+    alertEl.innerHTML = entries.length
+      ? entries.map(([ticker, target]) => {
+          const cur = state.prices[ticker];
+          const dir = target > cur ? '▲' : '▼';
+          return `<div class="order-item">
+            <div>
+              <span class="order-ticker">${ticker}</span>
+              <span class="order-meta" style="margin-left:8px">${dir} ${fmt(target)}</span>
+            </div>
+            <button class="order-cancel" data-alert-ticker="${ticker}">✕</button>
+          </div>`;
+        }).join('')
+      : '<div class="watch-empty">No active price alerts.</div>';
+    alertEl.onclick = e => {
+      const btn = e.target.closest('.order-cancel');
+      if (!btn) return;
+      delete state.priceAlerts[btn.dataset.alertTicker];
+      renderTabSections();
+      showToast('Alert removed');
+    };
+  }
+
+  // ── STATS TAB ─────────────────────────────────
+  const scoreGridFull = document.getElementById('scoreGridFull');
+  if (scoreGridFull) {
+    const totalVal    = Object.entries(state.holdings).reduce((a,[t,h]) => a + h.qty*state.prices[t], 0);
+    const netWorth    = state.cash + totalVal;
+    const totalReturn = ((netWorth - state.stats.startCash) / state.stats.startCash * 100);
+    const items = [
+      ['NET WORTH',    fmt(netWorth),                         netWorth >= state.stats.startCash ? 'up' : 'down'],
+      ['CASH',         fmt(state.cash),                       ''],
+      ['RETURN',       (totalReturn>=0?'+':'')+totalReturn.toFixed(1)+'%', totalReturn>=0?'up':'down'],
+      ['REALIZED P&L', fmt(state.stats.realizedPnl),          state.stats.realizedPnl>=0?'up':'down'],
+      ['DIVIDENDS',    fmt(state.stats.totalDividends),        'up'],
+      ['FEES PAID',    fmt(state.stats.totalFeesPaid),         'down'],
+      ['BEST TRADE',   fmt(state.stats.bestTrade),             'up'],
+      ['WORST TRADE',  fmt(Math.abs(state.stats.worstTrade)),  'down'],
+      ['TOTAL TRADES', state.stats.totalTrades,                ''],
+      ['GAME DAYS',    state.totalGameDays || 0,               ''],
+    ];
+    scoreGridFull.innerHTML = items.map(([lbl,val,cls]) => `
+      <div class="stat-card">
+        <div class="stat-card-label">${lbl}</div>
+        <div class="stat-card-val ${cls}" style="${cls?`color:var(--${cls==='up'?'green':'red'})`:''}">${val}</div>
+      </div>`).join('');
+  }
+
+  const thFull = document.getElementById('tradeHistoryElFull');
+  if (thFull) {
+    if (!state.tradeLog?.length) {
+      thFull.innerHTML = '<div class="watch-empty">No trades yet.</div>';
+    } else {
+      thFull.innerHTML = state.tradeLog.map(t => {
+        const isBuy = t.mode === 'BUY';
+        const pnlHtml = t.pnl !== null
+          ? `<div class="th-pnl ${t.pnl>=0?'up':'down'}">${t.pnl>=0?'+':''}${fmt(t.pnl)}</div>`
+          : '';
+        return `<div class="trade-hist-row">
+          <div class="th-left">
+            <span class="th-mode ${isBuy?'buy':'sell'}">${t.mode}</span>
+            <span class="th-ticker">${t.ticker}</span>
+            <span class="th-meta">${t.qty} @ ${fmt(t.price)}</span>
+          </div>
+          <div class="th-right">
+            ${pnlHtml}
+            <div class="th-fee">-${fmt(t.fee)}</div>
+            <div class="th-time">${t.time}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 function renderTable() {
@@ -1461,9 +1675,12 @@ function checkStopLosses() {
 }
 
 function checkDividends() {
-  // Alle 14 Spieltage auszahlen
-  if (state.gameDay % DIVIDEND_INTERVAL_DAYS !== 0 || state.gameDay === state.lastDividendDay) return;
-  state.lastDividendDay = state.gameDay;
+  // FIX #3 (Dividenden): totalGameDays statt gameDay % 7
+  // gameDay geht nur 0-6, daher konnte die alte Logik fast nie korrekt feuern
+  const tgd = state.totalGameDays || 0;
+  if (tgd === 0 || tgd % DIVIDEND_INTERVAL_DAYS !== 0) return;
+  if (state.lastDividendDay === tgd) return; // schon ausgezahlt heute
+  state.lastDividendDay = tgd;
 
   let totalPayout = 0;
   const payouts   = [];
@@ -1577,7 +1794,9 @@ function applyPendingNews() {
 
   // Kurs anwenden
   const oldPrice = state.prices[ticker];
-  const newPrice = Math.max(1, +(oldPrice * (1 + eventObj.impact)).toFixed(2));
+  const newsStock1 = STOCKS.find(x => x.ticker === ticker);
+  const newsFloor1  = newsStock1 ? newsStock1.basePrice * 0.10 : 1;
+  const newPrice = Math.max(newsFloor1, +(oldPrice * (1 + eventObj.impact)).toFixed(2));
   state.prices[ticker] = newPrice;
   state.histories[ticker].push(newPrice);
   if (state.histories[ticker].length > 60) state.histories[ticker].shift();
@@ -1587,7 +1806,9 @@ function applyPendingNews() {
   if (stockObj?.rival && state.prices[stockObj.rival] !== undefined) {
     const rivalOld = state.prices[stockObj.rival];
     const rivalImpact = -eventObj.impact * (0.4 + Math.random() * 0.3);
-    const rivalNew = Math.max(1, +(rivalOld * (1 + rivalImpact)).toFixed(2));
+    const newsRivalStock = STOCKS.find(x => x.ticker === stockObj.rival);
+    const newsRivalFloor = newsRivalStock ? newsRivalStock.basePrice * 0.10 : 1;
+    const rivalNew = Math.max(newsRivalFloor, +(rivalOld * (1 + rivalImpact)).toFixed(2));
     state.prices[stockObj.rival] = rivalNew;
     state.histories[stockObj.rival].push(rivalNew);
     if (state.histories[stockObj.rival].length > 60) state.histories[stockObj.rival].shift();
@@ -1861,6 +2082,7 @@ async function checkLogin() {
       if (!state.shorts)          state.shorts          = {};
       if (!state.priceAlerts)     state.priceAlerts     = {};
       if (state.lastDividendDay  === undefined) state.lastDividendDay  = 0;
+      if (state.totalGameDays    === undefined) state.totalGameDays    = 0;
 
       state.stats = mergeStats(state.stats, base.stats);
 
@@ -2150,7 +2372,9 @@ function fireInsiderTip() {
   setTimeout(() => {
     if (!state.prices[s.ticker]) return;
     const old = state.prices[s.ticker];
-    const np  = Math.max(1, +(old * (1 + impact)).toFixed(2));
+    const insiderStock = STOCKS.find(x => x.ticker === s.ticker);
+    const insiderFloor = insiderStock ? insiderStock.basePrice * 0.10 : 1;
+    const np  = Math.max(insiderFloor, +(old * (1 + impact)).toFixed(2));
     state.prices[s.ticker] = np;
     state.histories[s.ticker].push(np);
     if (state.histories[s.ticker].length > 60) state.histories[s.ticker].shift();
