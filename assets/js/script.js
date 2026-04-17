@@ -1195,25 +1195,161 @@ function updateGameTime() {
 function openModal(ticker) {
   modalTicker = ticker;
   modalMode   = 'buy';
-  refreshModal();
+
+  // Tab-System: immer auf TRADE zurücksetzen
+  switchModalTab('trade');
+
+  // BUY als Standard
   document.getElementById('mTabBuy').className  = 'trade-tab2 buy-active';
   document.getElementById('mTabSell').className = 'trade-tab2';
   document.getElementById('btnModalTrade').className   = 'btn-modal-trade btn-modal-buy';
   document.getElementById('btnModalTrade').textContent = 'BUY SHARES';
   document.getElementById('mQtyInput').value = 1;
   updateMTotal();
-  // Inner tabs zurücksetzen
-  document.getElementById('mpanelTrade').style.display  = '';
-  document.getElementById('mpanelOrders').style.display = 'none';
-  document.getElementById('mtabTrade').classList.add('active');
-  document.getElementById('mtabOrders').classList.remove('active');
-  document.getElementById('stockModal').classList.add('open');
 
-  const sl = state.stopLosses[ticker];
+  document.getElementById('stockModal').classList.add('open');
+  refreshModal();
+  updateWatchBtn();
+}
+
+// Neues 4-Tab-System für das Modal
+function switchModalTab(tab) {
+  const panels = ['trade','short','orders','alert'];
+  panels.forEach(p => {
+    const panel = document.getElementById('mpanel' + p.charAt(0).toUpperCase() + p.slice(1));
+    if (panel) panel.style.display = p === tab ? '' : 'none';
+  });
+  document.querySelectorAll('.modal-inner-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mtab === tab);
+  });
+  // Tab-spezifische Inhalte aktualisieren
+  if (tab === 'short')  refreshShortTab();
+  if (tab === 'orders') refreshOrdersTab();
+  if (tab === 'alert')  refreshAlertTab();
+}
+
+function refreshShortTab() {
+  if (!modalTicker) return;
+  const sh  = state.shorts?.[modalTicker];
+  const el  = document.getElementById('shortPosDisplay');
+  const ssl = state.stopLosses['short_' + modalTicker];
+
+  if (sh) {
+    const cur    = state.prices[modalTicker];
+    const pnl    = (sh.entryPrice - cur) * sh.qty;
+    const pnlPct = ((sh.entryPrice - cur) / sh.entryPrice * 100).toFixed(1);
+    el.innerHTML = `
+      <div class="modal-short-pos-card">
+        <div class="msp-row">
+          <span class="msp-label">POSITION</span>
+          <span class="msp-val">${sh.qty} shares</span>
+        </div>
+        <div class="msp-row">
+          <span class="msp-label">ENTRY</span>
+          <span class="msp-val">${fmt(sh.entryPrice)}</span>
+        </div>
+        <div class="msp-row">
+          <span class="msp-label">CURRENT</span>
+          <span class="msp-val">${fmt(cur)}</span>
+        </div>
+        <div class="msp-row">
+          <span class="msp-label">P&L</span>
+          <span class="msp-val ${pnl>=0?'up':'down'}">${pnl>=0?'+':''}${fmt(pnl)} (${pnlPct}%)</span>
+        </div>
+        <div class="msp-row">
+          <span class="msp-label">COLLATERAL</span>
+          <span class="msp-val">${fmt(sh.collateral)}</span>
+        </div>
+      </div>`;
+    document.getElementById('shortCoverQtyInput').value = sh.qty;
+  } else {
+    el.innerHTML = '<div class="watch-empty">No short position on ' + modalTicker + '.</div>';
+  }
+
+  // Short Stop-Loss Status
+  const sslInput  = document.getElementById('shortStopLossInput');
+  const sslStatus = document.getElementById('shortStopLossStatus');
+  const sslBtn    = document.getElementById('btnClearShortStopLoss');
+  if (ssl) {
+    sslInput.value          = ssl;
+    sslStatus.textContent   = `Active: auto-cover at +${ssl}% loss`;
+    sslBtn.style.display    = '';
+  } else {
+    sslInput.value          = '';
+    sslStatus.textContent   = '';
+    sslBtn.style.display    = 'none';
+  }
+}
+
+function refreshOrdersTab() {
+  if (!modalTicker) return;
+
+  // Stop-Loss (Long)
+  const sl = state.stopLosses[modalTicker];
   document.getElementById('stopLossInput').value = sl || '';
   document.getElementById('stopLossStatus').textContent = sl ? `Active: auto-sell at −${sl}% loss` : '';
   document.getElementById('btnClearStopLoss').style.display = sl ? '' : 'none';
-  updateWatchBtn();
+
+  // Aktive Orders für diesen Ticker
+  const el = document.getElementById('modalActiveOrders');
+  const orders = state.limitOrders.filter(o => o.ticker === modalTicker);
+  el.innerHTML = orders.length
+    ? orders.map(o => `
+      <div class="order-item">
+        <div>
+          <span class="order-meta">${o.type==='buy-below'?'BUY ≤':'SELL ≥'} ${fmt(o.price)} × ${o.qty}</span>
+        </div>
+        <button class="order-cancel" data-order-id="${o.id}">✕</button>
+      </div>`).join('')
+    : '<div class="watch-empty">No active orders for this stock.</div>';
+
+  el.onclick = e => {
+    const btn = e.target.closest('.order-cancel');
+    if (!btn) return;
+    state.limitOrders = state.limitOrders.filter(o => o.id !== +btn.dataset.orderId);
+    renderOrders();
+    renderTabSections();
+    refreshOrdersTab();
+    showToast('Order cancelled');
+  };
+}
+
+function refreshAlertTab() {
+  if (!modalTicker) return;
+  const a   = state.priceAlerts?.[modalTicker];
+  const cur = state.prices[modalTicker];
+
+  // Current alert display
+  const alertDisplay = document.getElementById('currentAlertDisplay');
+  if (a) {
+    const dir = a > cur ? '▲ above' : '▼ below';
+    alertDisplay.innerHTML = `
+      <div class="modal-alert-active">
+        🔔 Alert set at <strong>${fmt(a)}</strong> (${dir} current ${fmt(cur)})
+        <button onclick="clearPriceAlert('${modalTicker}')" class="btn-sm btn-danger" style="margin-left:8px;">REMOVE</button>
+      </div>`;
+    document.getElementById('priceAlertInput').value = a;
+  } else {
+    alertDisplay.innerHTML = '<div class="watch-empty">No alert set.</div>';
+    document.getElementById('priceAlertInput').value = '';
+  }
+
+  // Watchlist toggle
+  const watched = state.watchlist.includes(modalTicker);
+  const wBtn    = document.getElementById('btnWatchFull');
+  const wDisp   = document.getElementById('watchlistToggleDisplay');
+  wDisp.innerHTML = watched
+    ? `<div class="modal-alert-active">★ ${modalTicker} is on your watchlist.</div>`
+    : `<div class="watch-empty">${modalTicker} is not on your watchlist.</div>`;
+  wBtn.textContent = watched ? '★ REMOVE FROM WATCHLIST' : '☆ ADD TO WATCHLIST';
+  wBtn.onclick = () => {
+    const idx = state.watchlist.indexOf(modalTicker);
+    if (idx === -1) { state.watchlist.push(modalTicker); showToast('★ Added to watchlist'); }
+    else            { state.watchlist.splice(idx, 1);    showToast('Removed from watchlist'); }
+    updateWatchBtn();
+    renderWatchlist();
+    refreshAlertTab();
+  };
 }
 
 function closeModal() {
@@ -1278,35 +1414,22 @@ function refreshModal() {
 
   drawChart('modalChart', modalTicker, 200, 120);
   updateMTotal();
+  updateQuickActions();
 
-  // ── Short-Status ──────────────────────────────────────
+  // Status-Pills: Short & Alert — kompaktes Summary in der Header-Row
   const shortStatus = document.getElementById('shortStatus');
   if (shortStatus) {
     const sh = state.shorts?.[modalTicker];
-    if (sh) {
-      const pnl    = (sh.entryPrice - price) * sh.qty;
-      const pnlPct = ((sh.entryPrice - price) / sh.entryPrice * 100).toFixed(1);
-      shortStatus.innerHTML = `📉 Short: ${sh.qty} @ ${fmt(sh.entryPrice)} · P&L: <span class="${pnl >= 0 ? 'up' : 'down'}">${pnl >= 0 ? '+' : ''}${fmt(pnl)} (${pnlPct}%)</span>`;
-    } else {
-      shortStatus.textContent = '';
-    }
+    shortStatus.innerHTML = sh
+      ? `<span class="status-pill status-short">📉 SHORT ${sh.qty}×</span>`
+      : '';
   }
-
-  // ── Preis-Alarm Status ────────────────────────────────
   const alertStatus = document.getElementById('priceAlertStatus');
-  const alertInput  = document.getElementById('priceAlertInput');
   if (alertStatus) {
     const a = state.priceAlerts?.[modalTicker];
-    if (a) {
-      const dir = a > state.prices[modalTicker] ? '▲' : '▼';
-      alertStatus.innerHTML = `🔔 Alert set: ${dir} ${fmt(a)}
-        <span onclick="clearPriceAlert('${modalTicker}')"
-              style="color:var(--red);cursor:pointer;margin-left:8px;">✕ Remove</span>`;
-      if (alertInput) alertInput.value = a;
-    } else {
-      alertStatus.textContent = '';
-      if (alertInput) alertInput.value = '';
-    }
+    alertStatus.innerHTML = a
+      ? `<span class="status-pill status-alert">🔔 ALERT ${fmt(a)}</span>`
+      : '';
   }
 }
 
@@ -2172,17 +2295,11 @@ document.getElementById('stockModal').addEventListener('click', e => {
   if (e.target === document.getElementById('stockModal')) closeModal();
 });
 
-document.getElementById('mtabTrade').addEventListener('click', () => {
-  document.getElementById('mpanelTrade').style.display  = '';
-  document.getElementById('mpanelOrders').style.display = 'none';
-  document.getElementById('mtabTrade').classList.add('active');
-  document.getElementById('mtabOrders').classList.remove('active');
-});
-document.getElementById('mtabOrders').addEventListener('click', () => {
-  document.getElementById('mpanelTrade').style.display  = 'none';
-  document.getElementById('mpanelOrders').style.display = '';
-  document.getElementById('mtabOrders').classList.add('active');
-  document.getElementById('mtabTrade').classList.remove('active');
+// Modal Tab-Navigation — delegated auf alle .modal-inner-tab Buttons
+document.querySelector('.modal-inner-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.modal-inner-tab');
+  if (!btn || !btn.dataset.mtab) return;
+  switchModalTab(btn.dataset.mtab);
 });
 
 document.getElementById('mTabBuy').addEventListener('click', () => {
@@ -2388,24 +2505,55 @@ function fireInsiderTip() {
   }, 15000);
 }
 
-// Short buttons
+// Short Tab Buttons
 document.getElementById('btnOpenShort').addEventListener('click', () => {
   if (!modalTicker) return;
   const qty = parseInt(document.getElementById('shortQtyInput').value);
   if (!qty || qty < 1) { showToast('Enter a valid quantity', true); return; }
   openShort(modalTicker, qty);
   refreshModal();
+  refreshShortTab();
 });
 
 document.getElementById('btnCloseShort').addEventListener('click', () => {
   if (!modalTicker) return;
   const sh = state.shorts?.[modalTicker];
   if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
-  const inputVal = parseInt(document.getElementById('shortQtyInput').value);
+  const inputVal = parseInt(document.getElementById('shortCoverQtyInput').value);
   const qty = (!inputVal || inputVal >= sh.qty) ? sh.qty : inputVal;
   if (qty < 1) { showToast('Enter a valid quantity', true); return; }
   closeShort(modalTicker, qty);
   refreshModal();
+  refreshShortTab();
+});
+
+document.getElementById('btnCloseShortAll').addEventListener('click', () => {
+  if (!modalTicker) return;
+  const sh = state.shorts?.[modalTicker];
+  if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
+  closeShort(modalTicker, sh.qty);
+  refreshModal();
+  refreshShortTab();
+});
+
+// Short Stop-Loss
+document.getElementById('btnSetShortStopLoss').addEventListener('click', () => {
+  if (!modalTicker) return;
+  const pct = parseFloat(document.getElementById('shortStopLossInput').value);
+  if (!pct || pct < 1 || pct > 99) { showToast('Enter a % between 1–99', true); return; }
+  state.stopLosses['short_' + modalTicker] = pct;
+  document.getElementById('shortStopLossStatus').textContent = `Active: auto-cover at +${pct}% loss`;
+  document.getElementById('btnClearShortStopLoss').style.display = '';
+  showToast(`🛡 Short stop-loss set for ${modalTicker} at +${pct}%`);
+});
+
+document.getElementById('btnClearShortStopLoss').addEventListener('click', () => {
+  if (!modalTicker) return;
+  delete state.stopLosses['short_' + modalTicker];
+  document.getElementById('shortStopLossInput').value = '';
+  document.getElementById('shortStopLossStatus').textContent = '';
+  document.getElementById('btnClearShortStopLoss').style.display = 'none';
+  showToast(`🛡 Short stop-loss removed for ${modalTicker}`);
 });
 
 document.getElementById('confirmYes').addEventListener('click', () => {

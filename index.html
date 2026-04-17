@@ -347,13 +347,15 @@
       <div id="priceAlertStatus" class="alert-status"></div>
     </div>
 
-    <!-- ── Inner tabs: TRADE | ORDERS ─────────── -->
+    <!-- ── Modal Tabs: TRADE | SHORT | ORDERS | ALERT ── -->
     <div class="modal-inner-tabs">
-      <button id="mtabTrade"  class="modal-inner-tab active">TRADE</button>
-      <button id="mtabOrders" class="modal-inner-tab">ORDERS</button>
+      <button class="modal-inner-tab active" data-mtab="trade">📈 TRADE</button>
+      <button class="modal-inner-tab"        data-mtab="short">📉 SHORT</button>
+      <button class="modal-inner-tab"        data-mtab="orders">⏱ ORDERS</button>
+      <button class="modal-inner-tab"        data-mtab="alert">🔔 ALERT</button>
     </div>
 
-    <!-- ── TRADE panel ────────────────────────── -->
+    <!-- ── TAB: TRADE ─────────────────────────── -->
     <div id="mpanelTrade" class="modal-panel">
 
       <div class="trade-tabs2">
@@ -361,7 +363,7 @@
         <button id="mTabSell" class="trade-tab2">SELL</button>
       </div>
 
-      <!-- D — QUICK-ACTIONS ──────────────────── -->
+      <!-- Quick-Actions -->
       <div class="modal-quick-actions">
         <div class="quick-actions-label">QUICK BUY</div>
         <div class="quick-btns-row" id="quickBuyBtns"></div>
@@ -369,7 +371,7 @@
         <div class="quick-btns-row" id="quickSellBtns"></div>
       </div>
 
-      <!-- Manuelle Eingabe bleibt erhalten -->
+      <!-- Manuelle Eingabe -->
       <div class="m-qty-row">
         <input id="mQtyInput" class="m-qty-input" type="number" min="1" value="1">
         <div class="m-qty-btns">
@@ -383,19 +385,48 @@
       <div class="m-total">Total: <span id="mTotal">$0.00</span></div>
       <button id="btnModalTrade" class="btn-modal-trade btn-modal-buy">BUY SHARES</button>
 
-      <!-- Short Sell -->
-      <div class="modal-section">
-        <div class="section-label">SHORT SELL</div>
+    </div><!-- /#mpanelTrade -->
+
+    <!-- ── TAB: SHORT ─────────────────────────── -->
+    <div id="mpanelShort" class="modal-panel" style="display:none">
+
+      <!-- Aktuelle Short-Position Status -->
+      <div id="shortPosDisplay" class="modal-short-status"></div>
+
+      <div class="modal-section" style="margin-top:0;padding-top:0;border-top:none;">
+        <div class="section-label">OPEN / ADD SHORT</div>
         <div class="short-row">
           <input id="shortQtyInput" class="m-qty-input" type="number" min="1" value="1" placeholder="Qty">
           <button id="btnOpenShort"  class="btn-sm btn-short">SHORT ▼</button>
-          <button id="btnCloseShort" class="btn-sm btn-cover">COVER ▲</button>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin-top:6px;">
+          Collateral: 1:1 · Daily fee: 0.15% · Max: 1.5× cash
         </div>
       </div>
 
-    </div><!-- /#mpanelTrade -->
+      <div class="modal-section">
+        <div class="section-label">COVER (CLOSE SHORT)</div>
+        <div class="short-row">
+          <input id="shortCoverQtyInput" class="m-qty-input" type="number" min="1" value="1" placeholder="Qty">
+          <button id="btnCloseShort" class="btn-sm btn-cover">COVER ▲</button>
+          <button id="btnCloseShortAll" class="btn-sm btn-cover">COVER ALL</button>
+        </div>
+      </div>
 
-    <!-- ── ORDERS panel ───────────────────────── -->
+      <div class="modal-section">
+        <div class="section-label">SHORT STOP-LOSS</div>
+        <div class="stop-row">
+          <input id="shortStopLossInput" class="m-qty-input" type="number"
+                 placeholder="% loss" min="1" max="99">
+          <button id="btnSetShortStopLoss"   class="btn-sm">SET</button>
+          <button id="btnClearShortStopLoss" class="btn-sm btn-danger" style="display:none">CLEAR</button>
+        </div>
+        <div id="shortStopLossStatus" class="stop-status"></div>
+      </div>
+
+    </div><!-- /#mpanelShort -->
+
+    <!-- ── TAB: ORDERS ────────────────────────── -->
     <div id="mpanelOrders" class="modal-panel" style="display:none">
 
       <div class="modal-section" style="margin-top:0;padding-top:0;border-top:none;">
@@ -412,7 +443,7 @@
       </div>
 
       <div class="modal-section">
-        <div class="section-label">STOP-LOSS</div>
+        <div class="section-label">STOP-LOSS (LONG)</div>
         <div class="stop-row">
           <input id="stopLossInput" class="m-qty-input" type="number"
                  placeholder="% loss" min="1" max="99">
@@ -422,15 +453,36 @@
         <div id="stopLossStatus" class="stop-status"></div>
       </div>
 
+      <!-- Aktive Orders für diesen Ticker -->
       <div class="modal-section">
-        <div class="section-label">PRICE ALERT</div>
-        <div class="stop-row">
-          <input id="priceAlertInput" class="m-qty-input" type="number" placeholder="Target $">
-          <button id="btnSetAlert" class="btn-sm">SET</button>
-        </div>
+        <div class="section-label">ACTIVE ORDERS FOR THIS STOCK</div>
+        <div id="modalActiveOrders" class="modal-active-orders"></div>
       </div>
 
     </div><!-- /#mpanelOrders -->
+
+    <!-- ── TAB: ALERT ─────────────────────────── -->
+    <div id="mpanelAlert" class="modal-panel" style="display:none">
+
+      <div class="modal-section" style="margin-top:0;padding-top:0;border-top:none;">
+        <div class="section-label">PRICE ALERT</div>
+        <div id="currentAlertDisplay" class="modal-alert-display"></div>
+        <div class="stop-row" style="margin-top:8px;">
+          <input id="priceAlertInput" class="m-qty-input" type="number" placeholder="Target $">
+          <button id="btnSetAlert" class="btn-sm">SET ALERT</button>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin-top:8px;">
+          Alert fires once when price crosses the target.
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="section-label">WATCHLIST</div>
+        <div id="watchlistToggleDisplay" class="modal-watchlist-display"></div>
+        <button id="btnWatchFull" class="btn-sm" style="margin-top:8px;">ADD TO WATCHLIST</button>
+      </div>
+
+    </div><!-- /#mpanelAlert -->
 
   </div>
 </div>

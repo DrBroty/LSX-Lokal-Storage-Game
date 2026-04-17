@@ -1173,3 +1173,114 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 #sectionStats .trade-hist-row {
   background: rgba(255,255,255,0.02);
 }
+/* ═══════════════════════════════════════════════════════
+   MODAL 4-TAB SYSTEM
+   ═══════════════════════════════════════════════════════ */
+
+/* Tab-Leiste: 4 Tabs gleichmäßig verteilt */
+.modal-inner-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+.modal-inner-tab {
+  padding: 10px 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--dim);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+  white-space: nowrap;
+}
+.modal-inner-tab:hover:not(.active) { color: var(--text); }
+.modal-inner-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Status Pills in Header (kompaktes Short/Alert Summary) */
+.status-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-right: 4px;
+}
+.status-short {
+  background: rgba(255,51,85,0.12);
+  border: 1px solid rgba(255,51,85,0.35);
+  color: var(--red);
+}
+.status-alert {
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.35);
+  color: var(--gold);
+}
+
+/* SHORT TAB — Position Card */
+.modal-short-status { margin-bottom: 10px; }
+.modal-short-pos-card {
+  background: rgba(255,51,85,0.06);
+  border: 1px solid rgba(255,51,85,0.25);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 4px;
+}
+.msp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,51,85,0.08);
+  font-size: 12px;
+}
+.msp-row:last-child { border-bottom: none; }
+.msp-label {
+  color: var(--dim);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.msp-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* ALERT TAB */
+.modal-alert-display { margin-bottom: 4px; }
+.modal-alert-active {
+  background: rgba(255,215,0,0.07);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.modal-watchlist-display { margin-bottom: 4px; }
+
+/* ORDERS TAB — Active orders für diesen Stock */
+.modal-active-orders { margin-top: 6px; }
+
+/* Cover All Button */
+.btn-cover {
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.3);
+  color: var(--accent);
+}
