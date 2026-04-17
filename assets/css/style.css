@@ -139,7 +139,7 @@ header {
 /* ── APP LAYOUT (neue 3-Spalten Struktur) ────── */
 .app-layout {
   display: grid;
-  grid-template-columns: 240px 1fr 240px;
+  grid-template-columns: 220px 1fr 260px;
   gap: 0;
   /* Viewport minus Header (~64px) minus Ticker (30px) minus news-bar */
   height: calc(100vh - 94px - var(--news-bar-h));
@@ -824,7 +824,7 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
 /* ── TABLET LANDSCAPE (≤ 1200px) ────────────── */
 @media (max-width: 1200px) {
   .app-layout {
-    grid-template-columns: 200px 1fr 200px;
+    grid-template-columns: 180px 1fr 220px;
   }
 }
 
@@ -1283,4 +1283,74 @@ canvas#modalChart { width:100%; height:120px; display:block; margin-bottom:6px; 
   background: rgba(0,212,255,0.08);
   border: 1px solid rgba(0,212,255,0.3);
   color: var(--accent);
+}
+
+/* ── Sidebar Label Row (Label + Button nebeneinander) ── */
+.sidebar-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* ── HISTORY OVERLAY ─────────────────────────────────── */
+.history-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,8,16,0.88);
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+.history-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.history-overlay-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: min(760px, 95vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+  transform: translateY(16px) scale(.97);
+  transition: transform .25s;
+}
+.history-overlay.open .history-overlay-box {
+  transform: translateY(0) scale(1);
+}
+.history-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.history-overlay-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+.history-overlay-content {
+  overflow-y: auto;
+  padding: 16px 20px;
+  flex: 1;
+}
+
+/* ── Main-Tabs entfernt — keine .main-tabs mehr nötig ── */
+.main-tabs { display: none !important; }
+
+/* ── Stop-Losses + Alerts in rechter Sidebar ─────────── */
+#stopLossesEl .order-item,
+#priceAlertsEl .order-item {
+  font-size: 11px;
 }

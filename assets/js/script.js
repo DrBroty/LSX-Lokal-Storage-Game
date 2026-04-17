@@ -614,7 +614,9 @@ function renderAll() {
   if (modalTicker) refreshModal();
 }
 
-// FIX #2 (Tab-Sektionen): befüllt Portfolio/Orders/Stats Tab-Inhalte
+// renderTabSections: befüllt rechte Sidebar (Stop-Losses, Alerts)
+// Portfolio + Shorts + Orders werden bereits von renderPortfolioSidebar,
+// renderShortsSidebar, renderOrders befüllt
 function renderTabSections() {
   // ── PORTFOLIO TAB ──────────────────────────────
   const portFull  = document.getElementById('portfolioElFull');
@@ -2686,46 +2688,19 @@ document.getElementById('btnSetAlert').addEventListener('click', () => {
 
 let activeMainTab = 'market';
  
+// switchMainTab: Tabs entfernt — nur noch History Overlay
 function switchMainTab(tab) {
-  activeMainTab = tab;
- 
-  // Alle Tab-Buttons updaten
-  document.querySelectorAll('.main-tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
-  });
- 
-  // Sektionen ein-/ausblenden
-  const sections = {
-    market:    ['#sectionMarket'],
-    portfolio: ['#sectionPortfolio'],
-    orders:    ['#sectionOrders'],
-    history:   ['#sectionHistory'],
-  };
- 
-  Object.entries(sections).forEach(([key, ids]) => {
-    ids.forEach(id => {
-      const el = document.querySelector(id);
-      if (el) el.style.display = key === tab ? '' : 'none';
-    });
-  });
- 
-  // Sidebar anpassen
-  const sidebarLeft  = document.querySelector('.sidebar-left');
-  const sidebarRight = document.querySelector('.sidebar-right');
- 
-  if (tab === 'market') {
-    if (sidebarLeft)  sidebarLeft.style.display  = '';
-    if (sidebarRight) sidebarRight.style.display = '';
-  } else if (tab === 'portfolio') {
-    if (sidebarLeft)  sidebarLeft.style.display  = 'none';
-    if (sidebarRight) sidebarRight.style.display = '';
-  } else if (tab === 'orders') {
-    if (sidebarLeft)  sidebarLeft.style.display  = 'none';
-    if (sidebarRight) sidebarRight.style.display = '';
-  } else if (tab === 'stats') {
-    if (sidebarLeft)  sidebarLeft.style.display  = '';
-    if (sidebarRight) sidebarRight.style.display = 'none';
-  }
+  // Legacy-Compat: falls noch irgendwo aufgerufen
+  if (tab === 'history') openHistoryOverlay();
+}
+
+function openHistoryOverlay() {
+  renderHistoryTab();
+  document.getElementById('historyOverlay').classList.add('open');
+}
+
+function closeHistoryOverlay() {
+  document.getElementById('historyOverlay').classList.remove('open');
 }
 
 function updateQuickActions() {
@@ -2772,7 +2747,12 @@ function updateQuickActions() {
   }
 }
 
-// ── History Tab Filter ────────────────────────────────
+// ── History Overlay ──────────────────────────────────
+document.getElementById('btnOpenHistory').addEventListener('click', openHistoryOverlay);
+document.getElementById('btnCloseHistory').addEventListener('click', closeHistoryOverlay);
+document.getElementById('historyOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('historyOverlay')) closeHistoryOverlay();
+});
 document.addEventListener('change', e => {
   if (e.target.id === 'historyFilter') renderHistoryTab();
 });
