@@ -32,6 +32,42 @@ if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $cs
     exit;
 }
 
+
+// ── Admin Action Logger ───────────────────────────────
+function logAdminAction(action, targetId, details = []) {
+    $adminUser = $_SESSION['discord_username'] ?? 'unknown';
+    $adminId   = $_SESSION['discord_id']       ?? 'unknown';
+
+    $fields = [
+        ['name' => 'Admin',    'value' => "{$adminUser} ({$adminId})", 'inline' => true],
+        ['name' => 'Action',   'value' => strtoupper($action),         'inline' => true],
+        ['name' => 'Target ID','value' => $targetId ?: '—',            'inline' => true],
+    ];
+
+    foreach ($details as $d) {
+        $fields[] = $d;
+    }
+
+    $payload = [
+        'embeds' => [[
+            'title'       => '🛡 Admin Action — ' . strtoupper($action),
+            'color'       => 0x00d4ff,
+            'fields'      => $fields,
+            'footer'      => ['text' => 'LSX Admin · ' . date('d.m.Y H:i:s')],
+            'timestamp'   => date('c'),
+        ]]
+    ];
+
+    $ch = curl_init(DISCORD_WEBHOOK_URL);
+    curl_setopt($ch, CURLOPT_POST,           true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS,     json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER,     ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT,        4);
+    curl_exec($ch);
+    curl_close($ch);
+}
+
 $body   = json_decode(file_get_contents('php://input'), true);
 $action = $body['action'] ?? '';
 $id     = preg_replace('/[^0-9]/', '', $body['id'] ?? '');
@@ -44,6 +80,7 @@ if ($action === 'load') {
         echo json_encode(['error' => 'Not found']);
         exit;
     }
+    logAdminAction('load', $id);
     echo file_get_contents($file);
 
 } elseif ($action === 'save') {
@@ -60,10 +97,16 @@ if ($action === 'load') {
         exit;
     }
     file_put_contents($file, $json);
+    logAdminAction('save', $id, [
+        ['name' => 'Size', 'value' => strlen($json) . ' bytes', 'inline' => true],
+    ]);
     echo json_encode(['ok' => true]);
 
 } elseif ($action === 'delete') {
     if ($id && file_exists($file)) unlink($file);
+    logAdminAction('delete', $id, [
+        ['name' => 'Status', 'value' => file_exists($file) ? 'File not found' : 'Deleted', 'inline' => true],
+    ]);
     echo json_encode(['ok' => true]);
 
 } elseif ($action === 'list') {

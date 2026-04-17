@@ -129,9 +129,9 @@
           onclick="switchMainTab('orders')">
     <span class="tab-icon">📋</span>ORDERS
   </button>
-  <button class="main-tab-btn" data-tab="stats"
-          onclick="switchMainTab('stats')">
-    <span class="tab-icon">📈</span>STATS
+  <button class="main-tab-btn" data-tab="history"
+          onclick="switchMainTab('history')">
+    <span class="tab-icon">📜</span>HISTORY
   </button>
 </div>
 
@@ -267,14 +267,26 @@
       </div>
     </div><!-- /#sectionOrders -->
 
-    <!-- ══ STATS SEKTION ══ -->
-    <div id="sectionStats">
-      <div id="scoreGridFull" class="stats-grid"></div>
-      <div class="sidebar-card" style="margin-top:16px;">
-        <div class="sidebar-label">TRADE HISTORY</div>
-        <div id="tradeHistoryElFull"></div>
+    <!-- ══ HISTORY SEKTION ══ -->
+    <div id="sectionHistory">
+      <!-- Vollständige Trade History (unbegrenzt, mit Filter) -->
+      <div class="sidebar-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="sidebar-label" style="margin-bottom:0;">FULL TRADE HISTORY</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="historyFilter" class="limit-select" style="padding:4px 8px;font-size:11px;">
+              <option value="ALL">ALL</option>
+              <option value="BUY">BUY</option>
+              <option value="SELL">SELL</option>
+              <option value="SHORT">SHORT</option>
+              <option value="COVER">COVER</option>
+            </select>
+            <button id="btnExportCSV" class="btn-sm">⬇ CSV</button>
+          </div>
+        </div>
+        <div id="tradeHistoryFull"></div>
       </div>
-    </div><!-- /#sectionStats -->
+    </div><!-- /#sectionHistory -->
 
   </main>
 

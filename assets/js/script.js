@@ -1,4 +1,55 @@
 let csrfToken = ''; // Global, wird von checkLogin gesetzt
+
+// ═══════════════════════════════════════════════════════
+// LOGGING SYSTEM — Errors via Discord Webhook
+// ═══════════════════════════════════════════════════════
+function lsxLog(level, context, message, data = {}) {
+  const fn = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+  fn('[LSX ' + level.toUpperCase() + '] ' + context + ': ' + message, data);
+  if (level === 'info') return;
+
+  const color = level === 'error' ? 0xff3355 : 0xffd700;
+  const emoji = level === 'error' ? '🔴' : '🟡';
+  const nw    = (() => { try { return fmt(getNetWorth()); } catch(e) { return '?'; } })();
+  const cash  = (() => { try { return fmt(state.cash);    } catch(e) { return '?'; } })();
+
+  const fields = [
+    { name: 'Net Worth', value: nw,                              inline: true },
+    { name: 'Cash',      value: cash,                            inline: true },
+    { name: 'Game Day',  value: String(state?.totalGameDays ?? '?'), inline: true },
+    ...Object.entries(data).slice(0, 3).map(([k,v]) => ({
+      name: k, value: String(v).slice(0, 100), inline: true
+    })),
+  ];
+
+  fetch(PROXY_URL, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify({
+      embeds: [{
+        title:       emoji + ' LSX ' + level.toUpperCase() + ' — ' + context,
+        description: '```' + message + '```',
+        color,
+        fields,
+        footer:    { text: 'LSX Logger · ' + new Date().toLocaleString('de-DE') },
+        timestamp: new Date().toISOString(),
+      }]
+    }),
+  }).catch(() => {});
+}
+
+// Globale Error-Handler
+window.addEventListener('error', e => {
+  lsxLog('error', 'UncaughtError', e.message, {
+    file: (e.filename || '').split('/').pop(),
+    line: e.lineno,
+  });
+});
+window.addEventListener('unhandledrejection', e => {
+  lsxLog('error', 'UnhandledPromise', String(e.reason), {});
+});
+
 let sortCol = null;
 let sortDir = 'desc';
 let searchQuery = '';
@@ -719,56 +770,41 @@ function renderTabSections() {
     };
   }
 
-  // ── STATS TAB ─────────────────────────────────
-  const scoreGridFull = document.getElementById('scoreGridFull');
-  if (scoreGridFull) {
-    const totalVal    = Object.entries(state.holdings).reduce((a,[t,h]) => a + h.qty*state.prices[t], 0);
-    const netWorth    = state.cash + totalVal;
-    const totalReturn = ((netWorth - state.stats.startCash) / state.stats.startCash * 100);
-    const items = [
-      ['NET WORTH',    fmt(netWorth),                         netWorth >= state.stats.startCash ? 'up' : 'down'],
-      ['CASH',         fmt(state.cash),                       ''],
-      ['RETURN',       (totalReturn>=0?'+':'')+totalReturn.toFixed(1)+'%', totalReturn>=0?'up':'down'],
-      ['REALIZED P&L', fmt(state.stats.realizedPnl),          state.stats.realizedPnl>=0?'up':'down'],
-      ['DIVIDENDS',    fmt(state.stats.totalDividends),        'up'],
-      ['FEES PAID',    fmt(state.stats.totalFeesPaid),         'down'],
-      ['BEST TRADE',   fmt(state.stats.bestTrade),             'up'],
-      ['WORST TRADE',  fmt(Math.abs(state.stats.worstTrade)),  'down'],
-      ['TOTAL TRADES', state.stats.totalTrades,                ''],
-      ['GAME DAYS',    state.totalGameDays || 0,               ''],
-    ];
-    scoreGridFull.innerHTML = items.map(([lbl,val,cls]) => `
-      <div class="stat-card">
-        <div class="stat-card-label">${lbl}</div>
-        <div class="stat-card-val ${cls}" style="${cls?`color:var(--${cls==='up'?'green':'red'})`:''}">${val}</div>
-      </div>`).join('');
+  // ── HISTORY TAB ───────────────────────────────
+  renderHistoryTab();
+}
+
+function renderHistoryTab() {
+  const el = document.getElementById('tradeHistoryFull');
+  if (!el) return;
+  const filterEl = document.getElementById('historyFilter');
+  const filter   = filterEl ? filterEl.value : 'ALL';
+  const log      = state.tradeLog || [];
+  const filtered = filter === 'ALL' ? log : log.filter(t => t.mode === filter);
+
+  if (!filtered.length) {
+    el.innerHTML = '<div class="watch-empty">No trades yet.</div>';
+    return;
   }
 
-  const thFull = document.getElementById('tradeHistoryElFull');
-  if (thFull) {
-    if (!state.tradeLog?.length) {
-      thFull.innerHTML = '<div class="watch-empty">No trades yet.</div>';
-    } else {
-      thFull.innerHTML = state.tradeLog.map(t => {
-        const isBuy = t.mode === 'BUY';
-        const pnlHtml = t.pnl !== null
-          ? `<div class="th-pnl ${t.pnl>=0?'up':'down'}">${t.pnl>=0?'+':''}${fmt(t.pnl)}</div>`
-          : '';
-        return `<div class="trade-hist-row">
-          <div class="th-left">
-            <span class="th-mode ${isBuy?'buy':'sell'}">${t.mode}</span>
-            <span class="th-ticker">${t.ticker}</span>
-            <span class="th-meta">${t.qty} @ ${fmt(t.price)}</span>
-          </div>
-          <div class="th-right">
-            ${pnlHtml}
-            <div class="th-fee">-${fmt(t.fee)}</div>
-            <div class="th-time">${t.time}</div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  }
+  el.innerHTML = filtered.map(t => {
+    const modeClass = t.mode === 'BUY' ? 'buy' : t.mode === 'SELL' ? 'sell' : t.mode === 'SHORT' ? 'sell' : 'buy';
+    const pnlHtml = t.pnl !== null
+      ? `<div class="th-pnl ${t.pnl>=0?'up':'down'}">${t.pnl>=0?'+':''}${fmt(t.pnl)}</div>`
+      : '';
+    return `<div class="trade-hist-row">
+      <div class="th-left">
+        <span class="th-mode ${modeClass}">${t.mode}</span>
+        <span class="th-ticker">${t.ticker}</span>
+        <span class="th-meta">${t.qty} @ ${fmt(t.price)}</span>
+      </div>
+      <div class="th-right">
+        ${pnlHtml}
+        <div class="th-fee">Fee: ${fmt(t.fee)}</div>
+        <div class="th-time">${t.time}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderTable() {
@@ -2661,7 +2697,7 @@ function switchMainTab(tab) {
     market:    ['#sectionMarket'],
     portfolio: ['#sectionPortfolio'],
     orders:    ['#sectionOrders'],
-    stats:     ['#sectionStats'],
+    history:   ['#sectionHistory'],
   };
  
   Object.entries(sections).forEach(([key, ids]) => {
@@ -2733,6 +2769,31 @@ function updateQuickActions() {
     }
   }
 }
+
+// ── History Tab Filter ────────────────────────────────
+document.addEventListener('change', e => {
+  if (e.target.id === 'historyFilter') renderHistoryTab();
+});
+
+// ── CSV Export ────────────────────────────────────────
+document.addEventListener('click', e => {
+  if (e.target.id !== 'btnExportCSV') return;
+  const log = state.tradeLog || [];
+  if (!log.length) { showToast('No trades to export', true); return; }
+  const rows = [
+    ['Time','Ticker','Mode','Qty','Price','P&L','Fee'],
+    ...log.map(t => [t.time, t.ticker, t.mode, t.qty, t.price, t.pnl ?? '', t.fee])
+  ];
+  const csv  = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'lsx-trades.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 Trades exported as CSV');
+});
 
 // ═══════════════════════════════════════════════════════
 // BOOT
