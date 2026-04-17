@@ -466,8 +466,13 @@ function simulateTick(n = 1) {
         state.gameDay === 5 ? 0.60 :   // SAT – ruhiger Markt
         state.gameDay === 6 ? 0.60 :   // SUN – ruhiger Markt
         1.0;                            // DI–DO normal
-      const drift = (Math.random() - 0.495) * s.vol * dayMod * 0.65;
-      const np = Math.max(1, +(old * (1 + drift)).toFixed(2));
+      // Mean-Reversion: zieht Kurs zurück zum basePrice wenn zu weit abgedriftet
+      const distanceFromBase = (old - s.basePrice) / s.basePrice;
+      const reversionForce   = -distanceFromBase * 0.015; // sanfte Rückzugskraft
+      const drift = (Math.random() - 0.495) * s.vol * dayMod * 0.65 + reversionForce;
+      // Price Floor: mindestens 10% des basePrice (kein $1-Penny-Stock)
+      const priceFloor = s.basePrice * 0.10;
+      const np = Math.max(priceFloor, +(old * (1 + drift)).toFixed(2));
       state.prices[s.ticker] = np;
       state.histories[s.ticker].push(np);
       if (state.histories[s.ticker].length > 60) state.histories[s.ticker].shift();
@@ -478,7 +483,9 @@ function simulateTick(n = 1) {
         updated.add(s.rival);
         const ro = state.prices[s.rival];
         const rd = -drift * (0.4 + Math.random() * 0.3);
-        const rn = Math.max(1, +(ro * (1 + rd)).toFixed(2));
+        const rivalStock = STOCKS.find(x => x.ticker === s.rival);
+        const rivalFloor = rivalStock ? rivalStock.basePrice * 0.10 : 1;
+        const rn = Math.max(rivalFloor, +(ro * (1 + rd)).toFixed(2));
         state.prices[s.rival] = rn;
         state.histories[s.rival].push(rn);
         if (state.histories[s.rival].length > 60) state.histories[s.rival].shift();
@@ -487,16 +494,17 @@ function simulateTick(n = 1) {
       updated.add(s.ticker);
     });
 
-    // Den bestehenden if (state.gameHour >= 24) Block ersetzen:
+    // Spielzeit pro Tick vorantreiben (4s realtime = 1 Spielstunde)
+    state.gameHour++;
     if (state.gameHour >= 24) {
-    state.gameHour = 6;
-    state.gameDay  = (state.gameDay + 1) % 7;
-    state.gameDayOfMonth++;
-    if (state.gameDayOfMonth > 28) {
+      state.gameHour = 6;
+      state.gameDay  = (state.gameDay + 1) % 7;
+      state.gameDayOfMonth++;
+      if (state.gameDayOfMonth > 28) {
         state.gameDayOfMonth = 1;
         state.gameMonth = (state.gameMonth + 1) % 12;
-    }
-    checkShortFees(); // Leihgebühr einmal täglich
+      }
+      checkShortFees(); // Leihgebühr einmal täglich
     }
   }
 
@@ -1807,18 +1815,18 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
   location.reload();
 });
 
-      function mergeStats(saved, base) {
-          return {
-            totalTrades:    saved?.totalTrades    ?? base.totalTrades    ?? 0,
-            realizedPnl:    saved?.realizedPnl    ?? base.realizedPnl    ?? 0,
-            bestTrade:      saved?.bestTrade      ?? base.bestTrade      ?? 0,
-            worstTrade:     saved?.worstTrade     ?? base.worstTrade     ?? 0,
-            startCash:      saved?.startCash      ?? base.startCash,
-            totalFeesPaid:  saved?.totalFeesPaid  ?? base.totalFeesPaid  ?? 0,
-            totalDividends: saved?.totalDividends ?? base.totalDividends ?? 0,
-            netWorthATH:    saved?.netWorthATH    ?? base.netWorthATH    ?? (saved?.startCash || base.startCash),
-          };
-        }
+function mergeStats(saved, base) {
+  return {
+    totalTrades:    saved?.totalTrades    ?? base.totalTrades    ?? 0,
+    realizedPnl:    saved?.realizedPnl    ?? base.realizedPnl    ?? 0,
+    bestTrade:      saved?.bestTrade      ?? base.bestTrade      ?? 0,
+    worstTrade:     saved?.worstTrade     ?? base.worstTrade     ?? 0,
+    startCash:      saved?.startCash      ?? base.startCash,
+    totalFeesPaid:  saved?.totalFeesPaid  ?? base.totalFeesPaid  ?? 0,
+    totalDividends: saved?.totalDividends ?? base.totalDividends ?? 0,
+    netWorthATH:    saved?.netWorthATH    ?? base.netWorthATH    ?? (saved?.startCash || base.startCash),
+  };
+}
 
 async function checkLogin() {
   showSkeleton();
