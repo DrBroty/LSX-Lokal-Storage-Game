@@ -1807,6 +1807,19 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
   location.reload();
 });
 
+      function mergeStats(saved, base) {
+          return {
+            totalTrades:    saved?.totalTrades    ?? base.totalTrades    ?? 0,
+            realizedPnl:    saved?.realizedPnl    ?? base.realizedPnl    ?? 0,
+            bestTrade:      saved?.bestTrade      ?? base.bestTrade      ?? 0,
+            worstTrade:     saved?.worstTrade     ?? base.worstTrade     ?? 0,
+            startCash:      saved?.startCash      ?? base.startCash,
+            totalFeesPaid:  saved?.totalFeesPaid  ?? base.totalFeesPaid  ?? 0,
+            totalDividends: saved?.totalDividends ?? base.totalDividends ?? 0,
+            netWorthATH:    saved?.netWorthATH    ?? base.netWorthATH    ?? (saved?.startCash || base.startCash),
+          };
+        }
+
 async function checkLogin() {
   showSkeleton();
   try {
@@ -1840,20 +1853,6 @@ async function checkLogin() {
       if (!state.shorts)          state.shorts          = {};
       if (!state.priceAlerts)     state.priceAlerts     = {};
       if (state.lastDividendDay  === undefined) state.lastDividendDay  = 0;
-
-
-      function mergeStats(saved, base) {
-          return {
-            totalTrades:    saved?.totalTrades    ?? base.totalTrades    ?? 0,
-            realizedPnl:    saved?.realizedPnl    ?? base.realizedPnl    ?? 0,
-            bestTrade:      saved?.bestTrade      ?? base.bestTrade      ?? 0,
-            worstTrade:     saved?.worstTrade     ?? base.worstTrade     ?? 0,
-            startCash:      saved?.startCash      ?? base.startCash,
-            totalFeesPaid:  saved?.totalFeesPaid  ?? base.totalFeesPaid  ?? 0,
-            totalDividends: saved?.totalDividends ?? base.totalDividends ?? 0,
-            netWorthATH:    saved?.netWorthATH    ?? base.netWorthATH    ?? (saved?.startCash || base.startCash),
-          };
-        }
 
       state.stats = mergeStats(state.stats, base.stats);
 
