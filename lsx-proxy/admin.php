@@ -34,7 +34,7 @@ if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $cs
 
 
 // ── Admin Action Logger ───────────────────────────────
-function logAdminAction(action, targetId, details = []) {
+function logAdminAction($action, $targetId, $details = []) {
     $adminUser = $_SESSION['discord_username'] ?? 'unknown';
     $adminId   = $_SESSION['discord_id']       ?? 'unknown';
 

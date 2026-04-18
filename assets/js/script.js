@@ -1868,11 +1868,27 @@ function checkDividends() {
     .map(p => `${p.ticker} +${fmt(p.payout)} (${p.rate}%)`)
     .join(' · ');
 
-  showNewsToast(null,
-    `💰 DIVIDEND PAYOUT · ${fmt(totalPayout)} · ${lines}`,
-    0.0, false
-  );
-  showToast(`💰 Dividends received: ${fmt(totalPayout)}`);
+  // FIX: kein showNewsToast(null,...) mehr → zeigt "null" als Ticker
+  showToast(`💰 Dividends: +${fmt(totalPayout)}`);
+  // Kurze Info im News-Event-Toast ohne Ticker/Chart-Button
+  const _divEl = document.getElementById('newsEventToast');
+  _divEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px;">
+          💰 DIVIDEND PAYOUT
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.6;">${lines}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--green);margin-top:8px;">
+          Total: +${fmt(totalPayout)}
+        </div>
+      </div>
+      <button onclick="closeNewsToast()"
+        style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:0;">✕</button>
+    </div>`;
+  _divEl.classList.add('show');
+  clearTimeout(newsEventTimerToast);
+  newsEventTimerToast = setTimeout(() => _divEl.classList.remove('show'), 8000);
 
   // Discord-Ping wenn Dividende über $1.000
   if (totalPayout >= 1_000) {
@@ -2443,11 +2459,15 @@ document.getElementById('btnHardReset').addEventListener('click', async () => {
   const ok = await showConfirm('🧨', 'Hard Reset', 'Save will be permanently deleted. No undo.');
   if (!ok) return;
   stopTimers();
+  // FIX: CSRF-Header hinzugefügt — war der Grund warum Reset nicht funktionierte
   await fetch(API + '/save.php', {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...defaultState(), _hardReset: true }) // ← Flag setzen
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify({ ...defaultState(), _hardReset: true }),
   });
   location.reload();
 });

@@ -37,12 +37,25 @@ async function checkAdminAuth() {
     const loadResp = await fetch('/lsx-proxy/load.php', { credentials: 'include' });
 
     if (loadResp.status === 401) {
-      msg.textContent = 'Please login with Discord first.';
+      msg.textContent = 'Bitte zuerst mit Discord einloggen.';
       loginBtn.style.display = 'flex';
       return;
     }
 
-    const loadData = await loadResp.json();
+    if (!loadResp.ok) {
+      msg.textContent = `❌ load.php Fehler: HTTP ${loadResp.status}`;
+      msg.style.color = '#ff3355';
+      return;
+    }
+
+    let loadData;
+    try {
+      loadData = await loadResp.json();
+    } catch(jsonErr) {
+      msg.textContent = '❌ load.php gibt kein gültiges JSON zurück. PHP-Fehler?';
+      msg.style.color = '#ff3355';
+      return;
+    }
     if (loadData.user?.csrf) csrfToken = loadData.user.csrf;
 
     // Admin-Check
@@ -77,8 +90,16 @@ async function checkAdminAuth() {
     loadUserList();
 
   } catch (e) {
-    msg.textContent = 'Connection error. Is the server running?';
+    // Genauere Fehlermeldung
+    if (e instanceof TypeError && e.message.includes('fetch')) {
+      msg.textContent = '❌ Server nicht erreichbar. Bist du auf der richtigen Domain?';
+    } else if (e.message?.includes('JSON')) {
+      msg.textContent = '❌ Server antwortet mit ungültigem Format. PHP-Fehler prüfen.';
+    } else {
+      msg.textContent = '❌ Fehler: ' + e.message;
+    }
     msg.style.color = '#ff3355';
+    console.error('[LSX Admin] Auth error:', e);
   }
 }
 
