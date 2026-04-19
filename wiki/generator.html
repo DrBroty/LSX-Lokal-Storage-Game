@@ -6,8 +6,7 @@
   <title>LSX Company Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <link rel="shortcut icon" href="/wiki/assets/img/icon-512.ico" type="image/x-icon">
-  <link rel="stylesheet" href="/assets/css/style-generator.css"/>
+  <link rel="stylesheet" href="generator.css">
 </head>
 <body>
 
@@ -25,7 +24,7 @@
 <div class="page">
   <div class="page-tag">LSX · WIKI · COMPANY GENERATOR</div>
   <h1>Add New Company</h1>
-  <p class="page-sub">Fill in the fields, download the JSON, then upload it to <code style="color:var(--accent)">wiki/companies/</code> and add the ticker to <code style="color:var(--accent)">companies/index.json</code>.</p>
+  <p class="page-sub">Fill in the fields, download the JSON, then upload it to <code style="color:var(--accent)">wiki/companies/</code> — that's it. The Wiki detects it automatically.</p>
 
   <!-- Load existing JSON to edit -->
   <div class="load-box">
@@ -123,151 +122,18 @@
   </div>
 
   <div style="margin-top:28px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px 20px">
-    <div class="section-title" style="margin-top:0">After Download</div>
+    <div class="section-title" style="margin-top:0">After Download — One Step Only</div>
     <ol style="color:var(--dim);font-size:14px;line-height:2;margin-left:18px">
       <li>Upload <code style="color:var(--accent)">TICKER.json</code> to your server at <code style="color:var(--accent)">wiki/companies/</code></li>
-      <li>Open <code style="color:var(--accent)">wiki/companies/index.json</code> and add the ticker to the array</li>
-      <li>The Wiki will automatically load and display the new company on next page load</li>
     </ol>
     <div style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--green);background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:6px;padding:12px 16px">
-      <div style="color:var(--dim);margin-bottom:6px">// index.json — add your ticker:</div>
-      ["BSTA", "UAAT", ..., "<span style="color:var(--gold)">YOURNEW</span>"]
+      ✅ companies.php erkennt neue JSONs automatisch — kein index.json, kein extra Schritt.
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script>
-let executives = [
-  {role:'CEO', name:''},
-  {role:'CFO', name:''},
-];
-
-function renderExecs() {
-  const list = document.getElementById('execList');
-  list.innerHTML = executives.map((e, i) => `
-    <div class="exec-row">
-      <input type="text" value="${e.role}" placeholder="Role (e.g. CEO)" oninput="executives[${i}].role=this.value;updatePreview()">
-      <input type="text" value="${e.name}" placeholder="Full Name" oninput="executives[${i}].name=this.value;updatePreview()">
-      <button class="btn-remove" onclick="removeExec(${i})">✕</button>
-    </div>`).join('');
-}
-
-function addExec() {
-  executives.push({role:'', name:''});
-  renderExecs();
-  updatePreview();
-}
-
-function removeExec(i) {
-  executives.splice(i, 1);
-  renderExecs();
-  updatePreview();
-}
-
-function buildObject() {
-  return {
-    ticker:     document.getElementById('f-ticker').value.trim().toUpperCase(),
-    name:       document.getElementById('f-name').value.trim(),
-    sector:     document.getElementById('f-sector').value,
-    rival:      document.getElementById('f-rival').value.trim().toUpperCase(),
-    basePrice:  parseFloat(document.getElementById('f-basePrice').value) || 0,
-    vol:        parseFloat(document.getElementById('f-vol').value) || 0,
-    tagline:    document.getElementById('f-tagline').value.trim(),
-    founded:    document.getElementById('f-founded').value.trim(),
-    employees:  document.getElementById('f-employees').value.trim(),
-    hq:         document.getElementById('f-hq').value.trim(),
-    desc:       document.getElementById('f-desc').value.trim(),
-    executives: executives.filter(e => e.role || e.name),
-  };
-}
-
-function updatePreview() {
-  const obj = buildObject();
-  document.getElementById('previewJson').textContent = JSON.stringify(obj, null, 2);
-}
-
-function downloadJSON() {
-  const obj = buildObject();
-  if (!obj.ticker) { showToast('❌ Ticker is required', true); return; }
-  if (!obj.name)   { showToast('❌ Company name is required', true); return; }
-  if (!obj.sector) { showToast('❌ Sector is required', true); return; }
-  if (!obj.basePrice) { showToast('❌ Base price is required', true); return; }
-
-  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = obj.ticker + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast(`✅ Downloaded ${obj.ticker}.json — upload to wiki/companies/`);
-}
-
-function copyJSON() {
-  const json = JSON.stringify(buildObject(), null, 2);
-  navigator.clipboard.writeText(json).then(() => showToast('📋 Copied to clipboard'));
-}
-
-function resetForm() {
-  ['f-ticker','f-name','f-rival','f-tagline','f-founded','f-employees','f-hq','f-desc'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('f-sector').value = '';
-  document.getElementById('f-basePrice').value = '';
-  document.getElementById('f-vol').value = '';
-  executives = [{role:'CEO',name:''},{role:'CFO',name:''}];
-  renderExecs();
-  updatePreview();
-}
-
-function loadJSON(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const obj = JSON.parse(e.target.result);
-      document.getElementById('f-ticker').value    = obj.ticker    || '';
-      document.getElementById('f-name').value      = obj.name      || '';
-      document.getElementById('f-sector').value    = obj.sector    || '';
-      document.getElementById('f-rival').value     = obj.rival     || '';
-      document.getElementById('f-basePrice').value = obj.basePrice || '';
-      document.getElementById('f-vol').value       = obj.vol       || '';
-      document.getElementById('f-tagline').value   = obj.tagline   || '';
-      document.getElementById('f-founded').value   = obj.founded   || '';
-      document.getElementById('f-employees').value = obj.employees || '';
-      document.getElementById('f-hq').value        = obj.hq        || '';
-      document.getElementById('f-desc').value      = obj.desc      || '';
-      executives = obj.executives?.length
-        ? obj.executives
-        : [{role:'CEO',name:''},{role:'CFO',name:''}];
-      renderExecs();
-      updatePreview();
-      showToast(`✅ Loaded ${obj.ticker} — edit and re-download`);
-    } catch(err) {
-      showToast('❌ Invalid JSON file', true);
-    }
-  };
-  reader.readAsText(file);
-  input.value = '';
-}
-
-let toastTimer;
-function showToast(msg, isErr=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.borderColor = isErr ? 'var(--red)' : 'var(--green)';
-  t.style.color = isErr ? 'var(--red)' : 'var(--green)';
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-// ── Init ────────────────────────────────────────────────
-renderExecs();
-updatePreview();
-</script>
+<script src="generator.js"></script>
 </body>
 </html>
