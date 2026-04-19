@@ -218,7 +218,8 @@
       <!-- Trade History -->
       <div class="sidebar-card" style="margin-top:16px;">
         <div class="sidebar-label">TRADE HISTORY</div>
-        <div id="tradeHistoryEl"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span class="sidebar-label" style="margin-bottom:0;">RECENT TRADES</span><button id="btnOpenHistory" class="btn-sm" style="font-size:10px;padding:2px 8px;">ALL</button></div>
+      <div id="tradeHistoryEl"></div>
       </div>
 
     </div><!-- /#sectionMarket -->
@@ -315,6 +316,30 @@
 
 </div><!-- /.app-layout -->
 
+
+
+<!-- ═══════════════════════════════════════════════════
+     HISTORY OVERLAY
+═══════════════════════════════════════════════════ -->
+<div id="historyOverlay" class="history-overlay">
+  <div class="history-overlay-box">
+    <div class="history-overlay-header">
+      <div class="history-overlay-title">📜 TRADE HISTORY</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="historyFilter" class="limit-select">
+          <option value="ALL">ALL</option>
+          <option value="BUY">BUY</option>
+          <option value="SELL">SELL</option>
+          <option value="SHORT">SHORT</option>
+          <option value="COVER">COVER</option>
+        </select>
+        <button id="btnExportCSV" class="btn-sm">⬇ CSV</button>
+        <button id="btnCloseHistory" class="modal-close">✕</button>
+      </div>
+    </div>
+    <div id="tradeHistoryFull" class="history-overlay-content"></div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════
      BANKRUPTCY SCREEN
