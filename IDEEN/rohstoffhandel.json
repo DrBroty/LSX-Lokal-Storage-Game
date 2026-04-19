@@ -1,0 +1,262 @@
+[
+  {
+    "ticker": "OIL",
+    "name": "Crude Oil",
+    "category": "ENERGY",
+    "basePrice": 82.5,
+    "vol": 0.18,
+    "unit": "barrel",
+    "tagline": "Black Gold.",
+    "origin": "Blaine County",
+    "desc": "Primary fuel source. Prices spike during chaos and drop when supply stabilizes.",
+    "factors": ["War Events", "Refinery Damage", "Fuel Demand"]
+  },
+  {
+    "ticker": "GAS",
+    "name": "Natural Gas",
+    "category": "ENERGY",
+    "basePrice": 3.2,
+    "vol": 0.22,
+    "unit": "MMBtu",
+    "tagline": "Hot Commodity.",
+    "origin": "Desert Wells",
+    "desc": "Used for heating and energy. Volatile during winter months.",
+    "factors": ["Cold Weather", "Pipeline Issues"]
+  },
+  {
+    "ticker": "GLD",
+    "name": "Gold",
+    "category": "METAL",
+    "basePrice": 1950.0,
+    "vol": 0.1,
+    "unit": "oz",
+    "tagline": "Crisis Currency.",
+    "origin": "Mount Chiliad Mines",
+    "desc": "Safe haven asset during economic downturns.",
+    "factors": ["Market Crash", "Inflation Fear"]
+  },
+  {
+    "ticker": "SLV",
+    "name": "Silver",
+    "category": "METAL",
+    "basePrice": 24.0,
+    "vol": 0.14,
+    "unit": "oz",
+    "tagline": "Poor Man's Gold.",
+    "origin": "San Andreas Mines",
+    "desc": "Industrial and investment metal.",
+    "factors": ["Tech Demand", "Economic Trends"]
+  },
+  {
+    "ticker": "WEED",
+    "name": "Premium Cannabis",
+    "category": "AGRICULTURE",
+    "basePrice": 2800.0,
+    "vol": 0.35,
+    "unit": "kg",
+    "tagline": "High Demand.",
+    "origin": "Mountains",
+    "desc": "Illegal in some areas, booming in others.",
+    "factors": ["Police Raids", "Legalization"]
+  },
+  {
+    "ticker": "WATR",
+    "name": "Fresh Water",
+    "category": "UTILITY",
+    "basePrice": 1.5,
+    "vol": 0.05,
+    "unit": "1000L",
+    "tagline": "Future Gold.",
+    "origin": "Reservoirs",
+    "desc": "Increasingly valuable due to drought.",
+    "factors": ["Heatwaves", "Drought"]
+  },
+  {
+    "ticker": "ELEC",
+    "name": "Electricity",
+    "category": "ENERGY",
+    "basePrice": 0.25,
+    "vol": 0.2,
+    "unit": "kWh",
+    "tagline": "Power Everything.",
+    "origin": "Power Plants",
+    "desc": "Driven by consumption spikes.",
+    "factors": ["Heatwaves", "Blackouts"]
+  },
+  {
+    "ticker": "IRON",
+    "name": "Iron Ore",
+    "category": "METAL",
+    "basePrice": 120.0,
+    "vol": 0.16,
+    "unit": "ton",
+    "tagline": "Build It All.",
+    "origin": "Quarries",
+    "desc": "Used for construction and industry.",
+    "factors": ["Construction Boom"]
+  },
+  {
+    "ticker": "CORN",
+    "name": "Corn",
+    "category": "AGRICULTURE",
+    "basePrice": 6.0,
+    "vol": 0.12,
+    "unit": "bushel",
+    "tagline": "Feed the Masses.",
+    "origin": "Farms",
+    "desc": "Staple crop.",
+    "factors": ["Weather", "Demand"]
+  },
+  {
+    "ticker": "COFF",
+    "name": "Coffee Beans",
+    "category": "AGRICULTURE",
+    "basePrice": 2.4,
+    "vol": 0.2,
+    "unit": "lb",
+    "tagline": "Fuel for Humans.",
+    "origin": "Imports",
+    "desc": "Demand spikes every morning.",
+    "factors": ["Import Delays"]
+  },
+  {
+    "ticker": "DIAM",
+    "name": "Diamonds",
+    "category": "LUXURY",
+    "basePrice": 5000.0,
+    "vol": 0.3,
+    "unit": "carat",
+    "tagline": "Shiny Investment.",
+    "origin": "Unknown",
+    "desc": "High value, questionable sourcing.",
+    "factors": ["Heists", "Luxury Demand"]
+  },
+  {
+    "ticker": "SCRP",
+    "name": "Scrap Metal",
+    "category": "INDUSTRY",
+    "basePrice": 80.0,
+    "vol": 0.25,
+    "unit": "ton",
+    "tagline": "Trash to Cash.",
+    "origin": "City Junkyards",
+    "desc": "Recycled materials.",
+    "factors": ["Urban Destruction"]
+  },
+  {
+    "ticker": "MED",
+    "name": "Medical Supplies",
+    "category": "HEALTH",
+    "basePrice": 300.0,
+    "vol": 0.28,
+    "unit": "crate",
+    "tagline": "Life or Death.",
+    "origin": "Hospitals",
+    "desc": "Critical during crises.",
+    "factors": ["Pandemic", "Accidents"]
+  },
+  {
+    "ticker": "TECH",
+    "name": "Microchips",
+    "category": "TECH",
+    "basePrice": 150.0,
+    "vol": 0.4,
+    "unit": "batch",
+    "tagline": "Brains of Tech.",
+    "origin": "Factories",
+    "desc": "Essential for electronics.",
+    "factors": ["Supply Chain Issues"]
+  },
+  {
+    "ticker": "WOOD",
+    "name": "Timber",
+    "category": "AGRICULTURE",
+    "basePrice": 70.0,
+    "vol": 0.13,
+    "unit": "m3",
+    "tagline": "Nature's Resource.",
+    "origin": "Forests",
+    "desc": "Used in building.",
+    "factors": ["Wildfires"]
+  },
+  {
+    "ticker": "FISH",
+    "name": "Seafood",
+    "category": "AGRICULTURE",
+    "basePrice": 12.0,
+    "vol": 0.18,
+    "unit": "kg",
+    "tagline": "Fresh Catch.",
+    "origin": "Pacific Ocean",
+    "desc": "Daily supply dependent.",
+    "factors": ["Storms"]
+  },
+  {
+    "ticker": "SAND",
+    "name": "Construction Sand",
+    "category": "INDUSTRY",
+    "basePrice": 40.0,
+    "vol": 0.1,
+    "unit": "ton",
+    "tagline": "Underrated Gold.",
+    "origin": "Desert",
+    "desc": "Critical for construction.",
+    "factors": ["Building Boom"]
+  },
+  {
+    "ticker": "URAN",
+    "name": "Uranium",
+    "category": "ENERGY",
+    "basePrice": 60.0,
+    "vol": 0.35,
+    "unit": "kg",
+    "tagline": "Handle Carefully.",
+    "origin": "Secret Sites",
+    "desc": "Highly regulated energy source.",
+    "factors": ["Political Tension"]
+  },
+  {
+    "ticker": "LITH",
+    "name": "Lithium",
+    "category": "TECH",
+    "basePrice": 75.0,
+    "vol": 0.27,
+    "unit": "kg",
+    "tagline": "Battery Power.",
+    "origin": "Salt Flats",
+    "desc": "Essential for EVs.",
+    "factors": ["EV Demand"]
+  },
+  {
+    "ticker": "ALCO",
+    "name": "Alcohol",
+    "category": "CONSUMER",
+    "basePrice": 20.0,
+    "vol": 0.2,
+    "unit": "crate",
+    "tagline": "Party Fuel.",
+    "origin": "Breweries",
+    "desc": "Demand spikes on weekends.",
+    "factors": ["Events", "Holidays"]
+  }
+]
+
+1. Events koppeln
+
+Explosion bei Raffinerie → OIL ↑
+Hitzewelle → WATR ↑ ELEC ↑
+Polizeirazzia → WEED ↓
+
+2. Verknüpfung mit Aktien
+
+OIL ↑ → Fluglinien ↓
+TECH ↑ → Tech-Aktien ↑
+
+3. Schwarzmärkte
+
+WEED, MED, URAN → illegaler Markt mit höherer Volatilität
+
+4. Regionen
+
+Blaine County produziert Rohstoffe
+Los Santos verbraucht sie → Preisunterschiede möglich
