@@ -6,73 +6,8 @@
   <title>LSX Company Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <link rel="shortcut icon" href="/assets/icons/icon-512.ico" type="image/x-icon">
-  <style>
-    :root{--bg:#040810;--panel:#080f1e;--panel2:#0d1628;--border:rgba(0,212,255,0.12);--accent:#00d4ff;--green:#00ff88;--red:#ff3355;--gold:#ffd700;--text:#e8eaf0;--dim:#6b7a99;--font:'Rajdhani',sans-serif;--mono:'Share Tech Mono',monospace}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;min-height:100vh}
-    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-
-    header{position:sticky;top:0;z-index:100;background:rgba(4,8,16,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:54px}
-    .logo{font-family:var(--mono);font-size:17px;color:var(--accent);letter-spacing:2px;text-decoration:none}
-    .gen-badge{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--green);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:3px 9px;border-radius:3px}
-    .btn-link{font-family:var(--font);font-weight:700;font-size:12px;letter-spacing:1px;color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:4px;transition:all .2s;text-transform:uppercase;cursor:pointer;background:none}
-    .btn-link:hover{color:var(--accent);border-color:var(--accent)}
-
-    .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 24px 80px}
-
-    .page-tag{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);margin-bottom:8px}
-    h1{font-size:38px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
-    .page-sub{color:var(--dim);font-size:14px;margin-bottom:36px}
-
-    /* ── Form ── */
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-    .form-grid.full{grid-template-columns:1fr}
-    .field{display:flex;flex-direction:column;gap:6px}
-    label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
-    input,select,textarea{background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s;width:100%}
-    input:focus,select:focus,textarea:focus{border-color:rgba(0,212,255,0.5)}
-    select option{background:var(--panel)}
-    textarea{resize:vertical;min-height:120px;font-family:var(--font);font-size:14px;line-height:1.6}
-
-    .section-title{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin:28px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-
-    /* ── Executives builder ── */
-    .exec-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
-    .exec-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center}
-    .exec-row input{font-size:13px}
-    .btn-remove{background:rgba(255,51,85,0.1);border:1px solid rgba(255,51,85,0.3);color:var(--red);padding:9px 12px;border-radius:6px;cursor:pointer;font-size:14px;font-family:var(--mono);transition:all .2s;white-space:nowrap}
-    .btn-remove:hover{background:rgba(255,51,85,0.2)}
-    .btn-add-exec{background:rgba(0,212,255,0.05);border:1px solid var(--border);color:var(--accent);padding:9px 18px;border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:13px;letter-spacing:1px;transition:all .2s;width:100%}
-    .btn-add-exec:hover{border-color:var(--accent);background:rgba(0,212,255,0.1)}
-
-    /* ── Preview ── */
-    .preview-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-top:28px;position:relative}
-    .preview-box::before{content:'PREVIEW';font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--dim);position:absolute;top:-1px;left:16px;background:var(--panel);padding:0 8px;transform:translateY(-50%)}
-    .preview-json{font-family:var(--mono);font-size:12px;color:var(--green);white-space:pre-wrap;overflow-x:auto;line-height:1.7}
-
-    /* ── Actions ── */
-    .actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
-    .btn-primary{background:rgba(0,255,136,0.1);border:1px solid var(--green);color:var(--green);padding:12px 28px;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:14px;letter-spacing:1.5px;transition:all .2s;text-transform:uppercase}
-    .btn-primary:hover{background:rgba(0,255,136,0.2)}
-    .btn-secondary{background:rgba(0,212,255,0.05);border:1px solid var(--border);color:var(--accent);padding:12px 28px;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:14px;letter-spacing:1.5px;transition:all .2s;text-transform:uppercase}
-    .btn-secondary:hover{border-color:var(--accent);background:rgba(0,212,255,0.1)}
-
-    /* ── Toast ── */
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-size:13px;padding:12px 24px;border-radius:8px;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-    /* ── Load existing ── */
-    .load-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:28px}
-    .load-box-title{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--dim);margin-bottom:10px}
-    .load-row{display:flex;gap:10px;align-items:center}
-    .load-row input[type=file]{display:none}
-    .btn-load{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);color:var(--gold);padding:9px 18px;border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:13px;letter-spacing:1px;transition:all .2s}
-    .btn-load:hover{background:rgba(255,215,0,0.15)}
-    .load-hint{font-size:12px;color:var(--dim);font-family:var(--mono)}
-
-    @media(max-width:600px){.form-grid{grid-template-columns:1fr}.exec-row{grid-template-columns:1fr auto}}
-  </style>
+  <link rel="shortcut icon" href="/wiki/assets/img/icon-512.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/wiki/assets/css/style-generator.css"/>
 </head>
 <body>
 
