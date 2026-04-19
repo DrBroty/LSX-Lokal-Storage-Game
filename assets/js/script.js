@@ -2124,9 +2124,19 @@ async function saveGame() {
 }
 
 function saveGameBeacon() {
+  // FIX: sendBeacon unterstützt keine CSRF-Header → 403
+  // keepalive:true wird vom Browser auch beim Tab-Schließen gesendet
   state.savedAt = Date.now();
-  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
-  navigator.sendBeacon(API + '/save.php', blob);
+  fetch(API + '/save.php', {
+    method: 'POST',
+    credentials: 'include',
+    keepalive: true, // wird auch beim beforeunload zuverlässig gesendet
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': csrfToken,
+    },
+    body: JSON.stringify(state),
+  }).catch(() => {});
 }
 
 function startTimers() {

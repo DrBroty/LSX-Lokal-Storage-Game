@@ -58,7 +58,7 @@ function logAdminAction($action, $targetId, $details = []) {
         ]]
     ];
 
-    $ch = curl_init(DISCORD_WEBHOOK_URL);
+    $ch = curl_init(defined('ADMIN_WEBHOOK_URL') ? ADMIN_WEBHOOK_URL : DISCORD_WEBHOOK_URL);
     curl_setopt($ch, CURLOPT_POST,           true);
     curl_setopt($ch, CURLOPT_POSTFIELDS,     json_encode($payload));
     curl_setopt($ch, CURLOPT_HTTPHEADER,     ['Content-Type: application/json']);
