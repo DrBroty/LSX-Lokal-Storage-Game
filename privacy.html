@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Los Santos Exchange</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="/assets/icons/icon-512.ico" type="image/x-icon">
+  <style>
+    :root {
+      --bg:      #040810;
+      --panel:   #080f1e;
+      --border:  rgba(0,212,255,0.12);
+      --accent:  #00d4ff;
+      --green:   #00ff88;
+      --red:     #ff3355;
+      --gold:    #ffd700;
+      --text:    #e8eaf0;
+      --dim:     #6b7a99;
+      --font:    'Rajdhani', sans-serif;
+      --mono:    'Share Tech Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Animated grid background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(4,8,16,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 18px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    .back-btn {
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: var(--dim);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 4px;
+      transition: all .2s;
+      text-transform: uppercase;
+    }
+    .back-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── Main Content ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    /* ── Page Title ── */
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .page-meta {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    /* ── Sections ── */
+    .section {
+      margin-bottom: 40px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--accent);
+      opacity: 0.6;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    p {
+      color: var(--dim);
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      list-style: none;
+      margin: 12px 0;
+    }
+
+    ul li {
+      color: var(--dim);
+      font-size: 15px;
+      padding: 5px 0 5px 20px;
+      position: relative;
+    }
+
+    ul li::before {
+      content: '◆';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 7px;
+      top: 9px;
+    }
+
+    strong { color: var(--text); font-weight: 700; }
+
+    .highlight-box {
+      background: rgba(0,212,255,0.05);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 14px;
+      color: var(--text);
+      font-family: var(--mono);
+      line-height: 1.6;
+    }
+
+    .contact-block {
+      background: rgba(0,255,136,0.05);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 6px;
+      padding: 16px 20px;
+    }
+    .contact-block p { color: var(--text); margin: 4px 0; }
+    .contact-block a { color: var(--green); text-decoration: none; }
+    .contact-block a:hover { text-decoration: underline; }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    footer a { color: var(--dim); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">📈 LSX</a>
+  <a href="/" class="back-btn">← Zurück zum Spiel</a>
+</header>
+
+<main>
+
+  <div class="page-header">
+    <div class="page-tag">Legal · Datenschutz</div>
+    <h1>Privacy Policy</h1>
+    <div class="page-meta">Zuletzt aktualisiert: April 2026 &nbsp;·&nbsp; Los Santos Exchange</div>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§1</span> Verantwortlicher</h2>
+    <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist der Betreiber von <strong>Los Santos Exchange (LSX)</strong>:</p>
+    <div class="highlight-box">
+      Los Santos Exchange<br>
+      Domain: los-santos-exchange.de<br>
+      Kontakt: siehe §8
+    </div>
+    <p>LSX ist ein Fan-Projekt ohne kommerziellen Zweck. GTA V und alle verwandten Assets sind Eigentum von <strong>Rockstar Games</strong>.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§2</span> Welche Daten wir erheben</h2>
+    <p>Wir erheben nur das absolut Notwendige:</p>
+    <ul>
+      <li><strong>Discord OAuth-Daten:</strong> Deine Discord-ID, Benutzername und Avatar-URL — ausschließlich zur Identifikation deines Spielstands.</li>
+      <li><strong>Spielstand-Daten:</strong> Dein Spielfortschritt (Bargeld, Positionen, Trades, Einstellungen) wird serverseitig als JSON-Datei gespeichert.</li>
+      <li><strong>Session-Cookies:</strong> Eine PHP-Session wird genutzt um dich während deines Besuchs eingeloggt zu halten.</li>
+      <li><strong>Server-Logs:</strong> Der Webserver speichert standard HTTP-Access-Logs (IP-Adresse, Zeitstempel, aufgerufene URL). Diese werden nach 7 Tagen automatisch gelöscht.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§3</span> Was wir nicht tun</h2>
+    <ul>
+      <li>Wir verkaufen <strong>keine</strong> Daten an Dritte.</li>
+      <li>Wir zeigen <strong>keine</strong> Werbung.</li>
+      <li>Wir nutzen <strong>keine</strong> Tracking-Pixel, Analytics-Dienste oder Marketing-Tools.</li>
+      <li>Wir speichern <strong>keine</strong> Passwörter — Authentifizierung erfolgt ausschließlich via Discord OAuth2.</li>
+      <li>Wir erstellen <strong>keine</strong> Nutzerprofile für kommerzielle Zwecke.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§4</span> Discord OAuth2</h2>
+    <p>Zur Anmeldung verwenden wir <strong>Discord OAuth2</strong> mit dem Scope <code>identify</code>. Das bedeutet:</p>
+    <ul>
+      <li>Wir erhalten nur: Discord-ID, Benutzername, Avatar.</li>
+      <li>Wir haben <strong>keinen</strong> Zugriff auf deine E-Mail-Adresse, Nachrichten, Server oder Freundesliste.</li>
+      <li>Discord verarbeitet deine Login-Daten gemäß der <a href="https://discord.com/privacy" style="color:var(--accent)">Discord Privacy Policy</a>.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§5</span> Discord Webhooks</h2>
+    <p>Das Spiel sendet bestimmte Ereignisse via Discord Webhook an private Discord-Kanäle des Betreibers:</p>
+    <ul>
+      <li>Große Trades (ab $10.000 Volumen)</li>
+      <li>Milestones und Portfolio All-Time Highs</li>
+      <li>Fehler-Logs (anonymisiert, ohne personenbezogene Daten)</li>
+      <li>Admin-Aktionen im Admin-Panel</li>
+    </ul>
+    <p>Diese Benachrichtigungen enthalten deinen <strong>Discord-Benutzernamen</strong> und Spielstand-Daten. Sie werden ausschließlich zur Betrieb des Spiels verwendet und nicht an Dritte weitergegeben.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§6</span> Datenspeicherung & Sicherheit</h2>
+    <ul>
+      <li>Spielstände werden verschlüsselt auf einem Webserver in Deutschland (Netcup, Karlsruhe) gespeichert.</li>
+      <li>Jeder Nutzer kann nur auf seinen eigenen Spielstand zugreifen.</li>
+      <li>Zugriff auf fremde Spielstände ist technisch nicht möglich.</li>
+      <li>Session-Cookies sind als <code>HttpOnly</code>, <code>Secure</code> und <code>SameSite=None</code> konfiguriert.</li>
+      <li>Alle Requests sind CSRF-geschützt.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§7</span> Deine Rechte (DSGVO)</h2>
+    <p>Du hast gemäß DSGVO folgende Rechte:</p>
+    <ul>
+      <li><strong>Auskunft:</strong> Du kannst jederzeit Auskunft über gespeicherte Daten verlangen.</li>
+      <li><strong>Löschung:</strong> Du kannst die Löschung deines Spielstands jederzeit über den <em>Hard Reset</em>-Button im Spiel selbst vornehmen, oder per Anfrage an uns.</li>
+      <li><strong>Portabilität:</strong> Dein Spielstand kann als JSON-Datei exportiert werden.</li>
+      <li><strong>Widerspruch:</strong> Du kannst der Verarbeitung jederzeit widersprechen — in diesem Fall löschen wir alle deine Daten.</li>
+    </ul>
+    <p>Beschwerden können bei der zuständigen Datenschutzbehörde eingereicht werden.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§8</span> Kontakt</h2>
+    <div class="contact-block">
+      <p>Bei Fragen zum Datenschutz oder zur Löschung deiner Daten:</p>
+      <p style="margin-top:10px;">Discord: <a href="https://discord.com">@drBroty</a></p>
+      <p>Website: <a href="https://los-santos-exchange.de">los-santos-exchange.de</a></p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>© 2026 Los Santos Exchange · Fan-Projekt · Kein kommerzieller Zweck</span>
+  <span>
+    <a href="/privacy.html">Privacy Policy</a>
+    &nbsp;·&nbsp;
+    <a href="/tos.html">Terms of Service</a>
+    &nbsp;·&nbsp;
+    <a href="/">Spiel</a>
+  </span>
+</footer>
+
+</body>
+</html>

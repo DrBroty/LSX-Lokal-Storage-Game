@@ -1,26 +1,29 @@
 # ── Sensible Konfiguration ─────────────────────────────
-config.php
+lsx-proxy/config.php
 .env
 .env.local
 .env.*.local
 
 # ── Spielstände / User-Daten ───────────────────────────
-saves/
-*.json.corrupt_*
+lsx-proxy/saves/
+lsx-proxy/*.json.corrupt_*
+lsx-proxy/*.tmp_*
 
-# ── Rate-Limiting Temp-Files ───────────────────────────
+# ── PHP Temp-Dateien ────────────────────────────────────
 /tmp/lsx_rl_*
+*.tmp_*
 
-# ── Admin-Key nie in die History ──────────────────────
-# (Admin-URL nie bookmarken oder teilen)
-
-# ── PHP / Server ───────────────────────────────────────
+# ── Logs ───────────────────────────────────────────────
 *.log
 error_log
 php_errors.log
-.htpasswd
+lsx-proxy/logs/
 
-# ── Betriebssystem ────────────────────────────────────
+# ── Server ─────────────────────────────────────────────
+.htpasswd
+.htaccess.local
+
+# ── Betriebssystem ─────────────────────────────────────
 .DS_Store
 .DS_Store?
 ._*
@@ -30,7 +33,7 @@ Thumbs.db
 ehthumbs.db
 desktop.ini
 
-# ── IDE / Editor ──────────────────────────────────────
+# ── IDE / Editor ───────────────────────────────────────
 .vscode/
 .idea/
 *.swp
@@ -38,14 +41,17 @@ desktop.ini
 *~
 .project
 .settings/
+*.sublime-workspace
 
-# ── Node (falls jemals genutzt) ───────────────────────
+# ── Node (falls jemals genutzt) ────────────────────────
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
 
-# ── Backup-Dateien ────────────────────────────────────
+# ── Backup-Dateien ─────────────────────────────────────
 *.bak
 *.backup
 *.orig
+*.old

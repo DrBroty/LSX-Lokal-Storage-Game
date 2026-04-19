@@ -1,24 +1,50 @@
 # 📈 Los Santos Exchange (LSX)
 
-> A real-time stock market simulation game set in the GTA V universe — trade stocks, short sell, react to breaking news, and climb the leaderboard.
+> A real-time stock market simulation game set in the GTA V universe — trade stocks, short sell, react to breaking news, and build your empire.
 
-![LSX Banner](https://los-santos-exchange.de/og-image.png)
+[![Live](https://img.shields.io/badge/LIVE-los--santos--exchange.de-00d4ff?style=flat-square)](https://los-santos-exchange.de)
+[![License](https://img.shields.io/badge/license-MIT-00ff88?style=flat-square)](LICENSE)
+[![PHP](https://img.shields.io/badge/PHP-8.x-gold?style=flat-square)](https://php.net)
 
 ---
 
 ## 🎮 Features
 
+### Trading
 - **60+ GTA V stocks** across 8 sectors (FOOD, FINANCE, TECH, TRANSPORT, ENERGY, RETAIL, PHARMA, MEDIA)
-- **Real-time price simulation** with rival stock correlation, weekday volatility effects and sector news events
-- **Short selling** with daily borrow fees and stop-loss protection
-- **Limit orders & stop-losses** — set it and forget it
-- **Dividend payouts** every 7 game days based on sector
-- **Insider tips** — 70% accuracy, use them wisely
-- **30-second news reaction window** — act before the market does
-- **Heatmap & Top Movers** panel for market overview
-- **Discord OAuth login** — your progress is saved server-side per account
+- **Short selling** with 1:1 collateral, daily borrow fees (0.15%/day) and stop-loss protection
+- **Limit orders** — BUY ≤ and SELL ≥ auto-execute when price hits target
+- **Stop-losses** for both long and short positions
+- **Price alerts** — notified when a stock crosses your target price
+- **Trading fees** — tiered structure that rewards larger positions
+
+### Market Simulation
+- **Real-time price simulation** every 4 seconds with rival stock correlation
+- **Mean reversion** — stocks drift back toward their base price over time
+- **Price floor** at 10% of base price — no permanent penny stocks
+- **Weekday volatility** — Monday spikes, Friday sell-off, quiet weekends
+- **Sector news events** — 30-second reaction window to act before the market moves
+- **Insider tips** — 60% accuracy, act wisely
+- **Dividends** every 7 game days based on sector yield
+- **Milestone webhooks** — Discord notifications for big trades and net worth records
+
+### UI / UX
+- **Permanent 3-column layout** — Left sidebar (chart, movers, watchlist, scoreboard, history), Main (market table + heatmap), Right sidebar (positions, shorts, orders, stop-losses, alerts)
+- **Stock Modal with 4 Tabs** — 📈 TRADE · 📉 SHORT · ⏱ ORDERS · 🔔 ALERT
+- **Market Summary Bar** — Bull/Bear sentiment, gainers/losers, top/flop movers
+- **Heatmap view** — color-coded grid by 24h performance
+- **Trade History Overlay** — full history with filter (ALL/BUY/SELL/SHORT/COVER) + CSV export
+- **Skeleton loading screen** — no flash of unstyled content
 - **PWA support** — installable on mobile and desktop
-- **Discord Webhook** notifications for big trades and milestones
+
+### Security & Backend
+- **Discord OAuth2** (`identify` scope only) — no email, no messages
+- **CSRF protection** on all POST endpoints
+- **Atomic writes** — tmp → rename, prevents corrupt saves
+- **No-cache headers** on load.php and save.php
+- **Save size limit** — 512 KB max per user
+- **Admin panel** — Discord ID whitelist, separate webhook channel, full player list
+- **Error logging** — JS errors forwarded to Discord webhook after login
 
 ---
 
@@ -30,8 +56,22 @@
 | Backend | PHP 8, Discord OAuth2 |
 | Storage | Server-side JSON per Discord user |
 | Auth | Discord OAuth2 (`identify` scope) |
-| Hosting | Netcup Webhosting |
+| Hosting | Netcup Webhosting (Germany) |
 | PWA | Service Worker, Web App Manifest |
+
+---
+
+## 💰 Trading Fees
+
+| Volume | Fee |
+|---|---|
+| Under $1,000 | $50 flat |
+| $1,000 – $9,999 | 2.00% |
+| $10,000 – $49,999 | 1.50% |
+| $50,000 – $199,999 | 1.00% |
+| $200,000+ | 0.60% |
+
+Starting cash: **$10,000**
 
 ---
 
@@ -39,11 +79,15 @@
 
 ### 1. Discord App erstellen
 - Gehe zu [discord.com/developers/applications](https://discord.com/developers/applications)
-- Neue App erstellen → OAuth2 → Redirect URI hinzufügen:
-https://deinedomain.de/lsx-proxy/oauth.php
-
+- Neue App → OAuth2 → Redirect URI:
+  ```
+  https://deinedomain.de/lsx-proxy/oauth.php
+  ```
 
 ### 2. `lsx-proxy/config.php` anlegen
+
+Kopiere `lsx-proxy/config.example.php` und fülle die Werte aus:
+
 ```php
 <?php
 ini_set('session.cookie_samesite', 'None');
@@ -54,76 +98,102 @@ session_start();
 define('DISCORD_CLIENT_ID',     'DEINE_CLIENT_ID');
 define('DISCORD_CLIENT_SECRET', 'DEIN_CLIENT_SECRET');
 define('DISCORD_REDIRECT_URI',  'https://deinedomain.de/lsx-proxy/oauth.php');
+
+// Haupt-Webhook (Trades, Milestones, Logs)
 define('DISCORD_WEBHOOK_URL',   'DEIN_WEBHOOK_URL');
-define('SAVES_DIR',             __DIR__ . '/saves/');
-define('SESSION_SECRET',        'ZUFAELLIGER_STRING');
+
+// Admin-Webhook (Admin-Panel Aktionen) — optional, Fallback auf DISCORD_WEBHOOK_URL
+define('ADMIN_WEBHOOK_URL',     'DEIN_ADMIN_WEBHOOK_URL');
+
+// Discord IDs die Zugang zum Admin-Panel haben
+define('ADMIN_IDS', ['DEINE_DISCORD_ID']);
+
+define('SAVES_DIR',      __DIR__ . '/saves/');
+define('SESSION_SECRET', 'ZUFAELLIGER_SICHERER_STRING');
 
 if (!is_dir(SAVES_DIR)) mkdir(SAVES_DIR, 0755, true);
 ```
 
-### 3. Dateien hochladen
+### 3. Dateistruktur
+
+```
 httpdocs/
 ├── index.html
-├── style.css
-├── script.js
-├── sw.js
+├── privacy.html
+├── tos.html
 ├── manifest.json
+├── assets/
+│   ├── css/
+│   │   ├── style.css
+│   │   └── admin.css
+│   ├── js/
+│   │   ├── script.js
+│   │   └── admin.js
+│   └── icons/
 └── lsx-proxy/
-├── config.php
-├── oauth.php
-├── save.php
-├── load.php
-├── logout.php
-├── webhook.php
-└── saves/ ← wird automatisch erstellt
-
+    ├── config.php          ← nicht im Repo (gitignored)
+    ├── config.example.php  ← Vorlage
+    ├── oauth.php
+    ├── save.php
+    ├── load.php
+    ├── logout.php
+    ├── webhook.php
+    ├── admin.php
+    ├── admin.html
+    └── saves/              ← wird automatisch erstellt (gitignored)
+```
 
 ### 4. Testen
+
 | URL | Erwartete Antwort |
 |---|---|
 | `/lsx-proxy/load.php` | `{"error":"Not logged in"}` |
 | `/lsx-proxy/oauth.php` | Weiterleitung zu Discord |
 | Nach Login: `/lsx-proxy/load.php` | `{"newGame":true}` oder Spielstand |
-
----
-
-## 💰 Trading Fees
-
-| Volumen | Fee |
-|---|---|
-| unter $1.000 | $25 flat |
-| $1.000 – $9.999 | 1.20% |
-| $10.000 – $49.999 | 0.80% |
-| $50.000 – $199.999 | 0.50% |
-| ab $200.000 | 0.25% |
+| `/lsx-proxy/admin.html` | Admin-Panel (nur für ADMIN_IDS) |
 
 ---
 
 ## 📁 Projektstruktur
-script.js — Komplette Spiellogik (Simulation, Trading, UI, News, Save/Load)
-style.css — Dark-Theme UI, responsive
-index.html — Shell, alle DOM-Elemente
-sw.js — Service Worker (Cache First, PHP bypass)
-manifest.json — PWA Manifest
-lsx-proxy/ — PHP Backend (OAuth, Save, Load, Webhook)
 
+| Datei | Beschreibung |
+|---|---|
+| `assets/js/script.js` | Komplette Spiellogik — Simulation, Trading, UI, News, Save/Load, Logging |
+| `assets/css/style.css` | Dark-Theme UI, 3-Spalten-Layout, Modal, responsive |
+| `index.html` | App-Shell mit permanentem 3-Spalten-Layout |
+| `privacy.html` | Datenschutzerklärung (DSGVO-konform) |
+| `tos.html` | Terms of Service |
+| `manifest.json` | PWA Manifest |
+| `lsx-proxy/save.php` | Save-Endpoint (CSRF, Größenlimit, Atomic Write, No-Cache) |
+| `lsx-proxy/load.php` | Load-Endpoint (CSRF-Token, No-Cache, Corrupt-Recovery) |
+| `lsx-proxy/oauth.php` | Discord OAuth2 Flow |
+| `lsx-proxy/webhook.php` | Discord Webhook Proxy (CSRF-geschützt) |
+| `lsx-proxy/admin.php` | Admin-API (Discord ID Whitelist, Action Logging) |
+| `lsx-proxy/admin.html` | Admin-Panel UI |
+| `lsx-proxy/config.example.php` | Konfigurations-Vorlage |
 
 ---
 
 ## 🔒 Sicherheit
 
-- Spielstände werden serverseitig unter `saves/<discord_id>.json` gespeichert
-- Kein Spieler kann auf fremde Saves zugreifen
-- Session läuft über PHP mit `SameSite=None; Secure; HttpOnly`
-- Discord Secrets niemals in den Code committen — nur in `config.php` (nicht im Repo)
+- Spielstände serverseitig unter `saves/<discord_id>.json` — kein Cross-Access möglich
+- Session: `SameSite=None; Secure; HttpOnly`
+- CSRF-Token auf allen POST-Endpoints (`X-CSRF-Token` Header)
+- `keepalive: true` fetch statt `sendBeacon` für zuverlässiges Tab-Close-Saving mit CSRF
+- Admin-Panel: Discord ID Whitelist + separater Webhook-Kanal
+- JS-Fehler werden erst nach erfolgreichem Login (CSRF gesetzt) an Webhook gesendet
+- `config.php` mit allen Secrets ist gitignored
 
 ---
 
-## 📜 Lizenz
+## 📜 Lizenz & Legal
 
-This project is for entertainment purposes only.  
-GTA V and all related assets are property of **Rockstar Games**.  
-LSX is a fan-made project with no commercial intent.
+Dieses Projekt ist ein Fan-Projekt ohne kommerziellen Zweck.  
+GTA V und alle verwandten Assets sind Eigentum von **Rockstar Games / Take-Two Interactive**.  
+LSX steht in keiner offiziellen Verbindung zu diesen Unternehmen.
+
+- [Privacy Policy](https://los-santos-exchange.de/privacy.html)
+- [Terms of Service](https://los-santos-exchange.de/tos.html)
 
 ---
 

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Los Santos Exchange</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="/assets/icons/icon-512.ico" type="image/x-icon">
+  <style>
+    :root {
+      --bg:      #040810;
+      --panel:   #080f1e;
+      --border:  rgba(0,212,255,0.12);
+      --accent:  #00d4ff;
+      --green:   #00ff88;
+      --red:     #ff3355;
+      --gold:    #ffd700;
+      --text:    #e8eaf0;
+      --dim:     #6b7a99;
+      --font:    'Rajdhani', sans-serif;
+      --mono:    'Share Tech Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(4,8,16,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 18px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    .back-btn {
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: var(--dim);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 4px;
+      transition: all .2s;
+      text-transform: uppercase;
+    }
+    .back-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .page-meta {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .section {
+      margin-bottom: 40px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--gold);
+      opacity: 0.6;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+      background: rgba(255,215,0,0.08);
+      border: 1px solid rgba(255,215,0,0.2);
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    p {
+      color: var(--dim);
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      list-style: none;
+      margin: 12px 0;
+    }
+
+    ul li {
+      color: var(--dim);
+      font-size: 15px;
+      padding: 5px 0 5px 20px;
+      position: relative;
+    }
+
+    ul li::before {
+      content: '◆';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-size: 7px;
+      top: 9px;
+    }
+
+    strong { color: var(--text); font-weight: 700; }
+
+    .warn-box {
+      background: rgba(255,51,85,0.07);
+      border: 1px solid rgba(255,51,85,0.25);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .warn-box::before {
+      content: '⚠ ';
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .info-box {
+      background: rgba(255,215,0,0.05);
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 14px;
+      color: var(--text);
+      font-family: var(--mono);
+      line-height: 1.7;
+    }
+
+    .contact-block {
+      background: rgba(0,255,136,0.05);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 6px;
+      padding: 16px 20px;
+    }
+    .contact-block p { color: var(--text); margin: 4px 0; }
+    .contact-block a { color: var(--green); text-decoration: none; }
+    .contact-block a:hover { text-decoration: underline; }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--dim);
+    }
+
+    footer a { color: var(--dim); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">📈 LSX</a>
+  <a href="/" class="back-btn">← Zurück zum Spiel</a>
+</header>
+
+<main>
+
+  <div class="page-header">
+    <div class="page-tag">Legal · Nutzungsbedingungen</div>
+    <h1>Terms of Service</h1>
+    <div class="page-meta">Zuletzt aktualisiert: April 2026 &nbsp;·&nbsp; Los Santos Exchange</div>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§1</span> Über LSX</h2>
+    <p><strong>Los Santos Exchange (LSX)</strong> ist ein browserbasiertes Börsenspiel im Universum von GTA V. Es handelt sich um ein <strong>nicht-kommerzielles Fan-Projekt</strong> ohne Verbindung zu Rockstar Games oder Take-Two Interactive.</p>
+    <div class="info-box">
+      LSX ist kostenlos · Kein Echtgeld · Kein Gambling · Rein fiktiv
+    </div>
+    <p>Alle im Spiel gehandelten Aktien, Preise und Ereignisse sind <strong>vollständig fiktiv</strong> und haben keinerlei Bezug zu realen Märkten, Wertpapieren oder Finanzprodukten.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§2</span> Nutzungsberechtigung</h2>
+    <p>Die Nutzung von LSX ist:</p>
+    <ul>
+      <li>Kostenlos und für jeden zugänglich der über einen Discord-Account verfügt.</li>
+      <li>Ausschließlich für <strong>private, nicht-kommerzielle Zwecke</strong> gestattet.</li>
+      <li>Auf eine aktive Session pro Discord-Account beschränkt.</li>
+    </ul>
+    <div class="warn-box">
+      LSX ist kein Finanzprodukt. Nichts in diesem Spiel stellt Finanz-, Anlage- oder sonstige Beratung dar. Spielergebnisse lassen keinerlei Rückschlüsse auf reale Märkte zu.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§3</span> Account & Spielstand</h2>
+    <ul>
+      <li>Dein Spielstand wird serverseitig gespeichert und ist an deine <strong>Discord-ID</strong> gebunden.</li>
+      <li>Du bist für die Sicherheit deines Discord-Accounts selbst verantwortlich.</li>
+      <li>Du hast jederzeit das Recht deinen Spielstand zu <strong>löschen</strong> (Hard Reset im Spiel oder Anfrage an den Betreiber).</li>
+      <li>Der Betreiber behält sich vor, Spielstände ohne Vorankündigung zu löschen — insbesondere bei Missbrauch oder technischen Erfordernissen.</li>
+      <li>Es gibt <strong>keine Garantie</strong> auf dauerhafte Datenverfügbarkeit. LSX ist ein Hobby-Projekt ohne SLA.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§4</span> Erlaubte Nutzung</h2>
+    <p>Du darfst LSX für folgendes verwenden:</p>
+    <ul>
+      <li>Spielen, Handeln, Spekulieren — alles im Rahmen des Spiels.</li>
+      <li>Screenshots und Videos für private oder öffentliche Zwecke (z.B. Streams, Social Media).</li>
+      <li>Feedback und Verbesserungsvorschläge an den Betreiber.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§5</span> Verbotene Nutzung</h2>
+    <p>Folgendes ist ausdrücklich <strong>untersagt</strong>:</p>
+    <ul>
+      <li>Manipulation des Spielstands durch direkte Server-Anfragen, Exploits oder sonstige technische Mittel außerhalb der vorgesehenen Spieloberfläche.</li>
+      <li>Automatisierte Bots, Scripts oder Tools die das Spiel ohne menschliche Interaktion bedienen.</li>
+      <li>Reverse-Engineering des Backends oder Versuche auf fremde Spielstände zuzugreifen.</li>
+      <li>Kommerzielle Nutzung jeglicher Art — Verkauf von Spielständen, bezahlte Vorteile, etc.</li>
+      <li>Veröffentlichung von Admin-Panel-Inhalten oder Serverdaten Dritter.</li>
+    </ul>
+    <div class="warn-box">
+      Verstöße können zur sofortigen Sperrung und Löschung des Spielstands führen.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§6</span> Geistiges Eigentum</h2>
+    <p><strong>GTA V, Los Santos</strong> und alle zugehörigen Marken, Namen und Assets sind Eigentum von <strong>Rockstar Games / Take-Two Interactive</strong>. LSX ist ein Fan-Projekt und steht in keiner offiziellen Verbindung zu diesen Unternehmen.</p>
+    <p>Der <strong>Quellcode</strong> von LSX (soweit nicht durch Drittrechte eingeschränkt) steht unter der MIT-Lizenz und ist auf GitHub verfügbar. Fan-Projekte sind ausdrücklich erwünscht — bitte kreditiere das Original-Repo.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§7</span> Verfügbarkeit & Haftung</h2>
+    <ul>
+      <li>LSX wird <strong>"as is"</strong> ohne Gewährleistung bereitgestellt.</li>
+      <li>Es gibt <strong>keine Garantie</strong> auf Verfügbarkeit, Fehlerfreiheit oder Datensicherheit.</li>
+      <li>Der Betreiber haftet <strong>nicht</strong> für Datenverlust, Spielstandsverlust oder Ausfallzeiten.</li>
+      <li>LSX kann jederzeit ohne Vorankündigung geändert, eingeschränkt oder abgeschaltet werden.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§8</span> Änderungen</h2>
+    <p>Diese Nutzungsbedingungen können jederzeit geändert werden. Wesentliche Änderungen werden nach Möglichkeit auf der Website oder via Discord kommuniziert. Die weitere Nutzung nach einer Änderung gilt als Zustimmung.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="num">§9</span> Kontakt & Beschwerden</h2>
+    <div class="contact-block">
+      <p>Bei Fragen, Missbrauchsmeldungen oder sonstigen Anliegen:</p>
+      <p style="margin-top:10px;">Discord: <a href="https://discord.com">@drBroty</a></p>
+      <p>Website: <a href="https://los-santos-exchange.de">los-santos-exchange.de</a></p>
+      <p>GitHub: <a href="https://github.com/DrBroty/LSX-Lokal-Storage-Game">DrBroty/LSX-Lokal-Storage-Game</a></p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>© 2026 Los Santos Exchange · Fan-Projekt · Kein kommerzieller Zweck</span>
+  <span>
+    <a href="/privacy.html">Privacy Policy</a>
+    &nbsp;·&nbsp;
+    <a href="/tos.html">Terms of Service</a>
+    &nbsp;·&nbsp;
+    <a href="/">Spiel</a>
+  </span>
+</footer>
+
+</body>
+</html>
