@@ -23,5 +23,39 @@
       "role": "Director of Special Projects",
       "name": "[CLASSIFIED]"
     }
+  ],
+  "dividendYield": "0.0%",
+  "financials": {
+    "revenue": "$620M",
+    "netIncome": "-$140M",
+    "marketCap": "$4.1B",
+    "peRatio": "N/A",
+    "debtRating": "B+"
+  },
+  "history": [
+    {
+      "year": "1993",
+      "event": "Founded with a $200M classified government grant."
+    },
+    {
+      "year": "1998",
+      "event": "First laboratory facility opens in Grand Senora Desert."
+    },
+    {
+      "year": "2004",
+      "event": "Three researchers go missing. Company denies any connection."
+    },
+    {
+      "year": "2011",
+      "event": "IPO raises $800M despite zero disclosed revenue sources."
+    },
+    {
+      "year": "2016",
+      "event": "Facility reportedly raided. Company releases no statement."
+    },
+    {
+      "year": "2022",
+      "event": "Senate hearing on human research ethics. CEO declines to testify."
+    }
   ]
 }

@@ -72,7 +72,7 @@ function buildCards() {
     const v = volText(c.vol);
     const rival = allCompanies.find(x => x.ticker === c.rival);
     const rivalHtml = rival
-      ? `<span class="rival-link" onclick="scrollTo('${c.rival}')">${c.rival} — ${rival.name}</span>`
+      ? `<span class="rival-link" onclick="scrollToCard('${c.rival}')">${c.rival} — ${rival.name}</span>`
       : `<span style="color:var(--dim)">—</span>`;
 
     const mgmtHtml = (c.executives||[]).map(e => `
@@ -87,6 +87,28 @@ function buildCards() {
     card.dataset.sector = c.sector;
     card.dataset.search = (c.ticker + ' ' + c.name + ' ' + c.sector).toLowerCase();
 
+    // Financials block
+    const finHtml = c.financials ? `
+      <div class="card-financials">
+        ${c.dividendYield ? `<div class="fin-item"><span class="fin-lbl">DIVIDEND YIELD</span><span class="fin-val yield">${c.dividendYield}</span></div>` : ''}
+        ${c.financials.revenue    ? `<div class="fin-item"><span class="fin-lbl">REVENUE</span><span class="fin-val">${c.financials.revenue}</span></div>` : ''}
+        ${c.financials.netIncome  ? `<div class="fin-item"><span class="fin-lbl">NET INCOME</span><span class="fin-val ${c.financials.netIncome.startsWith('-')?'neg':'pos'}">${c.financials.netIncome}</span></div>` : ''}
+        ${c.financials.marketCap  ? `<div class="fin-item"><span class="fin-lbl">MARKET CAP</span><span class="fin-val">${c.financials.marketCap}</span></div>` : ''}
+        ${c.financials.peRatio    ? `<div class="fin-item"><span class="fin-lbl">P/E RATIO</span><span class="fin-val">${c.financials.peRatio}</span></div>` : ''}
+        ${c.financials.debtRating ? `<div class="fin-item"><span class="fin-lbl">DEBT RATING</span><span class="fin-val">${c.financials.debtRating}</span></div>` : ''}
+      </div>` : '';
+
+    // History timeline
+    const histHtml = c.history?.length ? `
+      <div class="card-history">
+        <div class="history-title">📅 COMPANY HISTORY</div>
+        ${c.history.map(h => `
+          <div class="history-item">
+            <span class="history-year">${h.year}</span>
+            <span class="history-event">${h.event}</span>
+          </div>`).join('')}
+      </div>` : '';
+
     card.innerHTML = `
       <div class="card-top">
         <div class="card-tl">
@@ -100,23 +122,26 @@ function buildCards() {
         <div class="card-price-box">
           <div class="card-price">$${Number(c.basePrice).toFixed(2)}</div>
           <div class="card-price-lbl">BASE PRICE</div>
+          ${c.dividendYield ? `<div class="vol-indicator" style="color:var(--green)">Div: ${c.dividendYield}</div>` : ''}
           <div class="vol-indicator">Vol: ${v.label} (${v.pct}%)</div>
         </div>
       </div>
       <p class="card-desc">${c.desc}</p>
+      ${finHtml}
       <div class="card-mgmt">${mgmtHtml}</div>
       <div class="card-stats">
         <div class="card-stat"><div class="stat-val">${c.founded||'—'}</div><div class="stat-lbl">Founded</div></div>
         <div class="card-stat"><div class="stat-val">${c.employees||'—'}</div><div class="stat-lbl">Employees</div></div>
         <div class="card-stat"><div class="stat-val" style="font-size:11px;line-height:1.4">${c.hq||'—'}</div><div class="stat-lbl">HQ</div></div>
         <div class="card-stat"><div class="stat-val" style="font-size:12px">${rivalHtml}</div><div class="stat-lbl">Main Rival</div></div>
-      </div>`;
+      </div>
+      ${histHtml}`;
 
     list.appendChild(card);
   });
 }
 
-function scrollTo(ticker) {
+function scrollToCard(ticker) {
   const el = document.getElementById('card-' + ticker);
   if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -146,7 +171,7 @@ function buildNav(filter='') {
       item.onclick = () => {
         document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
         item.classList.add('active');
-        scrollTo(c.ticker);
+        scrollToCard(c.ticker);
       };
       nav.appendChild(item);
     });

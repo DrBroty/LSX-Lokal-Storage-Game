@@ -27,5 +27,39 @@
       "role": "CMO",
       "name": "Stacy Bloom"
     }
+  ],
+  "dividendYield": "1.4%",
+  "financials": {
+    "revenue": "$3.1B",
+    "netIncome": "$180M",
+    "marketCap": "$2.8B",
+    "peRatio": "16x",
+    "debtRating": "BBB"
+  },
+  "history": [
+    {
+      "year": "1982",
+      "event": "First Burgershot opens in East LS on Innocence Blvd."
+    },
+    {
+      "year": "1994",
+      "event": "Reaches 100 locations across San Andreas."
+    },
+    {
+      "year": "2001",
+      "event": "Health department investigation over \"100% beef\" claims — settled out of court."
+    },
+    {
+      "year": "2009",
+      "event": "Franchise expansion into Blaine County — 40 new locations."
+    },
+    {
+      "year": "2016",
+      "event": "Triple Stack Burger named #1 fast food item in SA by LS Weekly."
+    },
+    {
+      "year": "2023",
+      "event": "Drone delivery pilot launched in Rockford Hills — mixed results."
+    }
   ]
 }

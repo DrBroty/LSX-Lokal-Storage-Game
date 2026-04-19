@@ -27,5 +27,39 @@
       "role": "General Counsel",
       "name": "Diana Pemberton"
     }
+  ],
+  "dividendYield": "2.8%",
+  "financials": {
+    "revenue": "$4.2B",
+    "netIncome": "$890M",
+    "marketCap": "$18.5B",
+    "peRatio": "21x",
+    "debtRating": "AA+"
+  },
+  "history": [
+    {
+      "year": "1923",
+      "event": "Founded as First National Bank of Los Santos by Victor Moorland Sr."
+    },
+    {
+      "year": "1962",
+      "event": "Renamed Maze Bank after merger with Continental Trust."
+    },
+    {
+      "year": "1989",
+      "event": "Maze Bank Tower construction completed — tallest building in LS."
+    },
+    {
+      "year": "2008",
+      "event": "Survived the financial crisis through emergency government loan of $2.1B."
+    },
+    {
+      "year": "2015",
+      "event": "Launched MazePay digital banking platform — 2M users in first year."
+    },
+    {
+      "year": "2022",
+      "event": "Record profit of $1.1B despite ongoing robbery incidents at branches."
+    }
   ]
 }

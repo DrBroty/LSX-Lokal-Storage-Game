@@ -115,3 +115,98 @@
     footer a:hover{color:var(--accent)}
 
     @media(max-width:860px){.layout{grid-template-columns:1fr}nav{display:none}main{padding:20px 16px}}
+/* ── Financials ───────────────────────────────────────── */
+.card-financials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  background: rgba(0,212,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.fin-item {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 16px;
+  border-right: 1px solid var(--border);
+}
+.fin-item:last-child { border-right: none; }
+.fin-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.fin-val {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.fin-val.yield { color: var(--green); }
+.fin-val.pos   { color: var(--green); }
+.fin-val.neg   { color: var(--red); }
+
+/* ── History Timeline ─────────────────────────────────── */
+.card-history {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.history-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.history-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 13px;
+}
+.history-item:last-child { border-bottom: none; }
+.history-year {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--gold);
+  min-width: 36px;
+  font-weight: 700;
+}
+.history-event { color: var(--dim); line-height: 1.5; }
+
+/* ── Scale 150% ─────────────────────────────────────── */
+html { zoom: 1.5; }
+
+/* ── Fix: Rechte Seite nav-items klickbar ───────────── */
+/* Das layout war 240px + 1fr — bei 150% zoom wird die
+   nav Sidebar zu schmal und überlappt main content.
+   Fix: pointer-events explizit setzen + z-index */
+nav { 
+  position: sticky; 
+  z-index: 10;
+  pointer-events: all;
+}
+nav .nav-item { 
+  pointer-events: all;
+  cursor: pointer;
+}
+/* Main content bekommt overflow-x: hidden damit keine
+   horizontale Scrollbar durch zoom entsteht */
+main { overflow-x: hidden; }
+body { overflow-x: hidden; }
+
+/* Bei 150% zoom: layout anpassen */
+.layout {
+  grid-template-columns: 200px 1fr;
+}

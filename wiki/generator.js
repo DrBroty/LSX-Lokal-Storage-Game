@@ -26,7 +26,31 @@ function removeExec(i) {
 }
 
 function buildObject() {
-  return {
+  // Parse history lines: "1982 | Founded in East LS"
+  const historyRaw = document.getElementById('f-history')?.value.trim() || '';
+  const history = historyRaw
+    ? historyRaw.split('\n').map(l => {
+        const [year, ...rest] = l.split('|');
+        return year && rest.length ? {year: year.trim(), event: rest.join('|').trim()} : null;
+      }).filter(Boolean)
+    : [];
+
+  // Build financials object only if any field is filled
+  const finFields = {
+    revenue:    document.getElementById('f-revenue')?.value.trim(),
+    netIncome:  document.getElementById('f-netIncome')?.value.trim(),
+    marketCap:  document.getElementById('f-marketCap')?.value.trim(),
+    peRatio:    document.getElementById('f-peRatio')?.value.trim(),
+    debtRating: document.getElementById('f-debtRating')?.value.trim(),
+  };
+  const hasFinancials = Object.values(finFields).some(v => v);
+  const financials = hasFinancials
+    ? Object.fromEntries(Object.entries(finFields).filter(([k,v]) => v))
+    : undefined;
+
+  const dividendYield = document.getElementById('f-dividendYield')?.value.trim() || undefined;
+
+  const obj = {
     ticker:     document.getElementById('f-ticker').value.trim().toUpperCase(),
     name:       document.getElementById('f-name').value.trim(),
     sector:     document.getElementById('f-sector').value,
@@ -40,6 +64,12 @@ function buildObject() {
     desc:       document.getElementById('f-desc').value.trim(),
     executives: executives.filter(e => e.role || e.name),
   };
+
+  if (dividendYield) obj.dividendYield = dividendYield;
+  if (financials)    obj.financials    = financials;
+  if (history.length) obj.history      = history;
+
+  return obj;
 }
 
 function updatePreview() {
@@ -70,8 +100,10 @@ function copyJSON() {
 }
 
 function resetForm() {
-  ['f-ticker','f-name','f-rival','f-tagline','f-founded','f-employees','f-hq','f-desc'].forEach(id => {
-    document.getElementById(id).value = '';
+  ['f-ticker','f-name','f-rival','f-tagline','f-founded','f-employees','f-hq','f-desc',
+   'f-dividendYield','f-revenue','f-netIncome','f-marketCap','f-peRatio','f-debtRating','f-history'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
   document.getElementById('f-sector').value = '';
   document.getElementById('f-basePrice').value = '';
@@ -99,6 +131,17 @@ function loadJSON(input) {
       document.getElementById('f-employees').value = obj.employees || '';
       document.getElementById('f-hq').value        = obj.hq        || '';
       document.getElementById('f-desc').value      = obj.desc      || '';
+      // Financials
+      const fin = obj.financials || {};
+      const dyEl = document.getElementById('f-dividendYield');
+      if (dyEl) dyEl.value = obj.dividendYield || '';
+      ['revenue','netIncome','marketCap','peRatio','debtRating'].forEach(k => {
+        const el = document.getElementById('f-' + k);
+        if (el) el.value = fin[k] || '';
+      });
+      // History
+      const histEl = document.getElementById('f-history');
+      if (histEl) histEl.value = (obj.history||[]).map(h => h.year + ' | ' + h.event).join('\n');
       executives = obj.executives?.length
         ? obj.executives
         : [{role:'CEO',name:''},{role:'CFO',name:''}];

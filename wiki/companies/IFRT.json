@@ -27,5 +27,39 @@
       "role": "CTO",
       "name": "Marcus Reid"
     }
+  ],
+  "dividendYield": "0.4%",
+  "financials": {
+    "revenue": "$8.9B",
+    "netIncome": "$2.1B",
+    "marketCap": "$142B",
+    "peRatio": "36x",
+    "debtRating": "AAA"
+  },
+  "history": [
+    {
+      "year": "1995",
+      "event": "Founded in a garage in Rockford Hills by Jonathan Piece and co-founders."
+    },
+    {
+      "year": "2001",
+      "event": "iFruit iMac launch — first consumer hit. Stock triples in 6 months."
+    },
+    {
+      "year": "2007",
+      "event": "Original iFruit Phone unveiled — redefined the smartphone industry."
+    },
+    {
+      "year": "2012",
+      "event": "iFruit Maps catastrophic launch — CEO publicly apologises."
+    },
+    {
+      "year": "2018",
+      "event": "First company in San Andreas to reach $100B market cap."
+    },
+    {
+      "year": "2023",
+      "event": "iFruit AR Glasses announced — pre-orders crash servers."
+    }
   ]
 }
