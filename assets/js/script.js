@@ -173,6 +173,24 @@ function checkNetWorthATH() {
 // ═══════════════════════════════════════════════════════
 // STOCKS DATA
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// ✏️  NEUE FIRMA HINZUFÜGEN — CHECKLISTE
+// ═══════════════════════════════════════════════════════
+//
+// Schritt 1 — STOCKS Array (hier unten):
+//   { ticker:'XXX', name:'Firmenname', sector:'SECTOR', rival:'YYY', basePrice:100.00, vol:0.030 }
+//
+// Schritt 2 — NEWS_EVENTS Array (weiter unten bei den Events):
+//   { msg: 'Schlagzeile über die Firma', impact: 0.15, sector: 'SECTOR' }
+//
+// Schritt 3 — DIVIDEND_RATES (nur bei NEUEM Sektor nötig):
+//   NEUER_SEKTOR: [0.005, '0.5'],
+//
+// Schritt 4 — index.html (nur bei NEUEM Sektor nötig):
+//   <button class="tab" data-sector="NEUER_SEKTOR">NEUER_SEKTOR</button>
+//
+// vol-Richtwerte: 0.018=stabil · 0.030=normal · 0.045=volatil · 0.060=sehr volatil
+// ═══════════════════════════════════════════════════════
 const STOCKS = [
   // ═══════════════ FOOD (10) ═══════════════
   { ticker:'BSTA',  name:'Burgershot',             sector:'FOOD',      rival:'UAAT',  basePrice:45.20,  vol:0.030 },
