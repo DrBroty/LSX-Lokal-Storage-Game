@@ -185,10 +185,18 @@ const STOCKS = [
   { ticker:'BEN',   name:'BeanMachine',             sector:'FOOD',      rival:'BAN',   basePrice:13.20,  vol:0.020 },
   { ticker:'GAS',   name:'GastroBand',              sector:'FOOD',      rival:'PISS',  basePrice:27.50,  vol:0.028 },
   { ticker:'KRP',   name:'Krapea',                  sector:'FOOD',      rival:'CLKB',  basePrice:48.90,  vol:0.030 },
+  { ticker:'SPNK',  name:'Sprunk Beverages',        sector:'FOOD',      rival:'PISS',  basePrice:42.10,  vol:0.028 },
+  { ticker:'EGCHK', name:'EgoChaser Energy',        sector:'FOOD',      rival:'SPNK',  basePrice:18.60,  vol:0.035 },
+  { ticker:'NYKA',  name:'Nuka-Cola LS',            sector:'FOOD',      rival:'SPNK',  basePrice:29.30,  vol:0.030 },
+  { ticker:'JMBJ',  name:'Jumberjack Diner',        sector:'FOOD',      rival:'BSTA',  basePrice:16.40,  vol:0.032 },
 
-  // ═══════════════ PHARMA (2) ═══════════════
+  // ═══════════════ PHARMA (6) ═══════════════
   { ticker:'BPHM',  name:'Betta Pharmaceuticals',   sector:'PHARMA',    rival:'BILK',  basePrice:124.60, vol:0.040 },
   { ticker:'BILK',  name:'Bilkington Research',     sector:'PHARMA',    rival:'BPHM',  basePrice:89.30,  vol:0.040 },
+  { ticker:'HUMNE', name:'Humane Labs',             sector:'PHARMA',    rival:'BPHM',  basePrice:156.40, vol:0.045 },
+  { ticker:'MXMD',  name:'Maze Medical',            sector:'PHARMA',    rival:'BILK',  basePrice:72.30,  vol:0.038 },
+  { ticker:'DRGS',  name:'Dr. Friedlander Health',  sector:'PHARMA',    rival:'MXMD',  basePrice:41.60,  vol:0.042 },
+  { ticker:'ZANK',  name:'Zanku Supplements',       sector:'PHARMA',    rival:'DRGS',  basePrice:19.80,  vol:0.048 },
 
   // ═══════════════ TRANSPORT – Airlines (4) ═══════════════
   { ticker:'FLYUS', name:'FlyUS Airlines',          sector:'TRANSPORT', rival:'AEMU',  basePrice:78.90,  vol:0.035 },
@@ -219,6 +227,20 @@ const STOCKS = [
   { ticker:'MER',   name:'Merryweather Security',   sector:'FINANCE',   rival:'GRU',   basePrice:62.50,  vol:0.030 },
   { ticker:'AUG',   name:'Augury Insurance',        sector:'FINANCE',   rival:'MOR',   basePrice:48.90,  vol:0.030 },
   { ticker:'MOR',   name:'MorsMutual Insurance',    sector:'FINANCE',   rival:'AUG',   basePrice:53.20,  vol:0.030 },
+  { ticker:'FLCA',  name:'Fleeca Bank',             sector:'FINANCE',   rival:'MAZE',  basePrice:142.30, vol:0.022 },
+  { ticker:'BLNE',  name:'Blaine County Savings',   sector:'FINANCE',   rival:'BOL',   basePrice:31.40,  vol:0.032 },
+  { ticker:'LSTR',  name:'Lester Crest Capital',    sector:'FINANCE',   rival:'GRU',   basePrice:24.80,  vol:0.038 },
+  { ticker:'PACP',  name:'Pacific Standard Finance',sector:'FINANCE',   rival:'FLCA',  basePrice:198.60, vol:0.018 },
+  { ticker:'SHRPSH', name:'Shrewsbury Arms',          sector:'RETAIL',    rival:'AMMU',  basePrice:44.20,  vol:0.038 },
+  { ticker:'HLWPNT', name:'Hollow Point Inc.',         sector:'RETAIL',    rival:'SHRPSH',basePrice:31.80,  vol:0.042 },
+  { ticker:'PSTL',   name:'Pistol Pete Firearms',     sector:'RETAIL',    rival:'HLWPNT',basePrice:22.60,  vol:0.045 },
+  { ticker:'MILIT',  name:'Militant Defense Corp.',   sector:'RETAIL',    rival:'MRRWT', basePrice:187.50, vol:0.030 },
+  { ticker:'MRRWT',  name:'Merryweather Arms Div.',   sector:'RETAIL',    rival:'MILIT', basePrice:142.30, vol:0.032 },
+  { ticker:'ROBLQ', name:"Rob's Liquor",            sector:'RETAIL',    rival:'TWNTFR',basePrice:18.90,  vol:0.040 },
+  { ticker:'TWNTFR',name:'24/7 Supermarkt',         sector:'RETAIL',    rival:'ROBLQ', basePrice:31.20,  vol:0.022 },
+  { ticker:'PONSBY',name:'Ponsonbys Fashion',        sector:'RETAIL',    rival:'SUBBN', basePrice:112.80, vol:0.025 },
+  { ticker:'SUBBN', name:'SubUrban Clothing',        sector:'RETAIL',    rival:'PONSBY',basePrice:44.60,  vol:0.028 },
+  { ticker:'BINCO', name:'Binco',                    sector:'RETAIL',    rival:'SUBBN', basePrice:22.10,  vol:0.030 },
 
   // ═══════════════ RETAIL (11) ═══════════════
   { ticker:'DEB',   name:'Debonaire Cigarettes',    sector:'RETAIL',    rival:'REDW',  basePrice:63.70,  vol:0.030 },
@@ -226,7 +248,7 @@ const STOCKS = [
   { ticker:'ARK',   name:'AnimalArk',               sector:'RETAIL',    rival:'MAX',   basePrice:22.40,  vol:0.025 },
   { ticker:'MAX',   name:'MaxRenda',                sector:'RETAIL',    rival:'ARK',   basePrice:24.10,  vol:0.025 },
   { ticker:'VAG',   name:'Vangelico Jewellers',     sector:'RETAIL',    rival:'PONSBY',basePrice:84.60,  vol:0.020 },
-  { ticker:'AMMU',  name:'Ammu-Nation',             sector:'RETAIL',    rival:'',      basePrice:58.40,  vol:0.035 },
+  { ticker:'AMMU',  name:'Ammu-Nation',             sector:'RETAIL',    rival:'SHRPSH',      basePrice:58.40,  vol:0.035 },
   { ticker:'ROBLQ', name:"Rob's Liquor",            sector:'RETAIL',    rival:'TWNTFR',basePrice:18.90,  vol:0.040 },
   { ticker:'TWNTFR',name:'24/7 Supermarkt',         sector:'RETAIL',    rival:'ROBLQ', basePrice:31.20,  vol:0.022 },
   { ticker:'PONSBY',name:'Ponsonbys Fashion',        sector:'RETAIL',    rival:'SUBBN', basePrice:112.80, vol:0.025 },
@@ -237,6 +259,10 @@ const STOCKS = [
   { ticker:'GCD',   name:'Gold Coast Dev.',         sector:'ENERGY',    rival:'BOM',   basePrice:156.30, vol:0.045 },
   { ticker:'BOM',   name:'BobMulét Energy',         sector:'ENERGY',    rival:'GCD',   basePrice:18.70,  vol:0.040 },
   { ticker:'HAF',   name:'Hammerstein & Faust',     sector:'ENERGY',    rival:'',      basePrice:31.40,  vol:0.035 },
+  { ticker:'PVGAS', name:'Paleto Bay Gas & Oil',    sector:'ENERGY',    rival:'GCD',   basePrice:48.70,  vol:0.042 },
+  { ticker:'ALTPL', name:'Alamo Travel Power',      sector:'ENERGY',    rival:'HAF',   basePrice:33.90,  vol:0.038 },
+  { ticker:'SNDR',  name:'Sandy Shores Drilling',   sector:'ENERGY',    rival:'PVGAS', basePrice:27.60,  vol:0.044 },
+  { ticker:'NVRDE', name:'NVerde Renewables',       sector:'ENERGY',    rival:'HAF',   basePrice:88.50,  vol:0.032 },
 
   // ═══════════════ MEDIA – Radio (12) ═══════════════
   { ticker:'RVSL',  name:'Rockford Vandals SL',     sector:'MEDIA',     rival:'WFM',   basePrice:22.10,  vol:0.060 },
@@ -252,9 +278,15 @@ const STOCKS = [
   { ticker:'REBEL', name:'Rebel Radio',             sector:'MEDIA',     rival:'BLSSM', basePrice:7.80,   vol:0.058 },
   { ticker:'SPC',   name:'Space 103.2',             sector:'MEDIA',     rival:'FLYLO', basePrice:13.20,  vol:0.050 },
 
-  // ═══════════════ TECH (2) – Die wichtigsten! ═══════════════
+  // ═══════════════ TECH (8) – Die wichtigsten! ═══════════════
   { ticker:'IFRT',  name:'iFruit Corp.',            sector:'TECH',      rival:'LFI',   basePrice:388.50, vol:0.028 },
   { ticker:'LFI',   name:'Lifeinvader',             sector:'TECH',      rival:'IFRT',  basePrice:12.30,  vol:0.040 },
+  { ticker:'DRNK',  name:'Drone Solutions LS',      sector:'TECH',      rival:'FCDE',  basePrice:44.20,  vol:0.045 },
+  { ticker:'FCDE',  name:'Facade Technologies',     sector:'TECH',      rival:'DRNK',  basePrice:38.60,  vol:0.042 },
+  { ticker:'CHNK',  name:'Cheval Systems',          sector:'TECH',      rival:'IFRT',  basePrice:91.30,  vol:0.038 },
+  { ticker:'WZRD',  name:'Weasel Tech',             sector:'TECH',      rival:'LFI',   basePrice:28.40,  vol:0.050 },
+  { ticker:'VNWD',  name:'Vinewood Digital',        sector:'TECH',      rival:'WZRD',  basePrice:67.80,  vol:0.035 },
+  { ticker:'BSTR',  name:'Badger Comms',            sector:'TECH',      rival:'FCDE',  basePrice:52.10,  vol:0.040 },
 ];
 
 const NEWS_STATIC = [
