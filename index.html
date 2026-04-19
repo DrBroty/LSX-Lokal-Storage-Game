@@ -16,7 +16,7 @@
 <body>
 
 <!-- ═══════════════════════════════════════════════════
-     SKELETON LOADING SCREEN
+     IMPROVEMENT #2 — SKELETON LOADING SCREEN
 ═══════════════════════════════════════════════════ -->
 <div id="skeletonScreen">
   <div class="skeleton-logo">📈 LSX</div>
@@ -66,29 +66,6 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════
-     HISTORY OVERLAY (ersetzt den History-Tab)
-═══════════════════════════════════════════════════ -->
-<div id="historyOverlay" class="history-overlay">
-  <div class="history-overlay-box">
-    <div class="history-overlay-header">
-      <div class="history-overlay-title">📜 TRADE HISTORY</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <select id="historyFilter" class="limit-select">
-          <option value="ALL">ALL</option>
-          <option value="BUY">BUY</option>
-          <option value="SELL">SELL</option>
-          <option value="SHORT">SHORT</option>
-          <option value="COVER">COVER</option>
-        </select>
-        <button id="btnExportCSV" class="btn-sm">⬇ CSV</button>
-        <button id="btnCloseHistory" class="modal-close">✕</button>
-      </div>
-    </div>
-    <div id="tradeHistoryFull" class="history-overlay-content"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
      HEADER
 ═══════════════════════════════════════════════════ -->
 <header>
@@ -112,14 +89,15 @@
   </div>
 
   <div class="header-right">
+    <!-- IMPROVEMENT #3 — kein Inline-Style mehr, CSS-Klasse steuert display -->
     <div id="userBadge">
       <img id="userAvatar" src="" width="28" height="28"
            style="border-radius:50%;vertical-align:middle;">
       <span id="userName" style="font-size:12px;color:var(--dim);"></span>
       <button id="btnLogout" class="btn-sm">LOGOUT</button>
     </div>
-    <button id="btnSave"      class="btn-sm">💾 SAVE</button>
-    <button id="btnHardReset" class="btn-sm btn-danger">🧨 RESET</button>
+    <button id="btnSave"  class="btn-sm">💾 SAVE</button>
+    <button id="btnHardReset" class="btn-sm btn-danger">🧨 HARD RESET</button>
   </div>
 </header>
 
@@ -136,20 +114,45 @@
 <div id="marketSummary" class="market-summary"></div>
 
 <!-- ═══════════════════════════════════════════════════
-     MAIN LAYOUT — permanentes 3-Spalten-Layout
-     Keine Haupt-Tabs mehr
+     B — HAUPT-TABS
+═══════════════════════════════════════════════════ -->
+<div class="main-tabs">
+  <button class="main-tab-btn active" data-tab="market"
+          onclick="switchMainTab('market')">
+    <span class="tab-icon">📊</span>MARKET
+  </button>
+  <button class="main-tab-btn" data-tab="portfolio"
+          onclick="switchMainTab('portfolio')">
+    <span class="tab-icon">📦</span>PORTFOLIO
+  </button>
+  <button class="main-tab-btn" data-tab="orders"
+          onclick="switchMainTab('orders')">
+    <span class="tab-icon">📋</span>ORDERS
+  </button>
+  <button class="main-tab-btn" data-tab="history"
+          onclick="switchMainTab('history')">
+    <span class="tab-icon">📜</span>HISTORY
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN LAYOUT
 ═══════════════════════════════════════════════════ -->
 <div class="app-layout">
 
-  <!-- ══════════════════════════════════════
-       LEFT SIDEBAR — immer sichtbar
-  ══════════════════════════════════════ -->
+  <!-- ── LEFT SIDEBAR ── -->
   <aside class="sidebar-left">
 
     <!-- Net Worth Chart -->
     <div class="sidebar-card">
       <div class="sidebar-label">NET WORTH</div>
       <canvas id="portfolioChart"></canvas>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="sidebar-card">
+      <div class="sidebar-label">SCOREBOARD</div>
+      <div id="scoreGrid" class="score-grid"></div>
     </div>
 
     <!-- Top Movers -->
@@ -161,80 +164,136 @@
       <div id="watchlistEl"></div>
     </div>
 
-    <!-- Scoreboard -->
-    <div class="sidebar-card">
-      <div class="sidebar-label">SCOREBOARD</div>
-      <div id="scoreGrid" class="score-grid"></div>
-    </div>
-
-    <!-- Trade History kompakt (letzte 10) -->
-    <div class="sidebar-card">
-      <div class="sidebar-label-row">
-        <span class="sidebar-label" style="margin-bottom:0;">RECENT TRADES</span>
-        <button id="btnOpenHistory" class="btn-sm" style="font-size:10px;padding:3px 8px;">ALL</button>
-      </div>
-      <div id="tradeHistoryEl"></div>
-    </div>
-
   </aside>
 
-  <!-- ══════════════════════════════════════
-       MAIN CONTENT — Markt
-  ══════════════════════════════════════ -->
+  <!-- ── MAIN CONTENT ── -->
   <main class="main-content">
 
-    <!-- Sector Tabs -->
-    <div id="sectorTabs" class="sector-tabs">
-      <button class="tab active" data-sector="ALL">ALL</button>
-      <button class="tab" data-sector="FOOD">FOOD</button>
-      <button class="tab" data-sector="FINANCE">FINANCE</button>
-      <button class="tab" data-sector="TRANSPORT">TRANSPORT</button>
-      <button class="tab" data-sector="RETAIL">RETAIL</button>
-      <button class="tab" data-sector="ENERGY">ENERGY</button>
-      <button class="tab" data-sector="PHARMA">PHARMA</button>
-      <button class="tab" data-sector="MEDIA">MEDIA</button>
-      <button class="tab" data-sector="TECH">TECH</button>
-    </div>
+    <!-- ══ MARKET SEKTION (default sichtbar) ══ -->
+    <div id="sectionMarket">
 
-    <!-- Search + Heatmap -->
-    <div class="table-controls">
-      <input id="searchInput" class="search-input" type="text"
-             placeholder="🔍 Search ticker or name…">
-      <span id="searchCount" class="search-count"></span>
-      <button id="btnHeatmap" class="btn-sm">🗺 HEATMAP</button>
-    </div>
+      <!-- Sector Tabs -->
+      <div id="sectorTabs" class="sector-tabs">
+        <button class="tab active" data-sector="ALL">ALL</button>
+        <button class="tab" data-sector="FOOD">FOOD</button>
+        <button class="tab" data-sector="FINANCE">FINANCE</button>
+        <button class="tab" data-sector="TRANSPORT">TRANSPORT</button>
+        <button class="tab" data-sector="RETAIL">RETAIL</button>
+        <button class="tab" data-sector="ENERGY">ENERGY</button>
+        <button class="tab" data-sector="PHARMA">PHARMA</button>
+        <button class="tab" data-sector="MEDIA">MEDIA</button>
+        <button class="tab" data-sector="TECH">TECH</button>
+      </div>
 
-    <!-- Stock Table -->
-    <div class="table-wrap" id="tableView">
-      <table class="stock-table">
-        <thead>
-          <tr>
-            <th data-sort="name">STOCK ↕</th>
-            <th>SECTOR</th>
-            <th data-sort="price">PRICE ↕</th>
-            <th data-sort="chg">CHG% ↕</th>
-            <th data-sort="chg24">24H% ↕</th>
-            <th>CHART</th>
-            <th data-sort="held">HELD ↕</th>
-            <th title="Watchlist">☆</th>
-          </tr>
-        </thead>
-        <tbody id="stockTableBody"></tbody>
-      </table>
-    </div>
+      <!-- Search + View Toggle -->
+      <div class="table-controls">
+        <input id="searchInput" class="search-input" type="text"
+               placeholder="🔍 Search ticker or name…">
+        <span id="searchCount" class="search-count"></span>
+        <button id="btnHeatmap" class="btn-sm">🗺 HEATMAP</button>
+      </div>
 
-    <!-- Heatmap -->
-    <div id="heatmapView" class="heatmap-view" style="display:none;"></div>
+      <!-- Stock Table -->
+      <div class="table-wrap" id="tableView">
+        <table class="stock-table">
+          <thead>
+            <tr>
+              <th data-sort="name">STOCK ↕</th>
+              <th>SECTOR</th>
+              <th data-sort="price">PRICE ↕</th>
+              <th data-sort="chg">CHG% ↕</th>
+              <th data-sort="chg24">24H% ↕</th>
+              <th>CHART</th>
+              <th data-sort="held">HELD ↕</th>
+              <th title="Watchlist">☆</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Heatmap View -->
+      <div id="heatmapView" class="heatmap-view" style="display:none;"></div>
+
+      <!-- Trade History -->
+      <div class="sidebar-card" style="margin-top:16px;">
+        <div class="sidebar-label">TRADE HISTORY</div>
+        <div id="tradeHistoryEl"></div>
+      </div>
+
+    </div><!-- /#sectionMarket -->
+
+    <!-- ══ PORTFOLIO SEKTION ══ -->
+    <div id="sectionPortfolio">
+      <div class="portfolio-full">
+
+        <div class="sidebar-card">
+          <div class="sidebar-label">NET WORTH CHART</div>
+          <canvas id="portfolioChartFull" height="160"></canvas>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-label">OPEN POSITIONS</div>
+          <div id="portfolioElFull"></div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-label">SHORT POSITIONS</div>
+          <div id="shortsElFull"></div>
+        </div>
+
+      </div>
+    </div><!-- /#sectionPortfolio -->
+
+    <!-- ══ ORDERS SEKTION ══ -->
+    <div id="sectionOrders">
+      <div class="orders-grid">
+
+        <div class="sidebar-card">
+          <div class="sidebar-label">LIMIT ORDERS</div>
+          <div id="ordersElFull"></div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-label">STOP-LOSSES</div>
+          <div id="stopLossesEl"></div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-label">PRICE ALERTS</div>
+          <div id="priceAlertsEl"></div>
+        </div>
+
+      </div>
+    </div><!-- /#sectionOrders -->
+
+    <!-- ══ HISTORY SEKTION ══ -->
+    <div id="sectionHistory">
+      <!-- Vollständige Trade History (unbegrenzt, mit Filter) -->
+      <div class="sidebar-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="sidebar-label" style="margin-bottom:0;">FULL TRADE HISTORY</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="historyFilter" class="limit-select" style="padding:4px 8px;font-size:11px;">
+              <option value="ALL">ALL</option>
+              <option value="BUY">BUY</option>
+              <option value="SELL">SELL</option>
+              <option value="SHORT">SHORT</option>
+              <option value="COVER">COVER</option>
+            </select>
+            <button id="btnExportCSV" class="btn-sm">⬇ CSV</button>
+          </div>
+        </div>
+        <div id="tradeHistoryFull"></div>
+      </div>
+    </div><!-- /#sectionHistory -->
 
   </main>
 
-  <!-- ══════════════════════════════════════
-       RIGHT SIDEBAR — immer sichtbar
-       Positions · Shorts · Orders · Alerts
-  ══════════════════════════════════════ -->
+  <!-- ── RIGHT SIDEBAR ── -->
   <aside class="sidebar-right">
 
-    <!-- Open Positions (Long) -->
+    <!-- Open Positions -->
     <div class="sidebar-card">
       <div class="sidebar-label">POSITIONS</div>
       <div id="portfolioEl"></div>
@@ -252,21 +311,49 @@
       <div id="ordersEl"></div>
     </div>
 
-    <!-- Stop-Losses -->
-    <div class="sidebar-card">
-      <div class="sidebar-label">STOP-LOSSES</div>
-      <div id="stopLossesEl"></div>
-    </div>
-
-    <!-- Price Alerts -->
-    <div class="sidebar-card">
-      <div class="sidebar-label">PRICE ALERTS</div>
-      <div id="priceAlertsEl"></div>
-    </div>
-
   </aside>
 
 </div><!-- /.app-layout -->
+
+
+<!-- ═══════════════════════════════════════════════════
+     BANKRUPTCY SCREEN
+═══════════════════════════════════════════════════ -->
+<div id="bankruptcyScreen" class="bankruptcy-screen">
+  <div class="bankruptcy-box">
+    <div class="bk-skull">💀</div>
+    <div class="bk-title">BANKRUPT</div>
+    <div class="bk-sub">Your portfolio has been wiped out.</div>
+    <div class="bk-stats">
+      <div class="bk-stat"><span class="bk-lbl">NET WORTH</span><span class="bk-val red" id="bk-networth">—</span></div>
+      <div class="bk-stat"><span class="bk-lbl">TOTAL RETURN</span><span class="bk-val" id="bk-return">—</span></div>
+      <div class="bk-stat"><span class="bk-lbl">TRADES</span><span class="bk-val" id="bk-trades">—</span></div>
+      <div class="bk-stat"><span class="bk-lbl">BEST TRADE</span><span class="bk-val green" id="bk-best">—</span></div>
+      <div class="bk-stat"><span class="bk-lbl">WORST TRADE</span><span class="bk-val red" id="bk-worst">—</span></div>
+      <div class="bk-stat"><span class="bk-lbl">GAME DAYS</span><span class="bk-val" id="bk-days">—</span></div>
+      <div class="bk-stat"><span class="bk-lbl">DIVIDENDS</span><span class="bk-val" id="bk-dividends">—</span></div>
+      <div class="bk-stat"><span class="bk-lbl">FEES PAID</span><span class="bk-val" id="bk-fees">—</span></div>
+    </div>
+    <button id="btnBankruptcyReset" class="bk-btn">🔄 START NEW GAME</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     ACHIEVEMENTS OVERLAY
+═══════════════════════════════════════════════════ -->
+<div id="achievementsOverlay" class="history-overlay">
+  <div class="history-overlay-box">
+    <div class="history-overlay-header">
+      <div class="history-overlay-title">🏆 ACHIEVEMENTS</div>
+      <button id="btnCloseAchievements" class="modal-close">✕</button>
+    </div>
+    <div id="achievementsGrid" class="achievements-grid history-overlay-content"></div>
+  </div>
+</div>
+
+<!-- Achievement Toast -->
+<div id="achievementToast" class="achievement-toast"></div>
 
 <!-- ═══════════════════════════════════════════════════
      STOCK MODAL
@@ -306,7 +393,7 @@
     <!-- ── Stats ──────────────────────────────── -->
     <div id="modalStats" class="modal-stats"></div>
 
-    <!-- ── Status Pills ───────────────────────── -->
+    <!-- ── Active status pills ────────────────── -->
     <div class="modal-status-row">
       <div id="shortStatus"      class="short-status"></div>
       <div id="priceAlertStatus" class="alert-status"></div>
@@ -328,6 +415,7 @@
         <button id="mTabSell" class="trade-tab2">SELL</button>
       </div>
 
+      <!-- Quick-Actions -->
       <div class="modal-quick-actions">
         <div class="quick-actions-label">QUICK BUY</div>
         <div class="quick-btns-row" id="quickBuyBtns"></div>
@@ -335,6 +423,7 @@
         <div class="quick-btns-row" id="quickSellBtns"></div>
       </div>
 
+      <!-- Manuelle Eingabe -->
       <div class="m-qty-row">
         <input id="mQtyInput" class="m-qty-input" type="number" min="1" value="1">
         <div class="m-qty-btns">
@@ -353,13 +442,14 @@
     <!-- ── TAB: SHORT ─────────────────────────── -->
     <div id="mpanelShort" class="modal-panel" style="display:none">
 
+      <!-- Aktuelle Short-Position Status -->
       <div id="shortPosDisplay" class="modal-short-status"></div>
 
       <div class="modal-section" style="margin-top:0;padding-top:0;border-top:none;">
         <div class="section-label">OPEN / ADD SHORT</div>
         <div class="short-row">
           <input id="shortQtyInput" class="m-qty-input" type="number" min="1" value="1" placeholder="Qty">
-          <button id="btnOpenShort" class="btn-sm btn-short">SHORT ▼</button>
+          <button id="btnOpenShort"  class="btn-sm btn-short">SHORT ▼</button>
         </div>
         <div style="font-size:11px;color:var(--dim);margin-top:6px;">
           Collateral: 1:1 · Daily fee: 0.15% · Max: 1.5× cash
@@ -370,7 +460,7 @@
         <div class="section-label">COVER (CLOSE SHORT)</div>
         <div class="short-row">
           <input id="shortCoverQtyInput" class="m-qty-input" type="number" min="1" value="1" placeholder="Qty">
-          <button id="btnCloseShort"    class="btn-sm btn-cover">COVER ▲</button>
+          <button id="btnCloseShort" class="btn-sm btn-cover">COVER ▲</button>
           <button id="btnCloseShortAll" class="btn-sm btn-cover">COVER ALL</button>
         </div>
       </div>
@@ -415,6 +505,7 @@
         <div id="stopLossStatus" class="stop-status"></div>
       </div>
 
+      <!-- Aktive Orders für diesen Ticker -->
       <div class="modal-section">
         <div class="section-label">ACTIVE ORDERS FOR THIS STOCK</div>
         <div id="modalActiveOrders" class="modal-active-orders"></div>
@@ -470,7 +561,7 @@
 
 <!-- ── Legal Footer ── -->
 <div class="legal-footer">
-  <span>© 2026 Los Santos Exchange · Fan project · Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive</span>
+  <span>© 2026 Los Santos Exchange · Fan-Projekt · Kein kommerzieller Zweck</span>
   <span>
     <a href="/privacy.html">Privacy Policy</a>
     &nbsp;·&nbsp;

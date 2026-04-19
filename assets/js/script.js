@@ -203,18 +203,10 @@ const STOCKS = [
   { ticker:'BEN',   name:'BeanMachine',             sector:'FOOD',      rival:'BAN',   basePrice:13.20,  vol:0.020 },
   { ticker:'GAS',   name:'GastroBand',              sector:'FOOD',      rival:'PISS',  basePrice:27.50,  vol:0.028 },
   { ticker:'KRP',   name:'Krapea',                  sector:'FOOD',      rival:'CLKB',  basePrice:48.90,  vol:0.030 },
-  { ticker:'SPNK',  name:'Sprunk Beverages',        sector:'FOOD',      rival:'PISS',  basePrice:42.10,  vol:0.028 },
-  { ticker:'EGCHK', name:'EgoChaser Energy',        sector:'FOOD',      rival:'SPNK',  basePrice:18.60,  vol:0.035 },
-  { ticker:'NYKA',  name:'Nuka-Cola LS',            sector:'FOOD',      rival:'SPNK',  basePrice:29.30,  vol:0.030 },
-  { ticker:'JMBJ',  name:'Jumberjack Diner',        sector:'FOOD',      rival:'BSTA',  basePrice:16.40,  vol:0.032 },
 
-  // ═══════════════ PHARMA (6) ═══════════════
+  // ═══════════════ PHARMA (2) ═══════════════
   { ticker:'BPHM',  name:'Betta Pharmaceuticals',   sector:'PHARMA',    rival:'BILK',  basePrice:124.60, vol:0.040 },
   { ticker:'BILK',  name:'Bilkington Research',     sector:'PHARMA',    rival:'BPHM',  basePrice:89.30,  vol:0.040 },
-  { ticker:'HUMNE', name:'Humane Labs',             sector:'PHARMA',    rival:'BPHM',  basePrice:156.40, vol:0.045 },
-  { ticker:'MXMD',  name:'Maze Medical',            sector:'PHARMA',    rival:'BILK',  basePrice:72.30,  vol:0.038 },
-  { ticker:'DRGS',  name:'Dr. Friedlander Health',  sector:'PHARMA',    rival:'MXMD',  basePrice:41.60,  vol:0.042 },
-  { ticker:'ZANK',  name:'Zanku Supplements',       sector:'PHARMA',    rival:'DRGS',  basePrice:19.80,  vol:0.048 },
 
   // ═══════════════ TRANSPORT – Airlines (4) ═══════════════
   { ticker:'FLYUS', name:'FlyUS Airlines',          sector:'TRANSPORT', rival:'AEMU',  basePrice:78.90,  vol:0.035 },
@@ -245,10 +237,17 @@ const STOCKS = [
   { ticker:'MER',   name:'Merryweather Security',   sector:'FINANCE',   rival:'GRU',   basePrice:62.50,  vol:0.030 },
   { ticker:'AUG',   name:'Augury Insurance',        sector:'FINANCE',   rival:'MOR',   basePrice:48.90,  vol:0.030 },
   { ticker:'MOR',   name:'MorsMutual Insurance',    sector:'FINANCE',   rival:'AUG',   basePrice:53.20,  vol:0.030 },
-  { ticker:'FLCA',  name:'Fleeca Bank',             sector:'FINANCE',   rival:'MAZE',  basePrice:142.30, vol:0.022 },
-  { ticker:'BLNE',  name:'Blaine County Savings',   sector:'FINANCE',   rival:'BOL',   basePrice:31.40,  vol:0.032 },
-  { ticker:'LSTR',  name:'Lester Crest Capital',    sector:'FINANCE',   rival:'GRU',   basePrice:24.80,  vol:0.038 },
-  { ticker:'PACP',  name:'Pacific Standard Finance',sector:'FINANCE',   rival:'FLCA',  basePrice:198.60, vol:0.018 },
+
+  // ═══════════════ RETAIL (11) ═══════════════
+  { ticker:'DEB',   name:'Debonaire Cigarettes',    sector:'RETAIL',    rival:'REDW',  basePrice:63.70,  vol:0.030 },
+  { ticker:'REDW',  name:'Redwood Cigarettes',      sector:'RETAIL',    rival:'DEB',   basePrice:71.20,  vol:0.030 },
+  { ticker:'ARK',   name:'AnimalArk',               sector:'RETAIL',    rival:'MAX',   basePrice:22.40,  vol:0.025 },
+  { ticker:'MAX',   name:'MaxRenda',                sector:'RETAIL',    rival:'ARK',   basePrice:24.10,  vol:0.025 },
+  { ticker:'VAG',   name:'Vangelico Jewellers',     sector:'RETAIL',    rival:'PONSBY',basePrice:84.60,  vol:0.020 },
+  { ticker:'AMMU',  name:'Ammu-Nation',             sector:'RETAIL',    rival:'SHRPSH',basePrice:58.40,  vol:0.035 },
+
+  // ═══════════════ RETAIL — Waffenhersteller ═══════════════
+  // (im GTA-Stil — manche echt aus dem Spiel, manche inspiriert)
   { ticker:'SHRPSH', name:'Shrewsbury Arms',          sector:'RETAIL',    rival:'AMMU',  basePrice:44.20,  vol:0.038 },
   { ticker:'HLWPNT', name:'Hollow Point Inc.',         sector:'RETAIL',    rival:'SHRPSH',basePrice:31.80,  vol:0.042 },
   { ticker:'PSTL',   name:'Pistol Pete Firearms',     sector:'RETAIL',    rival:'HLWPNT',basePrice:22.60,  vol:0.045 },
@@ -260,27 +259,10 @@ const STOCKS = [
   { ticker:'SUBBN', name:'SubUrban Clothing',        sector:'RETAIL',    rival:'PONSBY',basePrice:44.60,  vol:0.028 },
   { ticker:'BINCO', name:'Binco',                    sector:'RETAIL',    rival:'SUBBN', basePrice:22.10,  vol:0.030 },
 
-  // ═══════════════ RETAIL (11) ═══════════════
-  { ticker:'DEB',   name:'Debonaire Cigarettes',    sector:'RETAIL',    rival:'REDW',  basePrice:63.70,  vol:0.030 },
-  { ticker:'REDW',  name:'Redwood Cigarettes',      sector:'RETAIL',    rival:'DEB',   basePrice:71.20,  vol:0.030 },
-  { ticker:'ARK',   name:'AnimalArk',               sector:'RETAIL',    rival:'MAX',   basePrice:22.40,  vol:0.025 },
-  { ticker:'MAX',   name:'MaxRenda',                sector:'RETAIL',    rival:'ARK',   basePrice:24.10,  vol:0.025 },
-  { ticker:'VAG',   name:'Vangelico Jewellers',     sector:'RETAIL',    rival:'PONSBY',basePrice:84.60,  vol:0.020 },
-  { ticker:'AMMU',  name:'Ammu-Nation',             sector:'RETAIL',    rival:'SHRPSH',      basePrice:58.40,  vol:0.035 },
-  { ticker:'ROBLQ', name:"Rob's Liquor",            sector:'RETAIL',    rival:'TWNTFR',basePrice:18.90,  vol:0.040 },
-  { ticker:'TWNTFR',name:'24/7 Supermarkt',         sector:'RETAIL',    rival:'ROBLQ', basePrice:31.20,  vol:0.022 },
-  { ticker:'PONSBY',name:'Ponsonbys Fashion',        sector:'RETAIL',    rival:'SUBBN', basePrice:112.80, vol:0.025 },
-  { ticker:'SUBBN', name:'SubUrban Clothing',        sector:'RETAIL',    rival:'PONSBY',basePrice:44.60,  vol:0.028 },
-  { ticker:'BINCO', name:'Binco',                    sector:'RETAIL',    rival:'SUBBN', basePrice:22.10,  vol:0.030 },
-
   // ═══════════════ ENERGY (3) ═══════════════
   { ticker:'GCD',   name:'Gold Coast Dev.',         sector:'ENERGY',    rival:'BOM',   basePrice:156.30, vol:0.045 },
   { ticker:'BOM',   name:'BobMulét Energy',         sector:'ENERGY',    rival:'GCD',   basePrice:18.70,  vol:0.040 },
   { ticker:'HAF',   name:'Hammerstein & Faust',     sector:'ENERGY',    rival:'',      basePrice:31.40,  vol:0.035 },
-  { ticker:'PVGAS', name:'Paleto Bay Gas & Oil',    sector:'ENERGY',    rival:'GCD',   basePrice:48.70,  vol:0.042 },
-  { ticker:'ALTPL', name:'Alamo Travel Power',      sector:'ENERGY',    rival:'HAF',   basePrice:33.90,  vol:0.038 },
-  { ticker:'SNDR',  name:'Sandy Shores Drilling',   sector:'ENERGY',    rival:'PVGAS', basePrice:27.60,  vol:0.044 },
-  { ticker:'NVRDE', name:'NVerde Renewables',       sector:'ENERGY',    rival:'HAF',   basePrice:88.50,  vol:0.032 },
 
   // ═══════════════ MEDIA – Radio (12) ═══════════════
   { ticker:'RVSL',  name:'Rockford Vandals SL',     sector:'MEDIA',     rival:'WFM',   basePrice:22.10,  vol:0.060 },
@@ -296,15 +278,41 @@ const STOCKS = [
   { ticker:'REBEL', name:'Rebel Radio',             sector:'MEDIA',     rival:'BLSSM', basePrice:7.80,   vol:0.058 },
   { ticker:'SPC',   name:'Space 103.2',             sector:'MEDIA',     rival:'FLYLO', basePrice:13.20,  vol:0.050 },
 
-  // ═══════════════ TECH (8) – Die wichtigsten! ═══════════════
+  // ═══════════════ TECH (2) – Die wichtigsten! ═══════════════
   { ticker:'IFRT',  name:'iFruit Corp.',            sector:'TECH',      rival:'LFI',   basePrice:388.50, vol:0.028 },
   { ticker:'LFI',   name:'Lifeinvader',             sector:'TECH',      rival:'IFRT',  basePrice:12.30,  vol:0.040 },
+  // ═══════════════ TECH — 6 neue (+2 = 8 gesamt) ═══════════════
   { ticker:'DRNK',  name:'Drone Solutions LS',      sector:'TECH',      rival:'FCDE',  basePrice:44.20,  vol:0.045 },
   { ticker:'FCDE',  name:'Facade Technologies',     sector:'TECH',      rival:'DRNK',  basePrice:38.60,  vol:0.042 },
   { ticker:'CHNK',  name:'Cheval Systems',          sector:'TECH',      rival:'IFRT',  basePrice:91.30,  vol:0.038 },
   { ticker:'WZRD',  name:'Weasel Tech',             sector:'TECH',      rival:'LFI',   basePrice:28.40,  vol:0.050 },
   { ticker:'VNWD',  name:'Vinewood Digital',        sector:'TECH',      rival:'WZRD',  basePrice:67.80,  vol:0.035 },
   { ticker:'BSTR',  name:'Badger Comms',            sector:'TECH',      rival:'FCDE',  basePrice:52.10,  vol:0.040 },
+
+  // ═══════════════ PHARMA — 4 neue (+2 = 6 gesamt) ═══════════════
+  { ticker:'HUMNE', name:'Humane Labs',             sector:'PHARMA',    rival:'BPHM',  basePrice:156.40, vol:0.045 },
+  { ticker:'MXMD',  name:'Maze Medical',            sector:'PHARMA',    rival:'BILK',  basePrice:72.30,  vol:0.038 },
+  { ticker:'DRGS',  name:'Dr. Friedlander Health',  sector:'PHARMA',    rival:'MXMD',  basePrice:41.60,  vol:0.042 },
+  { ticker:'ZANK',  name:'Zanku Supplements',       sector:'PHARMA',    rival:'DRGS',  basePrice:19.80,  vol:0.048 },
+
+  // ═══════════════ ENERGY — 4 neue (+3 = 7 gesamt) ═══════════════
+  { ticker:'PVGAS', name:'Paleto Bay Gas & Oil',    sector:'ENERGY',    rival:'GCD',   basePrice:48.70,  vol:0.042 },
+  { ticker:'ALTPL', name:'Alamo Travel Power',      sector:'ENERGY',    rival:'HAF',   basePrice:33.90,  vol:0.038 },
+  { ticker:'SNDR',  name:'Sandy Shores Drilling',   sector:'ENERGY',    rival:'PVGAS', basePrice:27.60,  vol:0.044 },
+  { ticker:'NVRDE', name:'NVerde Renewables',       sector:'ENERGY',    rival:'HAF',   basePrice:88.50,  vol:0.032 },
+
+  // ═══════════════ FINANCE — 4 neue (+6 = 10 gesamt) ═══════════════
+  { ticker:'FLCA',  name:'Fleeca Bank',             sector:'FINANCE',   rival:'MAZE',  basePrice:142.30, vol:0.022 },
+  { ticker:'BLNE',  name:'Blaine County Savings',   sector:'FINANCE',   rival:'BOL',   basePrice:31.40,  vol:0.032 },
+  { ticker:'LSTR',  name:'Lester Crest Capital',    sector:'FINANCE',   rival:'GRU',   basePrice:24.80,  vol:0.038 },
+  { ticker:'PACP',  name:'Pacific Standard Finance',sector:'FINANCE',   rival:'FLCA',  basePrice:198.60, vol:0.018 },
+
+  // ═══════════════ FOOD — 4 neue (+10 = 14 gesamt) ═══════════════
+  { ticker:'SPNK',  name:'Sprunk Beverages',        sector:'FOOD',      rival:'PISS',  basePrice:42.10,  vol:0.028 },
+  { ticker:'EGCHK', name:'EgoChaser Energy',        sector:'FOOD',      rival:'SPNK',  basePrice:18.60,  vol:0.035 },
+  { ticker:'NYKA',  name:'Nuka-Cola LS',            sector:'FOOD',      rival:'SPNK',  basePrice:29.30,  vol:0.030 },
+  { ticker:'JMBJ',  name:'Jumberjack Diner',        sector:'FOOD',      rival:'BSTA',  basePrice:16.40,  vol:0.032 },
+
 ];
 
 const NEWS_STATIC = [
@@ -397,6 +405,15 @@ const NEWS_EVENTS = [
   { msg: 'New offshore drilling rights approved by SA government',     impact:  0.13, sector: 'ENERGY' },
   { msg: 'Environmental protesters block major LS pipeline',           impact: -0.11, sector: 'ENERGY' },
 
+
+  // ── RETAIL — Waffen ───────────────────────────────────────────
+  { msg: 'San Andreas assault weapons ban collapses in Senate — gun stocks surge', impact:  0.18, sector: 'RETAIL' },
+  { msg: 'Shrewsbury Arms faces mass tort over defective rifle recall',             impact: -0.20, sector: 'RETAIL' },
+  { msg: 'LSPD doubles weapon procurement budget — defense retailers rally',        impact:  0.15, sector: 'RETAIL' },
+  { msg: 'Ammu-Nation robbery spree forces temporary closures across LS',           impact: -0.12, sector: 'RETAIL' },
+  { msg: 'Militant Defense Corp. wins exclusive SA National Guard contract',        impact:  0.22, sector: 'RETAIL' },
+  { msg: 'Hollow Point Inc. CEO arrested — illegal arms trafficking charges',       impact: -0.28, sector: 'RETAIL' },
+
   // ── RETAIL ────────────────────────────────────────────────
   { msg: 'Consumer confidence index hits 5-year high in San Andreas',  impact:  0.12, sector: 'RETAIL' },
   { msg: 'Recession fears cause LS shoppers to cut discretionary spend',impact: -0.11, sector: 'RETAIL' },
@@ -416,6 +433,39 @@ const NEWS_EVENTS = [
   { msg: 'Lifeinvader user data sold to third parties — scandal erupts',  impact:-0.20, sector: 'TECH' },
   { msg: 'iFruit OS update bricks millions of devices',                   impact:-0.12, sector: 'TECH' },
   { msg: 'Lifeinvader monthly active users hit all-time high',            impact: 0.14, sector: 'TECH' },
+  // ── TECH (erweitert) ──────────────────────────────────────────
+  { msg: 'Badger Comms loses 5G contract to rival — shares tank',      impact: -0.14, sector: 'TECH' },
+  { msg: 'Drone Solutions LS lands LSPD surveillance deal',            impact:  0.17, sector: 'TECH' },
+  { msg: 'Facade Technologies IPO analyst coverage initiates BUY',     impact:  0.12, sector: 'TECH' },
+  { msg: 'Vinewood Digital streaming platform hits 10M subscribers',   impact:  0.15, sector: 'TECH' },
+  { msg: 'Weasel Tech social network faces federal privacy probe',      impact: -0.18, sector: 'TECH' },
+  { msg: 'Cheval Systems autonomous vehicle recall issued statewide',   impact: -0.13, sector: 'TECH' },
+
+  // ── PHARMA (erweitert) ────────────────────────────────────────
+  { msg: 'Humane Labs scandal — unauthorized human trials exposed',     impact: -0.22, sector: 'PHARMA' },
+  { msg: 'Zanku Supplements banned — performance-enhancing compounds',  impact: -0.16, sector: 'PHARMA' },
+  { msg: 'Dr. Friedlander Health settles malpractice suit for $200M',   impact: -0.14, sector: 'PHARMA' },
+  { msg: 'Maze Medical wins FDA equivalent approval for new drug',       impact:  0.20, sector: 'PHARMA' },
+  { msg: 'Humane Labs secures LS government biodefense contract',        impact:  0.18, sector: 'PHARMA' },
+
+  // ── ENERGY (erweitert) ────────────────────────────────────────
+  { msg: 'Sandy Shores Drilling hits major new oil reserve',             impact:  0.19, sector: 'ENERGY' },
+  { msg: 'Paleto Bay oil spill triggers state environmental inquiry',    impact: -0.18, sector: 'ENERGY' },
+  { msg: 'NVerde Renewables secures $500M solar farm contract in SA',    impact:  0.17, sector: 'ENERGY' },
+  { msg: 'Alamo Travel Power grid failure leaves LS blackout for hours', impact: -0.15, sector: 'ENERGY' },
+
+  // ── FINANCE (erweitert) ───────────────────────────────────────
+  { msg: 'Fleeca Bank branches robbed simultaneously across LS',         impact: -0.20, sector: 'FINANCE' },
+  { msg: 'Pacific Standard Finance acquires rival in $2B deal',          impact:  0.16, sector: 'FINANCE' },
+  { msg: 'Lester Crest Capital flagged by SEC for insider trading',      impact: -0.22, sector: 'FINANCE' },
+  { msg: 'Blaine County Savings collapses — FDIC equivalent steps in',   impact: -0.25, sector: 'FINANCE' },
+
+  // ── FOOD (erweitert) ──────────────────────────────────────────
+  { msg: 'Sprunk Beverages launches new energy drink — market surge',    impact:  0.13, sector: 'FOOD' },
+  { msg: 'EgoChaser Energy drink linked to hospitalisations in LS',      impact: -0.19, sector: 'FOOD' },
+  { msg: 'Jumberjack Diner announces 50 new LS locations',               impact:  0.11, sector: 'FOOD' },
+  { msg: 'Sprunk vs EgoChaser price war hits both margins hard',         impact: -0.10, sector: 'FOOD' },
+
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -528,8 +578,14 @@ function defaultState() {
     },
     lastDividendDay: 0,   // FIX: wird durch totalGameDays ersetzt
     totalGameDays:   0,   // FIX: globaler Spieltag-Zähler für Dividenden
-    lastMilestone: 0,   // ← NEU
+    lastMilestone: 0,
     orderIdSeq: 1,
+    // ── Wirtschaftszyklen ──────────────────────────────
+    marketCycle:     'SIDEWAYS', // 'BULL' | 'BEAR' | 'SIDEWAYS'
+    cycleDay:        0,          // Tage im aktuellen Zyklus
+    // ── Achievements ──────────────────────────────────
+    achievements:    {},         // { id: true } wenn freigeschaltet
+    achievementLog:  [],         // [ { id, time } ] Chronik
   };
 }
 
@@ -573,7 +629,8 @@ function simulateTick(n = 1) {
       // Mean-Reversion: zieht Kurs zurück zum basePrice wenn zu weit abgedriftet
       const distanceFromBase = (old - s.basePrice) / s.basePrice;
       const reversionForce   = -distanceFromBase * 0.015; // sanfte Rückzugskraft
-      const drift = (Math.random() - 0.495) * s.vol * dayMod * 0.65 + reversionForce;
+      const cycleDrift = getCycleDrift();
+      const drift = (Math.random() - 0.495) * s.vol * dayMod * 0.65 + reversionForce + cycleDrift;
       // Price Floor: mindestens 10% des basePrice (kein $1-Penny-Stock)
       const priceFloor = s.basePrice * 0.10;
       const np = Math.max(priceFloor, +(old * (1 + drift)).toFixed(2));
@@ -609,7 +666,9 @@ function simulateTick(n = 1) {
         state.gameDayOfMonth = 1;
         state.gameMonth = (state.gameMonth + 1) % 12;
       }
-      checkShortFees(); // Leihgebühr einmal täglich
+      checkShortFees();    // Leihgebühr einmal täglich
+      checkMarketCycle();  // Wirtschaftszyklus prüfen
+      checkMarginCalls();  // Margin Calls für Shorts
     }
   }
 
@@ -626,6 +685,8 @@ function simulateTick(n = 1) {
   checkShortStopLosses();  
   checkMilestone();
   checkNetWorthATH();
+  checkAchievements();
+  checkBankruptcy();
   renderAll();
 }
 
@@ -659,6 +720,7 @@ function renderAll() {
   if (heatmapMode) renderHeatmap();
   // FIX #2 (Tab-Sektionen): Tab-spezifische Elemente mitrendern
   renderTabSections();
+  renderAchievements();
   updateHeader();
   updateGameTime();
   if (modalTicker) refreshModal();
@@ -1098,12 +1160,19 @@ function renderMarketSummary() {
   });
 
   const avgChg   = totalChg / STOCKS.length;
-  const sentiment = avgChg > 0.5 ? '🐂 BULL' : avgChg < -0.5 ? '🐻 BEAR' : '➡ NEUTRAL';
+  const cycle      = state.marketCycle || 'SIDEWAYS';
+  const cycleStr   = `${CYCLE_EMOJI[cycle]} ${cycle}`;
+  const sentiment  = avgChg > 0.5 ? '🐂 BULL' : avgChg < -0.5 ? '🐻 BEAR' : '➡ NEUTRAL';
   const sentCol   = avgChg > 0.5 ? 'var(--green)' : avgChg < -0.5 ? 'var(--red)' : 'var(--dim)';
 
   el.innerHTML = `
     <div class="ms-item">
-      <span class="ms-label">MARKET</span>
+      <span class="ms-label">CYCLE</span>
+      <span class="ms-val" style="color:${CYCLE_COLORS[cycle]}">${cycleStr}</span>
+    </div>
+    <div class="ms-divider"></div>
+    <div class="ms-item">
+      <span class="ms-label">SENTIMENT</span>
       <span class="ms-val" style="color:${sentCol}">${sentiment}</span>
     </div>
     <div class="ms-divider"></div>
@@ -1602,6 +1671,11 @@ function calcFee(total) {
 // TRADING
 // ═══════════════════════════════════════════════════════
 function executeTrade(ticker, mode, qty) {
+  // Market Hours Check
+  if (!isMarketOpen()) {
+    showToast(`🔒 Market closed · Open Mon–Fri 09:00–17:00`, true);
+    return false;
+  }
   const price = state.prices[ticker];
   const total = qty * price;
   const fee   = calcFee(total);
@@ -1700,6 +1774,10 @@ function executeTrade(ticker, mode, qty) {
 // SHORT SELLING
 // ═══════════════════════════════════════════════════════
 function openShort(ticker, qty) {
+  if (!isMarketOpen()) {
+    showToast(`🔒 Market closed · Open Mon–Fri 09:00–17:00`, true);
+    return false;
+  }
   const price      = state.prices[ticker];
   const total      = qty * price;
   const fee        = calcFee(total);
@@ -1997,9 +2075,8 @@ function fireNewsEvent() {
  
   pendingNewsEvent = { ticker: s.ticker, stockObj: s, eventObj: ev };
  
-  const label = ev.sector
-    ? `[${ev.sector}] ${s.name}: ${ev.msg}`
-    : `${s.name}: ${ev.msg}`;
+  // FIX: Sektor-Badge wird separat in showNewsToast gerendert
+  const label = `${s.name}: ${ev.msg}`;
  
   showNewsToast(s.ticker, label, ev.impact, ev.sector);
  
@@ -2322,6 +2399,10 @@ async function checkLogin() {
       if (!state.priceAlerts)     state.priceAlerts     = {};
       if (state.lastDividendDay  === undefined) state.lastDividendDay  = 0;
       if (state.totalGameDays    === undefined) state.totalGameDays    = 0;
+      if (!state.achievements)  state.achievements  = {};
+      if (!state.achievementLog) state.achievementLog = [];
+      if (!state.marketCycle)   state.marketCycle   = 'SIDEWAYS';
+      if (state.cycleDay === undefined) state.cycleDay = 0;
 
       state.stats = mergeStats(state.stats, base.stats);
 
@@ -2514,6 +2595,35 @@ document.getElementById('btnWatch').addEventListener('click', () => {
 });
 
 document.getElementById('btnSave').addEventListener('click', saveGame);
+
+// Leaderboard Score posten
+document.getElementById('btnLeaderboard')?.addEventListener('click', postLeaderboard);
+
+// Achievements Overlay
+document.getElementById('btnAchievements')?.addEventListener('click', () => {
+  renderAchievements();
+  document.getElementById('achievementsOverlay').classList.add('open');
+});
+document.getElementById('btnCloseAchievements')?.addEventListener('click', () => {
+  document.getElementById('achievementsOverlay').classList.remove('open');
+});
+document.getElementById('achievementsOverlay')?.addEventListener('click', e => {
+  if (e.target === document.getElementById('achievementsOverlay'))
+    document.getElementById('achievementsOverlay').classList.remove('open');
+});
+
+// Bankruptcy New Game
+document.getElementById('btnBankruptcyReset')?.addEventListener('click', async () => {
+  document.getElementById('bankruptcyScreen').classList.remove('open');
+  bankruptcyShown = false;
+  stopTimers();
+  await fetch(API + '/save.php', {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+    body: JSON.stringify({ ...defaultState(), _hardReset: true }),
+  });
+  location.reload();
+});
 
 document.getElementById('btnHardReset').addEventListener('click', async () => {
   const ok = await showConfirm('🧨', 'Hard Reset', 'Save will be permanently deleted. No undo.');
@@ -2856,6 +2966,243 @@ document.addEventListener('click', e => {
   URL.revokeObjectURL(url);
   showToast('📥 Trades exported as CSV');
 });
+
+
+// ═══════════════════════════════════════════════════════
+// WIRTSCHAFTSZYKLEN
+// ═══════════════════════════════════════════════════════
+const CYCLE_DURATION = 30; // Spieltage pro Zyklus
+const CYCLE_DRIFT = {
+  BULL:     +0.003,  // leicht positiver Drift
+  BEAR:     -0.003,  // leicht negativer Drift
+  SIDEWAYS:  0,
+};
+const CYCLE_COLORS = { BULL: 'var(--green)', BEAR: 'var(--red)', SIDEWAYS: 'var(--dim)' };
+const CYCLE_EMOJI  = { BULL: '🐂', BEAR: '🐻', SIDEWAYS: '➡' };
+
+function checkMarketCycle() {
+  state.cycleDay = (state.cycleDay || 0) + 1;
+  if (state.cycleDay >= CYCLE_DURATION) {
+    state.cycleDay = 0;
+    const cycles = ['BULL','BEAR','SIDEWAYS'];
+    // Wähle anderen Zyklus als aktuellen
+    const options = cycles.filter(c => c !== state.marketCycle);
+    const prev = state.marketCycle;
+    state.marketCycle = options[Math.floor(Math.random() * options.length)];
+    showToast(`📊 Market cycle changed: ${prev} → ${state.marketCycle}`);
+    sendDiscordWebhook({
+      title:       `📊 Marktzyklus: ${CYCLE_EMOJI[state.marketCycle]} ${state.marketCycle}`,
+      description: `Der Markt wechselt von **${prev}** zu **${state.marketCycle}**.`,
+      color:       state.marketCycle === 'BULL' ? 0x00ff88 : state.marketCycle === 'BEAR' ? 0xff3355 : 0x6b7a99,
+      footer:      { text: gameTimeStr() },
+      timestamp:   new Date().toISOString(),
+    });
+  }
+}
+
+// Drift im simulateTick anwenden — wird in renderMarketSummary gezeigt
+function getCycleDrift() {
+  return CYCLE_DRIFT[state.marketCycle || 'SIDEWAYS'];
+}
+
+// ═══════════════════════════════════════════════════════
+// MARGIN CALL
+// ═══════════════════════════════════════════════════════
+function checkMarginCalls() {
+  if (!state.shorts || !Object.keys(state.shorts).length) return;
+  Object.entries(state.shorts).forEach(([ticker, sh]) => {
+    const price   = state.prices[ticker];
+    const loss    = (price - sh.entryPrice) * sh.qty; // positiv = Verlust für Short
+    const collat  = sh.collateral;
+    // Margin Call wenn Verlust > 80% des Collateral
+    if (loss > collat * 0.80) {
+      showToast(`⚠️ MARGIN CALL — ${ticker} Short auto-covered!`, true);
+      closeShort(ticker, sh.qty);
+      sendDiscordWebhook({
+        title:       `🚨 Margin Call — ${ticker}`,
+        description: `Short-Position automatisch geschlossen. Verlust überstieg 80% des Collateral.`,
+        color:       0xff3355,
+        fields: [
+          { name: 'Ticker',     value: ticker,            inline: true },
+          { name: 'Verlust',    value: fmt(loss),         inline: true },
+          { name: 'Collateral', value: fmt(collat),       inline: true },
+        ],
+        footer:    { text: gameTimeStr() },
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// MARKET HOURS
+// ═══════════════════════════════════════════════════════
+function isMarketOpen() {
+  const h   = state.gameHour;
+  const day = state.gameDay;
+  // Wochenende (SAT=5, SUN=6) geschlossen
+  if (day === 5 || day === 6) return false;
+  // Öffnungszeiten 09:00–17:00
+  return h >= 9 && h < 17;
+}
+
+// ═══════════════════════════════════════════════════════
+// BANKRUPTCY
+// ═══════════════════════════════════════════════════════
+let bankruptcyShown = false;
+
+function checkBankruptcy() {
+  if (bankruptcyShown) return;
+  const nw       = getNetWorth();
+  const hasOpen  = Object.keys(state.holdings || {}).length > 0;
+  const hasShort = Object.keys(state.shorts   || {}).length > 0;
+  // Nur Bankrott wenn: Net Worth < $500 UND keine offenen Positionen mehr
+  if (nw < 500 && !hasOpen && !hasShort) {
+    bankruptcyShown = true;
+    stopTimers();
+    showBankruptcyScreen();
+  }
+}
+
+function showBankruptcyScreen() {
+  const nw          = getNetWorth();
+  const totalReturn = ((nw - state.stats.startCash) / state.stats.startCash * 100).toFixed(1);
+  const el          = document.getElementById('bankruptcyScreen');
+  if (!el) return;
+
+  document.getElementById('bk-networth').textContent   = fmt(nw);
+  document.getElementById('bk-return').textContent     = (totalReturn >= 0 ? '+' : '') + totalReturn + '%';
+  document.getElementById('bk-trades').textContent     = state.stats.totalTrades;
+  document.getElementById('bk-best').textContent       = fmt(state.stats.bestTrade);
+  document.getElementById('bk-worst').textContent      = fmt(Math.abs(state.stats.worstTrade));
+  document.getElementById('bk-days').textContent       = state.totalGameDays || 0;
+  document.getElementById('bk-dividends').textContent  = fmt(state.stats.totalDividends);
+  document.getElementById('bk-fees').textContent       = fmt(state.stats.totalFeesPaid);
+
+  el.classList.add('open');
+
+  sendDiscordWebhook({
+    title:       '💀 BANKROTT',
+    description: `Das Portfolio ist auf **${fmt(nw)}** gefallen. Game Over.`,
+    color:       0xff3355,
+    fields: [
+      { name: 'Return',     value: (totalReturn >= 0 ? '+' : '') + totalReturn + '%', inline: true },
+      { name: 'Trades',     value: `${state.stats.totalTrades}`,                      inline: true },
+      { name: 'Spieltage',  value: `${state.totalGameDays || 0}`,                     inline: true },
+    ],
+    footer:    { text: gameTimeStr() },
+    timestamp: new Date().toISOString(),
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ACHIEVEMENTS
+// ═══════════════════════════════════════════════════════
+const ACHIEVEMENT_DEFS = [
+  // Net Worth
+  { id: 'nw_10k',      icon: '💵', title: 'Getting Started',   desc: 'Reach $10,000 net worth',           check: s => getNetWorth() >= 10_000   },
+  { id: 'nw_50k',      icon: '📈', title: 'Moving Up',         desc: 'Reach $50,000 net worth',           check: s => getNetWorth() >= 50_000   },
+  { id: 'nw_100k',     icon: '💰', title: 'Six Figures',       desc: 'Reach $100,000 net worth',          check: s => getNetWorth() >= 100_000  },
+  { id: 'nw_1m',       icon: '🥂', title: 'Millionaire',       desc: 'Reach $1,000,000 net worth',        check: s => getNetWorth() >= 1_000_000},
+  { id: 'nw_10m',      icon: '🏙', title: 'Mogul',             desc: 'Reach $10,000,000 net worth',       check: s => getNetWorth() >= 10_000_000},
+  // Trading
+  { id: 'trade_1',     icon: '🎯', title: 'First Trade',       desc: 'Execute your first trade',          check: s => s.stats.totalTrades >= 1  },
+  { id: 'trade_50',    icon: '📊', title: 'Active Trader',     desc: 'Execute 50 trades',                 check: s => s.stats.totalTrades >= 50 },
+  { id: 'trade_500',   icon: '⚡', title: 'Day Trader',        desc: 'Execute 500 trades',                check: s => s.stats.totalTrades >= 500},
+  { id: 'profit_10k',  icon: '🟢', title: 'In The Green',      desc: 'Realize $10,000 profit in one trade',check: s => s.stats.bestTrade >= 10_000 },
+  { id: 'profit_100k', icon: '💎', title: 'Diamond Hands',     desc: 'Realize $100,000 profit in one trade',check: s => s.stats.bestTrade >= 100_000 },
+  // Shorts
+  { id: 'short_1',     icon: '📉', title: 'Bear Mode',         desc: 'Open your first short',             check: s => s.stats.totalTrades >= 1 && s.tradeLog.some(t => t.mode === 'SHORT') },
+  { id: 'short_win',   icon: '🎯', title: 'Short Squeeze',     desc: 'Close a short with 50%+ gain',      check: s => s.stats.bestTrade > 0 && s.tradeLog.some(t => t.mode === 'COVER' && t.pnl > 0 && t.pnl / (state.prices[t.ticker] * t.qty) > 0.5) },
+  // Portfolio
+  { id: 'div_first',   icon: '💸', title: 'Dividend Day',      desc: 'Receive your first dividend',       check: s => s.stats.totalDividends > 0 },
+  { id: 'div_10k',     icon: '🏦', title: 'Passive Income',    desc: 'Receive $10,000 in dividends',      check: s => s.stats.totalDividends >= 10_000 },
+  { id: 'watchlist_5', icon: '⭐', title: 'Analyst',           desc: 'Add 5 stocks to your watchlist',    check: s => (s.watchlist||[]).length >= 5 },
+  { id: 'days_30',     icon: '📅', title: 'Veteran',           desc: 'Play for 30 game days',             check: s => (s.totalGameDays||0) >= 30 },
+  { id: 'days_100',    icon: '🏆', title: 'Legend',            desc: 'Play for 100 game days',            check: s => (s.totalGameDays||0) >= 100 },
+  { id: 'sector_4',    icon: '🌐', title: 'Diversified',       desc: 'Hold stocks in 4+ sectors',         check: s => {
+    const sectors = new Set(Object.keys(s.holdings).map(t => STOCKS.find(x=>x.ticker===t)?.sector).filter(Boolean));
+    return sectors.size >= 4;
+  }},
+  { id: 'fee_1k',      icon: '💸', title: 'Fee Machine',       desc: 'Pay $1,000 in trading fees',        check: s => s.stats.totalFeesPaid >= 1_000 },
+];
+
+function checkAchievements() {
+  if (!state.achievements) state.achievements = {};
+  if (!state.achievementLog) state.achievementLog = [];
+
+  ACHIEVEMENT_DEFS.forEach(def => {
+    if (state.achievements[def.id]) return; // already unlocked
+    try {
+      if (def.check(state)) {
+        state.achievements[def.id] = true;
+        state.achievementLog.push({ id: def.id, time: gameTimeStr() });
+        showAchievementToast(def);
+      }
+    } catch(e) {}
+  });
+}
+
+function showAchievementToast(def) {
+  const el = document.getElementById('achievementToast');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="font-size:32px">${def.icon}</div>
+      <div>
+        <div style="font-size:10px;letter-spacing:2px;color:var(--gold);font-family:var(--mono);margin-bottom:3px;">ACHIEVEMENT UNLOCKED</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);">${def.title}</div>
+        <div style="font-size:12px;color:var(--dim);">${def.desc}</div>
+      </div>
+    </div>`;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+function renderAchievements() {
+  const el = document.getElementById('achievementsGrid');
+  if (!el) return;
+  el.innerHTML = ACHIEVEMENT_DEFS.map(def => {
+    const unlocked = state.achievements?.[def.id];
+    const logEntry = state.achievementLog?.find(l => l.id === def.id);
+    return `
+      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'}">
+        <div class="ach-icon">${def.icon}</div>
+        <div class="ach-title">${def.title}</div>
+        <div class="ach-desc">${def.desc}</div>
+        ${unlocked && logEntry ? `<div class="ach-time">${logEntry.time}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// LEADERBOARD via Discord Webhook
+// ═══════════════════════════════════════════════════════
+function postLeaderboard() {
+  // Nur eigenen Score posten — kein Backend nötig
+  const nw          = getNetWorth();
+  const totalReturn = ((nw - state.stats.startCash) / state.stats.startCash * 100).toFixed(1);
+  const username    = document.getElementById('userName')?.textContent || 'Anonym';
+
+  sendDiscordWebhook({
+    title:       '🏆 LSX Leaderboard — Score Submitted',
+    description: `**${username}** hat seinen Score eingereicht.`,
+    color:       0xffd700,
+    fields: [
+      { name: 'Net Worth',   value: `**${fmt(nw)}**`,                              inline: true },
+      { name: 'Return',      value: `**${(totalReturn>=0?'+':'')}${totalReturn}%**`, inline: true },
+      { name: 'Trades',      value: `${state.stats.totalTrades}`,                  inline: true },
+      { name: 'Best Trade',  value: fmt(state.stats.bestTrade),                    inline: true },
+      { name: 'Dividends',   value: fmt(state.stats.totalDividends),               inline: true },
+      { name: 'Game Days',   value: `${state.totalGameDays || 0}`,                 inline: true },
+      { name: 'Achievements',value: `${Object.keys(state.achievements||{}).length}/${ACHIEVEMENT_DEFS.length}`, inline: true },
+      { name: 'Cycle',       value: `${CYCLE_EMOJI[state.marketCycle||'SIDEWAYS']} ${state.marketCycle||'SIDEWAYS'}`, inline: true },
+    ],
+    footer:    { text: `LSX Leaderboard · ${new Date().toLocaleString('de-DE')}` },
+    timestamp: new Date().toISOString(),
+  });
+  showToast('🏆 Score auf Discord gepostet!');
+}
 
 // ═══════════════════════════════════════════════════════
 // BOOT
