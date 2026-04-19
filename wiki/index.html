@@ -8,347 +8,122 @@
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:      #040810;
-      --panel:   #080f1e;
-      --panel2:  #0d1628;
-      --border:  rgba(0,212,255,0.12);
-      --accent:  #00d4ff;
-      --green:   #00ff88;
-      --red:     #ff3355;
-      --gold:    #ffd700;
-      --text:    #e8eaf0;
-      --dim:     #6b7a99;
-      --font:    'Rajdhani', sans-serif;
-      --mono:    'Share Tech Mono', monospace;
+      --bg:#040810; --panel:#080f1e; --panel2:#0d1628;
+      --border:rgba(0,212,255,0.12); --accent:#00d4ff;
+      --green:#00ff88; --red:#ff3355; --gold:#ffd700;
+      --text:#e8eaf0; --dim:#6b7a99;
+      --font:'Rajdhani',sans-serif; --mono:'Share Tech Mono',monospace;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 15px;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
 
     /* ── Header ── */
-    header {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(4,8,16,0.96);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 54px;
-    }
-    .header-left { display: flex; align-items: center; gap: 20px; }
-    .logo { font-family: var(--mono); font-size: 17px; color: var(--accent); letter-spacing: 2px; text-decoration: none; }
-    .wiki-badge {
-      background: rgba(255,215,0,0.1);
-      border: 1px solid rgba(255,215,0,0.3);
-      color: var(--gold);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      padding: 3px 9px;
-      border-radius: 3px;
-    }
-    .header-right { display: flex; align-items: center; gap: 12px; }
-    .back-btn {
-      font-family: var(--font); font-weight: 700; font-size: 12px;
-      letter-spacing: 1px; color: var(--dim); text-decoration: none;
-      border: 1px solid var(--border); padding: 6px 14px; border-radius: 4px;
-      transition: all .2s; text-transform: uppercase;
-    }
-    .back-btn:hover { color: var(--accent); border-color: var(--accent); }
+    header{position:sticky;top:0;z-index:200;background:rgba(4,8,16,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:54px}
+    .header-left{display:flex;align-items:center;gap:16px}
+    .logo{font-family:var(--mono);font-size:17px;color:var(--accent);letter-spacing:2px;text-decoration:none}
+    .wiki-badge{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);color:var(--gold);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:3px 9px;border-radius:3px}
+    .header-right{display:flex;align-items:center;gap:10px}
+    .hdr-search{background:rgba(0,212,255,0.05);border:1px solid var(--border);border-radius:6px;padding:7px 14px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;width:220px;transition:border-color .2s}
+    .hdr-search:focus{border-color:rgba(0,212,255,0.4)}
+    .btn-link{font-family:var(--font);font-weight:700;font-size:12px;letter-spacing:1px;color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:4px;transition:all .2s;text-transform:uppercase;cursor:pointer;background:none}
+    .btn-link:hover{color:var(--accent);border-color:var(--accent)}
+    .btn-gold{border-color:rgba(255,215,0,0.3);color:var(--gold)}
+    .btn-gold:hover{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,0.05)}
 
     /* ── Layout ── */
-    .layout {
-      position: relative; z-index: 1;
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      min-height: calc(100vh - 54px);
-    }
-
-    /* ── Sidebar ── */
-    nav {
-      position: sticky; top: 54px;
-      height: calc(100vh - 54px);
-      overflow-y: auto;
-      border-right: 1px solid var(--border);
-      background: rgba(8,15,30,0.6);
-      padding: 20px 0;
-    }
-    nav::-webkit-scrollbar { width: 4px; }
-    nav::-webkit-scrollbar-track { background: transparent; }
-    nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .nav-search {
-      margin: 0 14px 16px;
-      padding: 8px 12px;
-      background: rgba(0,212,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 12px;
-      width: calc(100% - 28px);
-      outline: none;
-    }
-    .nav-search::placeholder { color: var(--dim); }
-    .nav-search:focus { border-color: rgba(0,212,255,0.4); }
-
-    .nav-sector {
-      padding: 6px 14px 4px;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 2px;
-      color: var(--dim);
-      text-transform: uppercase;
-      margin-top: 8px;
-    }
-
-    .nav-item {
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 14px;
-      cursor: pointer;
-      transition: background .15s;
-      border-left: 2px solid transparent;
-      font-size: 13px;
-    }
-    .nav-item:hover { background: rgba(0,212,255,0.05); }
-    .nav-item.active {
-      background: rgba(0,212,255,0.08);
-      border-left-color: var(--accent);
-      color: var(--accent);
-    }
-    .nav-ticker {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--accent);
-      min-width: 52px;
-    }
-    .nav-item.active .nav-ticker { color: var(--accent); }
-    .nav-name { color: var(--dim); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .nav-item.active .nav-name { color: var(--text); }
+    .layout{position:relative;z-index:1;display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 54px)}
+    nav{position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;border-right:1px solid var(--border);background:rgba(8,15,30,0.6);padding:16px 0}
+    nav::-webkit-scrollbar{width:3px}
+    nav::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .nav-search{margin:0 12px 14px;padding:7px 12px;background:rgba(0,212,255,0.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;width:calc(100% - 24px);outline:none}
+    .nav-search:focus{border-color:rgba(0,212,255,0.4)}
+    .nav-sector-label{padding:8px 12px 4px;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-top:6px}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:5px 12px;cursor:pointer;border-left:2px solid transparent;transition:background .15s}
+    .nav-item:hover{background:rgba(0,212,255,0.05)}
+    .nav-item.active{background:rgba(0,212,255,0.08);border-left-color:var(--accent)}
+    .nav-ticker{font-family:var(--mono);font-size:11px;color:var(--accent);min-width:50px}
+    .nav-name{color:var(--dim);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
     /* ── Main ── */
-    main {
-      padding: 40px 48px;
-      max-width: 960px;
-    }
+    main{padding:36px 44px;max-width:1000px}
 
     /* ── Hero ── */
-    .wiki-hero {
-      margin-bottom: 48px;
-      padding-bottom: 32px;
-      border-bottom: 1px solid var(--border);
-    }
-    .wiki-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; color: var(--gold); margin-bottom: 10px; }
-    .wiki-hero h1 { font-size: 48px; font-weight: 700; letter-spacing: 3px; color: var(--text); line-height: 1; margin-bottom: 14px; }
-    .wiki-hero p { color: var(--dim); font-size: 15px; max-width: 600px; }
-    .wiki-stats {
-      display: flex; gap: 32px; margin-top: 24px;
-    }
-    .wiki-stat { }
-    .wiki-stat-val { font-family: var(--mono); font-size: 28px; color: var(--accent); font-weight: 700; }
-    .wiki-stat-lbl { font-size: 11px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-top: 2px; }
+    .hero{margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+    .hero-tag{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
+    .hero h1{font-size:44px;font-weight:700;letter-spacing:3px;line-height:1;margin-bottom:12px}
+    .hero p{color:var(--dim);font-size:14px;max-width:560px}
+    .hero-stats{display:flex;gap:28px;margin-top:20px}
+    .hero-stat-val{font-family:var(--mono);font-size:26px;color:var(--accent);font-weight:700}
+    .hero-stat-lbl{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-top:2px}
 
-    /* ── Sector Filter ── */
-    .sector-bar {
-      display: flex; gap: 6px; flex-wrap: wrap;
-      margin-bottom: 32px;
-    }
-    .sector-btn {
-      padding: 5px 14px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      color: var(--dim);
-      font-family: var(--font);
-      font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all .2s;
-      text-transform: uppercase;
-    }
-    .sector-btn:hover { border-color: rgba(0,212,255,0.4); color: var(--text); }
-    .sector-btn.active { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+    /* ── Sector bar ── */
+    .sector-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px}
+    .sec-btn{padding:4px 13px;background:transparent;border:1px solid var(--border);border-radius:20px;color:var(--dim);font-family:var(--font);font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+    .sec-btn:hover{border-color:rgba(0,212,255,0.4);color:var(--text)}
+    .sec-btn.active{background:rgba(0,212,255,0.1);border-color:var(--accent);color:var(--accent)}
+
+    /* ── Loading ── */
+    .loading{text-align:center;padding:80px;color:var(--dim);font-family:var(--mono);font-size:13px}
+    .spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .no-results{text-align:center;padding:60px;color:var(--dim);font-family:var(--mono);font-size:13px;display:none}
 
     /* ── Company Card ── */
-    .company-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 28px 32px;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color .2s;
-      scroll-margin-top: 80px;
-    }
-    .company-card:hover { border-color: rgba(0,212,255,0.25); }
-    .company-card::before {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 120px; height: 120px;
-      background: radial-gradient(circle at top right, rgba(0,212,255,0.04), transparent 70%);
-      pointer-events: none;
-    }
+    .company-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:18px;position:relative;overflow:hidden;transition:border-color .2s;scroll-margin-top:74px}
+    .company-card:hover{border-color:rgba(0,212,255,0.22)}
+    .company-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+    .company-card[data-sector="FOOD"]::before      {background:linear-gradient(90deg,#ff9800,transparent)}
+    .company-card[data-sector="FINANCE"]::before   {background:linear-gradient(90deg,#00ff88,transparent)}
+    .company-card[data-sector="TECH"]::before      {background:linear-gradient(90deg,#00d4ff,transparent)}
+    .company-card[data-sector="TRANSPORT"]::before {background:linear-gradient(90deg,#aa88ff,transparent)}
+    .company-card[data-sector="RETAIL"]::before    {background:linear-gradient(90deg,#ff3355,transparent)}
+    .company-card[data-sector="ENERGY"]::before    {background:linear-gradient(90deg,#ffd700,transparent)}
+    .company-card[data-sector="PHARMA"]::before    {background:linear-gradient(90deg,#00ffcc,transparent)}
+    .company-card[data-sector="MEDIA"]::before     {background:linear-gradient(90deg,#ff66aa,transparent)}
+    .company-card.hidden{display:none}
 
-    /* Sector color accent line */
-    .company-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 3px;
-    }
-    .company-card[data-sector="FOOD"]::after      { background: linear-gradient(90deg, #ff9800, transparent); }
-    .company-card[data-sector="FINANCE"]::after   { background: linear-gradient(90deg, #00ff88, transparent); }
-    .company-card[data-sector="TECH"]::after      { background: linear-gradient(90deg, #00d4ff, transparent); }
-    .company-card[data-sector="TRANSPORT"]::after { background: linear-gradient(90deg, #aa88ff, transparent); }
-    .company-card[data-sector="RETAIL"]::after    { background: linear-gradient(90deg, #ff3355, transparent); }
-    .company-card[data-sector="ENERGY"]::after    { background: linear-gradient(90deg, #ffd700, transparent); }
-    .company-card[data-sector="PHARMA"]::after    { background: linear-gradient(90deg, #00ffcc, transparent); }
-    .company-card[data-sector="MEDIA"]::after     { background: linear-gradient(90deg, #ff66aa, transparent); }
+    .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+    .card-tl{}
+    .card-ticker-row{display:flex;align-items:center;gap:10px;margin-bottom:3px}
+    .card-ticker{font-family:var(--mono);font-size:21px;font-weight:700;color:var(--accent)}
+    .card-sector-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;padding:3px 8px;border-radius:3px;text-transform:uppercase}
+    .badge-FOOD      {background:rgba(255,152,0,.12);color:#ff9800;border:1px solid rgba(255,152,0,.3)}
+    .badge-FINANCE   {background:rgba(0,255,136,.10);color:#00ff88;border:1px solid rgba(0,255,136,.3)}
+    .badge-TECH      {background:rgba(0,212,255,.10);color:#00d4ff;border:1px solid rgba(0,212,255,.3)}
+    .badge-TRANSPORT {background:rgba(170,136,255,.10);color:#aa88ff;border:1px solid rgba(170,136,255,.3)}
+    .badge-RETAIL    {background:rgba(255,51,85,.10);color:#ff3355;border:1px solid rgba(255,51,85,.3)}
+    .badge-ENERGY    {background:rgba(255,215,0,.10);color:#ffd700;border:1px solid rgba(255,215,0,.3)}
+    .badge-PHARMA    {background:rgba(0,255,204,.10);color:#00ffcc;border:1px solid rgba(0,255,204,.3)}
+    .badge-MEDIA     {background:rgba(255,102,170,.10);color:#ff66aa;border:1px solid rgba(255,102,170,.3)}
+    .card-name{font-size:22px;font-weight:700;color:var(--text)}
+    .card-tagline{font-size:13px;color:var(--dim);font-style:italic;margin-top:2px}
+    .card-price-box{text-align:right;background:rgba(0,212,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:120px;flex-shrink:0}
+    .card-price{font-family:var(--mono);font-size:20px;color:var(--green);font-weight:700}
+    .card-price-lbl{font-size:10px;letter-spacing:1px;color:var(--dim);margin-top:2px}
+    .vol-indicator{margin-top:6px;font-size:10px;color:var(--dim)}
 
-    .card-header {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      gap: 16px; margin-bottom: 16px;
-    }
-    .card-header-left { flex: 1; }
-    .card-ticker-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .card-ticker {
-      font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    .card-sector {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      padding: 3px 9px;
-      border-radius: 3px;
-      text-transform: uppercase;
-    }
-    .sector-FOOD      { background: rgba(255,152,0,0.12);    color: #ff9800;    border: 1px solid rgba(255,152,0,0.3); }
-    .sector-FINANCE   { background: rgba(0,255,136,0.10);    color: #00ff88;    border: 1px solid rgba(0,255,136,0.3); }
-    .sector-TECH      { background: rgba(0,212,255,0.10);    color: #00d4ff;    border: 1px solid rgba(0,212,255,0.3); }
-    .sector-TRANSPORT { background: rgba(170,136,255,0.10);  color: #aa88ff;    border: 1px solid rgba(170,136,255,0.3); }
-    .sector-RETAIL    { background: rgba(255,51,85,0.10);    color: #ff3355;    border: 1px solid rgba(255,51,85,0.3); }
-    .sector-ENERGY    { background: rgba(255,215,0,0.10);    color: #ffd700;    border: 1px solid rgba(255,215,0,0.3); }
-    .sector-PHARMA    { background: rgba(0,255,204,0.10);    color: #00ffcc;    border: 1px solid rgba(0,255,204,0.3); }
-    .sector-MEDIA     { background: rgba(255,102,170,0.10);  color: #ff66aa;    border: 1px solid rgba(255,102,170,0.3); }
+    .card-desc{color:var(--dim);font-size:14px;line-height:1.7;margin-bottom:18px}
 
-    .card-name { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
-    .card-tagline { font-size: 13px; color: var(--dim); margin-top: 3px; font-style: italic; }
+    .card-mgmt{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-bottom:18px}
+    .mgmt-item{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:9px 13px}
+    .mgmt-role{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--dim)}
+    .mgmt-name{font-size:13px;font-weight:700;color:var(--text);margin-top:2px}
 
-    .card-price-box {
-      text-align: right;
-      background: rgba(0,212,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 18px;
-      min-width: 130px;
-    }
-    .card-price { font-family: var(--mono); font-size: 22px; color: var(--green); font-weight: 700; }
-    .card-price-lbl { font-size: 10px; letter-spacing: 1.5px; color: var(--dim); margin-top: 2px; }
-    .card-vol-lbl { font-size: 10px; color: var(--dim); margin-top: 4px; }
-    .vol-low    { color: #00ff88; }
-    .vol-mid    { color: #ffd700; }
-    .vol-high   { color: #ff9800; }
-    .vol-veryhigh { color: #ff3355; }
+    .card-stats{display:flex;gap:0;background:var(--panel2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .card-stat{flex:1;padding:10px 14px;border-right:1px solid var(--border);text-align:center}
+    .card-stat:last-child{border-right:none}
+    .stat-val{font-family:var(--mono);font-size:13px;color:var(--text);font-weight:700}
+    .stat-lbl{font-size:10px;letter-spacing:1px;color:var(--dim);margin-top:2px;text-transform:uppercase}
+    .rival-link{color:var(--accent);cursor:pointer;text-decoration:underline}
+    .rival-link:hover{color:var(--gold)}
 
-    /* Description */
-    .card-desc { color: var(--dim); font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+    /* footer */
+    footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 44px;display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--dim)}
+    footer a{color:var(--dim);text-decoration:none}
+    footer a:hover{color:var(--accent)}
 
-    /* Management */
-    .card-mgmt {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .mgmt-item {
-      background: var(--panel2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 14px;
-    }
-    .mgmt-role { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--dim); }
-    .mgmt-name { font-size: 14px; font-weight: 700; color: var(--text); margin-top: 3px; }
-
-    /* Stats row */
-    .card-stats {
-      display: flex; gap: 0;
-      background: var(--panel2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .card-stat {
-      flex: 1;
-      padding: 12px 16px;
-      border-right: 1px solid var(--border);
-      text-align: center;
-    }
-    .card-stat:last-child { border-right: none; }
-    .card-stat-val { font-family: var(--mono); font-size: 14px; color: var(--text); font-weight: 700; }
-    .card-stat-lbl { font-size: 10px; letter-spacing: 1px; color: var(--dim); margin-top: 3px; text-transform: uppercase; }
-    .rival-link { color: var(--accent); cursor: pointer; text-decoration: underline; }
-    .rival-link:hover { color: var(--gold); }
-
-    /* Volatility bar */
-    .vol-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
-    .vol-bar {
-      flex: 1; height: 4px; background: rgba(255,255,255,0.06);
-      border-radius: 2px; overflow: hidden;
-    }
-    .vol-bar-fill { height: 100%; border-radius: 2px; }
-
-    /* Hidden cards */
-    .company-card.hidden { display: none; }
-
-    /* No results */
-    .no-results {
-      text-align: center; padding: 80px 40px;
-      color: var(--dim); font-family: var(--mono);
-      font-size: 14px; display: none;
-    }
-
-    /* Footer */
-    footer {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border);
-      padding: 20px 48px;
-      display: flex; align-items: center; justify-content: space-between;
-      font-family: var(--mono); font-size: 11px; color: var(--dim);
-    }
-    footer a { color: var(--dim); text-decoration: none; }
-    footer a:hover { color: var(--accent); }
-
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-      nav { display: none; }
-      main { padding: 24px 20px; }
-    }
+    @media(max-width:860px){.layout{grid-template-columns:1fr}nav{display:none}main{padding:20px 16px}}
   </style>
 </head>
 <body>
@@ -359,1263 +134,247 @@
     <span class="wiki-badge">WIKI</span>
   </div>
   <div class="header-right">
-    <input type="text" id="globalSearch" placeholder="🔍 Search company, ticker..." style="
-      background: rgba(0,212,255,0.05); border: 1px solid var(--border);
-      border-radius: 6px; padding: 7px 14px; color: var(--text);
-      font-family: var(--mono); font-size: 12px; outline: none;
-      width: 240px; transition: border-color .2s;
-    " onfocus="this.style.borderColor='rgba(0,212,255,0.4)'" onblur="this.style.borderColor='rgba(0,212,255,0.12)'">
-    <a href="https://los-santos-exchange.de" class="back-btn">← Zum Spiel</a>
+    <input class="hdr-search" type="text" id="globalSearch" placeholder="🔍 Search...">
+    <a href="generator.html" class="btn-link btn-gold">+ ADD COMPANY</a>
+    <a href="https://los-santos-exchange.de" class="btn-link">← Play LSX</a>
   </div>
 </header>
 
 <div class="layout">
-
-  <!-- ── Sidebar Navigation ── -->
-  <nav id="sideNav">
-    <input class="nav-search" type="text" id="navSearch" placeholder="Filter companies...">
+  <nav>
+    <input class="nav-search" id="navSearch" type="text" placeholder="Filter...">
     <div id="navList"></div>
   </nav>
 
-  <!-- ── Main Content ── -->
   <main>
-
-    <!-- Hero -->
-    <div class="wiki-hero">
-      <div class="wiki-tag">LSX · WIKI · COMPANY DATABASE</div>
+    <div class="hero">
+      <div class="hero-tag">LSX · WIKI · COMPANY DATABASE</div>
       <h1>Market<br>Intelligence</h1>
-      <p>Complete profiles for every company listed on the Los Santos Exchange. Executive teams, business descriptions, market positions and rival analysis.</p>
-      <div class="wiki-stats">
-        <div class="wiki-stat">
-          <div class="wiki-stat-val" id="statCompanies">92</div>
-          <div class="wiki-stat-lbl">Listed Companies</div>
+      <p>Complete profiles for every company listed on the Los Santos Exchange. Executive teams, business descriptions and rival analysis.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-val" id="statCount">—</div>
+          <div class="hero-stat-lbl">Companies</div>
         </div>
-        <div class="wiki-stat">
-          <div class="wiki-stat-val">8</div>
-          <div class="wiki-stat-lbl">Sectors</div>
+        <div>
+          <div class="hero-stat-val">8</div>
+          <div class="hero-stat-lbl">Sectors</div>
         </div>
-        <div class="wiki-stat">
-          <div class="wiki-stat-val">LSX</div>
-          <div class="wiki-stat-lbl">Exchange</div>
+        <div>
+          <div class="hero-stat-val">LSX</div>
+          <div class="hero-stat-lbl">Exchange</div>
         </div>
       </div>
     </div>
 
-    <!-- Sector Filter -->
-    <div class="sector-bar">
-      <button class="sector-btn active" data-sector="ALL" onclick="filterSector('ALL', this)">ALL</button>
-      <button class="sector-btn" data-sector="FOOD" onclick="filterSector('FOOD', this)">🍔 FOOD</button>
-      <button class="sector-btn" data-sector="FINANCE" onclick="filterSector('FINANCE', this)">🏦 FINANCE</button>
-      <button class="sector-btn" data-sector="TECH" onclick="filterSector('TECH', this)">💻 TECH</button>
-      <button class="sector-btn" data-sector="TRANSPORT" onclick="filterSector('TRANSPORT', this)">🚗 TRANSPORT</button>
-      <button class="sector-btn" data-sector="RETAIL" onclick="filterSector('RETAIL', this)">🛒 RETAIL</button>
-      <button class="sector-btn" data-sector="ENERGY" onclick="filterSector('ENERGY', this)">⚡ ENERGY</button>
-      <button class="sector-btn" data-sector="PHARMA" onclick="filterSector('PHARMA', this)">💊 PHARMA</button>
-      <button class="sector-btn" data-sector="MEDIA" onclick="filterSector('MEDIA', this)">📻 MEDIA</button>
+    <div class="sector-bar" id="sectorBar">
+      <button class="sec-btn active" data-sector="ALL">ALL</button>
     </div>
 
-    <!-- Company Cards -->
-    <div id="companyList"></div>
-    <div class="no-results" id="noResults">No companies found matching your search.</div>
-
+    <div id="cardList">
+      <div class="loading"><div class="spinner"></div>Loading company data...</div>
+    </div>
+    <div class="no-results" id="noResults">No companies match your search.</div>
   </main>
 </div>
 
 <footer>
-  <span>© 2026 Los Santos Exchange Wiki · All companies are fictional · GTA V assets © Rockstar Games</span>
-  <span>
-    <a href="https://los-santos-exchange.de/privacy.html">Privacy</a> ·
-    <a href="https://los-santos-exchange.de/tos.html">ToS</a> ·
-    <a href="https://los-santos-exchange.de">Play LSX</a>
-  </span>
+  <span>© 2026 Los Santos Exchange Wiki · All companies are fictional · GTA V © Rockstar Games</span>
+  <span><a href="https://los-santos-exchange.de/privacy.html">Privacy</a> · <a href="https://los-santos-exchange.de/tos.html">ToS</a> · <a href="https://los-santos-exchange.de">Play LSX</a></span>
 </footer>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// COMPANY DATABASE
-// ═══════════════════════════════════════════════════════
-const COMPANIES = [
+const SECTOR_EMOJI = {FOOD:'🍔',FINANCE:'🏦',TECH:'💻',TRANSPORT:'🚗',RETAIL:'🛒',ENERGY:'⚡',PHARMA:'💊',MEDIA:'📻'};
+const SECTOR_ORDER = ['FOOD','FINANCE','TECH','TRANSPORT','RETAIL','ENERGY','PHARMA','MEDIA'];
 
-  // ─────────────────────── FOOD ───────────────────────
-  {
-    ticker: 'BSTA', name: 'Burgershot', sector: 'FOOD', rival: 'UAAT', basePrice: 45.20, vol: 0.030,
-    tagline: '"Have It Your Way, Or Else."',
-    desc: 'Burgershot is the undisputed king of fast food in San Andreas. Founded in 1982 in East Los Santos, the chain operates over 1,200 locations across the state, serving its legendary Triple Stack Burger to millions of customers daily. Despite persistent health code violations and several FDA investigations, Burgershot continues to dominate the LS quick-service market through aggressive pricing and relentless advertising. The company recently launched a delivery drone pilot program in Rockford Hills.',
-    executives: [
-      { role: 'CEO', name: 'Chad D. Fullerton' },
-      { role: 'CFO', name: 'Patricia Wentz-Harlow' },
-      { role: 'COO', name: 'Darnell McKnight' },
-      { role: 'CMO', name: 'Stacy Bloom' },
-    ],
-    founded: '1982', employees: '48,000', hq: 'East Los Santos',
-  },
-  {
-    ticker: 'UAAT', name: 'Up-An-Atom', sector: 'FOOD', rival: 'BSTA', basePrice: 38.10, vol: 0.030,
-    tagline: '"Fresh. Fast. Radioactive."',
-    desc: 'Up-An-Atom Burger positions itself as the "healthier" fast food alternative in Los Santos, despite offering largely identical caloric content to its main rival. The chain gained cult status after sponsoring the Rockstar Energy Stunt Race Series and is the official food partner of the Los Santos Dodgers. Known for its neon atom logo and quirky marketing campaigns, Up-An-Atom has aggressively expanded into the Blaine County market.',
-    executives: [
-      { role: 'CEO', name: 'Tina Holbrook' },
-      { role: 'CFO', name: 'Marcus J. Pellegrino' },
-      { role: 'COO', name: 'Devin Rowe-Santos' },
-    ],
-    founded: '1991', employees: '31,500', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'CLKB', name: 'Clucking Bell', sector: 'FOOD', rival: 'TBMB', basePrice: 52.80, vol: 0.025,
-    tagline: '"It\'s The Bell. Cluck Yeah."',
-    desc: 'Clucking Bell is San Andreas\'s premier fried chicken and fast Mexican food chain. With its signature Cluck Sandwich and Burrito Supreme, the company serves the late-night crowd with 24-hour locations across LS. A longstanding rivalry with TacoBomb has resulted in multiple trademark disputes and at least two lobbyist-funded city council hearings. Clucking Bell recently settled a class action over its "Made Fresh Daily" marketing claims.',
-    executives: [
-      { role: 'CEO', name: 'Reginald Fawkes III' },
-      { role: 'CFO', name: 'Anne-Sophie Moreau' },
-      { role: 'CMO', name: 'Troy Upshaw' },
-    ],
-    founded: '1978', employees: '39,200', hq: 'Chamberlain Hills, LS',
-  },
-  {
-    ticker: 'TBMB', name: 'TacoBomb', sector: 'FOOD', rival: 'CLKB', basePrice: 41.50, vol: 0.025,
-    tagline: '"Drop The Bomb On Hunger."',
-    desc: 'TacoBomb exploded onto the San Andreas fast food scene in the 1990s, riding a wave of tex-mex fever to build one of the largest QSR franchises in the state. Their Bombito and Crunch Wrap Supreme have achieved near-legendary status among LS night owls. The company recently acquired three regional taco chains in Sandy Shores and Paleto Bay, expanding its rural footprint significantly.',
-    executives: [
-      { role: 'CEO', name: 'Carlos "Chuck" Ramirez' },
-      { role: 'CFO', name: 'Wendy Park' },
-      { role: 'CDO', name: 'Jamal Brooks' },
-    ],
-    founded: '1994', employees: '27,800', hq: 'La Mesa, LS',
-  },
-  {
-    ticker: 'PISS', name: 'Pisswasser Brewery', sector: 'FOOD', rival: 'LOG', basePrice: 34.50, vol: 0.028,
-    tagline: '"Cold. Cheap. Effective."',
-    desc: 'Pisswasser is San Andreas\'s best-selling domestic beer, brewed in massive industrial facilities near the LS docklands. Despite its provocative name — a proud tribute to its working-class roots — the brand commands fierce loyalty among Blaine County residents and sports fans. The company recently rebranded its premium line as "Pisswasser Reserve" and entered the craft beer market, to mixed reviews.',
-    executives: [
-      { role: 'CEO', name: 'Hans Gerhardt Brösel' },
-      { role: 'CFO', name: 'Linda Voss' },
-      { role: 'Master Brewer', name: 'Otto Kleinfeld' },
-    ],
-    founded: '1962', employees: '8,400', hq: 'Terminal, LS Port',
-  },
-  {
-    ticker: 'LOG', name: 'Logger Beer', sector: 'FOOD', rival: 'PISS', basePrice: 28.80, vol: 0.028,
-    tagline: '"Brewed For The Outdoors."',
-    desc: 'Logger Beer markets itself as the beer of rugged San Andreas — hunters, fishermen, and anyone who works with their hands. Brewed in the foothills of the Alamo Sea region, Logger has a devoted blue-collar fanbase and is the official beer of the Sandy Shores Off-Road Rally. Revenue has slipped slightly as craft beer trends eat into the working-class segment, but Logger\'s loyal demographic keeps churn low.',
-    executives: [
-      { role: 'CEO', name: 'Buck Hartley' },
-      { role: 'CFO', name: 'Rene Dupont-Leblanc' },
-    ],
-    founded: '1957', employees: '4,100', hq: 'Sandy Shores',
-  },
-  {
-    ticker: 'BAN', name: 'CoolBeans Coffee', sector: 'FOOD', rival: 'BEN', basePrice: 15.60, vol: 0.020,
-    tagline: '"Your Morning, Sorted."',
-    desc: 'CoolBeans Coffee is attempting to bring third-wave coffee culture to the streets of Los Santos, with mixed results. The chain operates 340 artisanal coffee shops across LS, each decorated in reclaimed wood and exposed brick. Despite high churn among the Vinewood Hills demographic, CoolBeans has found traction in the Mission Row business district where corporate coffee subscriptions drive stable recurring revenue.',
-    executives: [
-      { role: 'CEO', name: 'Amber Kowalski-Stern' },
-      { role: 'CFO', name: 'Simon Ng' },
-      { role: 'Head of Experience', name: 'Zoe Farquhar' },
-    ],
-    founded: '2008', employees: '6,200', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'BEN', name: 'BeanMachine', sector: 'FOOD', rival: 'BAN', basePrice: 13.20, vol: 0.020,
-    tagline: '"Fuel The Machine."',
-    desc: 'BeanMachine pitches itself to the tech and creative class of Los Santos, offering subscription-based specialty coffee delivered to co-working spaces across the city. The company\'s app-first model and loyalty NFT program generated buzz in 2023 before the LS digital asset market cooled. BeanMachine remains popular in the Vinewood and Hawick areas but has struggled to crack the Blaine County market.',
-    executives: [
-      { role: 'CEO', name: 'Tyler Vance-Okafor' },
-      { role: 'CTO', name: 'Priya Sharma' },
-      { role: 'CFO', name: 'Brenda Castellanos' },
-    ],
-    founded: '2011', employees: '3,800', hq: 'Vinewood, LS',
-  },
-  {
-    ticker: 'GAS', name: 'GastroBand', sector: 'FOOD', rival: 'PISS', basePrice: 27.50, vol: 0.028,
-    tagline: '"Street Food. Stadium Prices."',
-    desc: 'GastroBand operates a chain of food courts and stadium concession stands throughout San Andreas. As the exclusive food vendor at the Maze Bank Arena, GastroBand prints money on game nights. The company has expanded into festival catering and private event services, becoming a fixture at the LS Music Festival. Margins remain thin due to venue commission fees and food waste challenges.',
-    executives: [
-      { role: 'CEO', name: 'Franco Bellini' },
-      { role: 'CFO', name: 'Dana Hobbs' },
-      { role: 'VP Operations', name: 'Kwame Asante' },
-    ],
-    founded: '2003', employees: '12,600', hq: 'Downtown LS',
-  },
-  {
-    ticker: 'KRP', name: 'Krapea', sector: 'FOOD', rival: 'CLKB', basePrice: 48.90, vol: 0.030,
-    tagline: '"Crepes. Done Different."',
-    desc: 'Krapea is Los Santos\'s surprising fast food success story — a French-inspired crepe chain that managed to crack the American QSR market. With over 600 LS locations and a viral social media presence, Krapea appeals to the Instagrammable food crowd. The brand recently launched a late-night "Dark Krapea" menu targeting post-club traffic in the Strawberry district.',
-    executives: [
-      { role: 'CEO', name: 'Dominique Leclerc' },
-      { role: 'CFO', name: 'James Okonkwo' },
-      { role: 'Brand Director', name: 'Misha Volkov' },
-    ],
-    founded: '2006', employees: '18,300', hq: 'Little Seoul, LS',
-  },
-  {
-    ticker: 'SPNK', name: 'Sprunk Beverages', sector: 'FOOD', rival: 'PISS', basePrice: 42.10, vol: 0.028,
-    tagline: '"Get Sprunked."',
-    desc: 'Sprunk is the definitive soft drink of San Andreas — a neon-green citrus soda with a loyal following that borders on religious. As the title sponsor of multiple LS sports teams, Sprunk\'s brand recognition is second to none. The company\'s recent push into energy drinks and sports hydration has opened up new revenue streams, though the flagship soda remains the heart of the business.',
-    executives: [
-      { role: 'CEO', name: 'Barbara "Bev" Whitmore' },
-      { role: 'CFO', name: 'Nelson Frias' },
-      { role: 'CMO', name: 'Kevin Chu' },
-    ],
-    founded: '1955', employees: '14,200', hq: 'Cypress Flats, LS',
-  },
-  {
-    ticker: 'EGCHK', name: 'EgoChaser Energy', sector: 'FOOD', rival: 'SPNK', basePrice: 18.60, vol: 0.035,
-    tagline: '"Chase More. Sleep Less."',
-    desc: 'EgoChaser is the brash energy drink brand taking on the LS market with extreme sports sponsorships and controversial marketing. Its signature red-and-black cans are ubiquitous at Blaine County motocross events and skate parks. The brand\'s association with several hospitalisation incidents has attracted regulatory scrutiny, keeping the stock volatile.',
-    executives: [
-      { role: 'CEO', name: 'Ricky Mansfield' },
-      { role: 'CFO', name: 'Chandra Patel' },
-    ],
-    founded: '2014', employees: '2,100', hq: 'Sandy Shores',
-  },
-  {
-    ticker: 'NYKA', name: 'Nuka-Cola LS', sector: 'FOOD', rival: 'SPNK', basePrice: 29.30, vol: 0.030,
-    tagline: '"Taste The Future."',
-    desc: 'Nuka-Cola LS is the San Andreas subsidiary of a larger East Coast beverage conglomerate, selling its nuclear-themed cola brand through LS convenience stores and vending machines. Despite operating on thinner margins than domestic competitors, the Nuka brand\'s retro-futuristic aesthetic has driven strong merchandise revenue and a passionate collector community.',
-    executives: [
-      { role: 'CEO (SA Division)', name: 'Gerald Swanson' },
-      { role: 'CFO', name: 'Kim Nakashima' },
-    ],
-    founded: '2019 (LS Division)', employees: '1,800', hq: 'Little Seoul, LS',
-  },
-  {
-    ticker: 'JMBJ', name: 'Jumberjack Diner', sector: 'FOOD', rival: 'BSTA', basePrice: 16.40, vol: 0.032,
-    tagline: '"Big Eats. Bigger Belt."',
-    desc: 'Jumberjack Diner is San Andreas\'s beloved 24-hour roadside diner chain, serving enormous portions of American comfort food to truckers, night-shift workers, and tourists. The chain operates 220 locations, mostly near highways and along the Route 1 corridor. Its signature Lumberjack Slam breakfast plate holds a spot in the LS Guinness equivalency records for caloric content.',
-    executives: [
-      { role: 'CEO', name: 'Bobby Ray Dalton' },
-      { role: 'CFO', name: 'Sheila Morrissey' },
-    ],
-    founded: '1974', employees: '9,700', hq: 'Paleto Bay',
-  },
+let allCompanies = [];
+let currentSector = 'ALL';
+let currentSearch = '';
 
-  // ─────────────────────── FINANCE ───────────────────────
-  {
-    ticker: 'MAZE', name: 'Maze Bank', sector: 'FINANCE', rival: 'BOL', basePrice: 218.50, vol: 0.020,
-    tagline: '"Your Money. Our Maze."',
-    desc: 'Maze Bank is the largest financial institution in San Andreas and the tallest skyscraper in Los Santos is their headquarters. Offering retail banking, private wealth management, and investment services, Maze Bank handles the accounts of everyone from Vinewood celebrities to Blaine County ranchers. Despite its dominance, the bank has faced accusations of predatory lending practices and mysterious fund disappearances from high-value accounts.',
-    executives: [
-      { role: 'CEO', name: 'Victor "Vic" Moorland' },
-      { role: 'CFO', name: 'Rebecca Ashworth-Crane' },
-      { role: 'CRO', name: 'Gerald Fung' },
-      { role: 'General Counsel', name: 'Diana Pemberton' },
-    ],
-    founded: '1923', employees: '24,000', hq: 'Maze Bank Tower, Downtown LS',
-  },
-  {
-    ticker: 'BOL', name: 'Bank of Liberty', sector: 'FINANCE', rival: 'MAZE', basePrice: 174.20, vol: 0.020,
-    tagline: '"Freedom To Bank."',
-    desc: 'Bank of Liberty is the East Coast challenger trying to crack the San Andreas market. With its Liberty City heritage and strong institutional banking division, BOL has made inroads with LS corporations seeking alternatives to Maze Bank. The bank\'s SA expansion has been costly, and whispers of liquidity issues have followed its stock for years.',
-    executives: [
-      { role: 'CEO', name: 'Andrew Fitch-Kessler' },
-      { role: 'CFO', name: 'Maria da Silva' },
-      { role: 'Head of SA Operations', name: 'Thomas Park' },
-    ],
-    founded: '1887', employees: '18,500', hq: 'Mission Row, LS',
-  },
-  {
-    ticker: 'FLCA', name: 'Fleeca Bank', sector: 'FINANCE', rival: 'MAZE', basePrice: 142.30, vol: 0.022,
-    tagline: '"Fast. Simple. Fleeca."',
-    desc: 'Fleeca Bank is everywhere in Los Santos — the bright blue branch fronts are a fixture on every major street corner. Specialising in personal loans, car financing, and small business banking, Fleeca built its empire on accessibility. Unfortunately, its accessibility extends to would-be robbers: Fleeca branches hold the dubious record as the most frequently robbed bank in San Andreas history.',
-    executives: [
-      { role: 'CEO', name: 'Susan Morales-Vega' },
-      { role: 'CFO', name: 'Derek Huang' },
-      { role: 'Head of Security', name: 'Carl "Stonewall" Dixon' },
-    ],
-    founded: '1991', employees: '11,200', hq: 'Strawberry, LS',
-  },
-  {
-    ticker: 'GRU', name: 'GruppeSechs Security', sector: 'FINANCE', rival: 'MER', basePrice: 36.80, vol: 0.030,
-    tagline: '"Six Is Enough."',
-    desc: 'GruppeSechs is San Andreas\'s largest private security and armoured transport firm. Their distinctively branded white and orange vans are a common sight transporting cash between Maze Bank branches and casinos. Controversially, multiple GruppeSechs vehicles have been robbed, leading to investor concerns about operational security. The firm recently won the contract to secure the Humane Labs facility.',
-    executives: [
-      { role: 'CEO', name: 'Helmut Grünwald' },
-      { role: 'COO', name: 'Frank O\'Brien' },
-      { role: 'CFO', name: 'Ingrid Svensson' },
-    ],
-    founded: '1987', employees: '8,900', hq: 'La Mesa, LS',
-  },
-  {
-    ticker: 'MER', name: 'Merryweather Security', sector: 'FINANCE', rival: 'GRU', basePrice: 62.50, vol: 0.030,
-    tagline: '"Your Safety. Our Business."',
-    desc: 'Merryweather Security is a private military company operating across San Andreas and internationally. Unlike GruppeSechs, Merryweather handles high-threat environments — corporate protection, maritime security, and allegedly, covert operations. Their Elysian Island base hints at capabilities far beyond a typical security firm. The company\'s founder, Don Percival, maintains close ties to several government officials.',
-    executives: [
-      { role: 'CEO', name: 'Don Percival' },
-      { role: 'COO', name: 'General (ret.) Barry Howell' },
-      { role: 'CFO', name: 'Lucinda Chase' },
-    ],
-    founded: '2001', employees: '15,600', hq: 'Elysian Island, LS',
-  },
-  {
-    ticker: 'AUG', name: 'Augury Insurance', sector: 'FINANCE', rival: 'MOR', basePrice: 48.90, vol: 0.030,
-    tagline: '"We See It Coming."',
-    desc: 'Augury Insurance sells itself on predictive analytics and proactive coverage in the high-risk San Andreas market. The company offers auto, property, and life insurance, with a particular niche in insuring Vinewood entertainment assets and studio productions. Their "Psychic Shield" premium tier has attracted scrutiny from the SA Insurance Commission.',
-    executives: [
-      { role: 'CEO', name: 'Cassandra Foley' },
-      { role: 'CFO', name: 'Benjamin Tran' },
-      { role: 'Chief Actuary', name: 'Dr. Miriam Goldstein' },
-    ],
-    founded: '2000', employees: '5,400', hq: 'Pillbox Hill, LS',
-  },
-  {
-    ticker: 'MOR', name: 'MorsMutual Insurance', sector: 'FINANCE', rival: 'AUG', basePrice: 53.20, vol: 0.030,
-    tagline: '"Death Is Certain. Coverage Shouldn\'t Be."',
-    desc: 'MorsMutual is the dark horse of LS insurance — a company whose macabre branding has paradoxically become a marketing asset. Specialising in life insurance and disability coverage, MorsMutual capitalises on San Andreas\'s unusually high mortality rate. Their actuarial models reportedly account for the elevated frequency of gang violence, police pursuits, and unexplained explosions.',
-    executives: [
-      { role: 'CEO', name: 'Edgar Grimsley' },
-      { role: 'CFO', name: 'Carol Vanthorpe' },
-    ],
-    founded: '1946', employees: '4,200', hq: 'Morningwood, LS',
-  },
-  {
-    ticker: 'BLNE', name: 'Blaine County Savings', sector: 'FINANCE', rival: 'BOL', basePrice: 31.40, vol: 0.032,
-    tagline: '"Small Town. Safe Money."',
-    desc: 'Blaine County Savings is the community bank serving rural San Andreas. With branches in Sandy Shores, Grapeseed, and Paleto Bay, BCS offers agricultural loans, ranch financing, and basic personal banking to a community historically underserved by LS\'s big banks. The bank\'s homespun image belies a surprisingly sophisticated private lending book for county land deals.',
-    executives: [
-      { role: 'CEO', name: 'Earl Whitaker' },
-      { role: 'CFO', name: 'Jean-Ann Kowalczyk' },
-    ],
-    founded: '1931', employees: '1,200', hq: 'Sandy Shores',
-  },
-  {
-    ticker: 'LSTR', name: 'Lester Crest Capital', sector: 'FINANCE', rival: 'GRU', basePrice: 24.80, vol: 0.038,
-    tagline: '"The Smart Money."',
-    desc: 'Lester Crest Capital is a boutique hedge fund and private intelligence operation that somehow obtained a public listing. The firm\'s exceptional track record — returns averaging 34% annually — has attracted both admiration and multiple SEC-equivalent investigations. Founder Lester Crest is rarely seen publicly, and the firm\'s Sandy Shores warehouse headquarters is rumoured to contain significantly more computing infrastructure than a typical fund.',
-    executives: [
-      { role: 'Founder & CIO', name: 'Lester Crest' },
-      { role: 'CFO', name: 'Patricia Malone-Webb' },
-    ],
-    founded: '2009', employees: '47', hq: 'Sandy Shores',
-  },
-  {
-    ticker: 'PACP', name: 'Pacific Standard Finance', sector: 'FINANCE', rival: 'FLCA', basePrice: 198.60, vol: 0.018,
-    tagline: '"West Coast. Best Coast. Best Rates."',
-    desc: 'Pacific Standard Finance is the premiere investment bank and public bond issuer of San Andreas. PSF handles major infrastructure debt, corporate IPOs, and sovereign wealth fund operations for the SA government. Their downtown LS tower holds the most valuable vault on the West Coast — a fact that has not gone unnoticed by the criminal underworld. The firm recently survived its third major robbery attempt.',
-    executives: [
-      { role: 'CEO', name: 'Howard Blanche III' },
-      { role: 'CFO', name: 'Sophia Kim' },
-      { role: 'Chief Security Officer', name: 'Major (ret.) Alan Sheppard' },
-      { role: 'General Counsel', name: 'Nathaniel Burns' },
-    ],
-    founded: '1902', employees: '7,800', hq: 'Pillbox Hill, LS',
-  },
+// ── Load all companies from JSON files ──────────────────
+async function loadCompanies() {
+  try {
+    // Load manifest first
+    const idxResp = await fetch('companies/index.json');
+    const tickers = await idxResp.json();
 
-  // ─────────────────────── TECH ───────────────────────
-  {
-    ticker: 'IFRT', name: 'iFruit Corp.', sector: 'TECH', rival: 'LFI', basePrice: 388.50, vol: 0.028,
-    tagline: '"Think Fruit."',
-    desc: 'iFruit is the most valuable technology company in San Andreas and the maker of the iconic iFruit smartphone — the device that turned Los Santos into a mobile-first city. With a cult following among Vinewood celebrities and tech workers alike, iFruit commands obscene margins on its hardware. Their recent foray into autonomous vehicles and AR glasses has kept analysts bullish despite slowing phone sales.',
-    executives: [
-      { role: 'CEO', name: 'Jonathan Piece' },
-      { role: 'CFO', name: 'Ellen Kwon' },
-      { role: 'SVP Design', name: 'Sebastian Braun' },
-      { role: 'CTO', name: 'Marcus Reid' },
-    ],
-    founded: '1995', employees: '42,000', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'LFI', name: 'Lifeinvader', sector: 'TECH', rival: 'IFRT', basePrice: 12.30, vol: 0.040,
-    tagline: '"Stalk Your Friends."',
-    desc: 'Lifeinvader is San Andreas\'s dominant social network — a fact its executives celebrate while its stock tells a different story. Despite 400 million registered accounts, the platform\'s aggressive data harvesting, political manipulation scandals, and a notoriously public IPO implosion have kept the stock in the gutter. Founder Jay Norris\'s personal controversies have not helped investor confidence.',
-    executives: [
-      { role: 'CEO', name: 'Jay Norris' },
-      { role: 'CFO', name: 'Amanda Krebs' },
-      { role: 'COO', name: 'Derek Fong' },
-    ],
-    founded: '2003', employees: '28,000', hq: 'Vinewood, LS',
-  },
-  {
-    ticker: 'DRNK', name: 'Drone Solutions LS', sector: 'TECH', rival: 'FCDE', basePrice: 44.20, vol: 0.045,
-    tagline: '"Eyes In The Sky."',
-    desc: 'Drone Solutions LS provides commercial UAV services to the LSPD, real estate firms, and film studios. The company\'s proprietary Hawk-Eye surveillance drones are a regular sight over Los Santos, raising significant civil liberties concerns. A lucrative government contract renewal is expected this fiscal year.',
-    executives: [
-      { role: 'CEO', name: 'Nathan Ashby' },
-      { role: 'CTO', name: 'Lisa Tran' },
-      { role: 'CFO', name: 'Robert Nakamura' },
-    ],
-    founded: '2015', employees: '890', hq: 'La Mesa, LS',
-  },
-  {
-    ticker: 'FCDE', name: 'Facade Technologies', sector: 'TECH', rival: 'DRNK', basePrice: 38.60, vol: 0.042,
-    tagline: '"Build The Future."',
-    desc: 'Facade Technologies builds enterprise software platforms for LS\'s construction and real estate industries. Its flagship product, FacadeOS, manages permit workflows, architectural compliance, and contractor payments for over 60% of active LS building projects. The company\'s recent pivot toward AI-driven zoning prediction has attracted venture interest.',
-    executives: [
-      { role: 'CEO', name: 'Aisha Osei' },
-      { role: 'CFO', name: 'Paul Whitfield' },
-      { role: 'CTO', name: 'Daniel Park' },
-    ],
-    founded: '2012', employees: '1,400', hq: 'Pillbox Hill, LS',
-  },
-  {
-    ticker: 'CHNK', name: 'Cheval Systems', sector: 'TECH', rival: 'IFRT', basePrice: 91.30, vol: 0.038,
-    tagline: '"Precision Engineering. Redefined."',
-    desc: 'Cheval Systems is a LS-based autonomous vehicle and advanced mobility company, best known for their electric fleet vehicles. While their autonomous delivery van has seen commercial success across LS, a high-profile recall of their self-driving taxi prototype set the stock back considerably. Cheval is currently lobbying the SA Department of Transport for expanded trial zones.',
-    executives: [
-      { role: 'CEO', name: 'Valentina Cross' },
-      { role: 'CFO', name: 'Andrew Yip' },
-      { role: 'Chief Engineer', name: 'Dr. Klaus Brandt' },
-    ],
-    founded: '2017', employees: '3,200', hq: 'LSIA District, LS',
-  },
-  {
-    ticker: 'WZRD', name: 'Weasel Tech', sector: 'TECH', rival: 'LFI', basePrice: 28.40, vol: 0.050,
-    tagline: '"Smart Moves."',
-    desc: 'Weasel Tech operates as a subsidiary of Weazel Media, providing the digital advertising and data analytics infrastructure behind the SA\'s largest media network. The company\'s audience targeting capabilities have attracted political campaign spending — and an equal share of controversies around manipulation of public opinion during election cycles.',
-    executives: [
-      { role: 'CEO', name: 'Scott Berkowitz' },
-      { role: 'CTO', name: 'Hina Yamamoto' },
-      { role: 'CFO', name: 'Derrick Okonkwo' },
-    ],
-    founded: '2010', employees: '2,600', hq: 'Vinewood, LS',
-  },
-  {
-    ticker: 'VNWD', name: 'Vinewood Digital', sector: 'TECH', rival: 'WZRD', basePrice: 67.80, vol: 0.035,
-    tagline: '"Hollywood Meets Silicon."',
-    desc: 'Vinewood Digital is the streaming and digital distribution arm of the LS entertainment industry. Its VDTV platform hosts original content, live event streams, and archival Vinewood film libraries. The company competes fiercely with out-of-state streaming giants and recently poached three major showrunners from rival platforms in a high-profile talent war.',
-    executives: [
-      { role: 'CEO', name: 'Gloria Mabela' },
-      { role: 'CFO', name: 'Matthew Goldstein' },
-      { role: 'Chief Content Officer', name: 'Jillian Norris-Watts' },
-    ],
-    founded: '2016', employees: '4,100', hq: 'Vinewood Hills, LS',
-  },
-  {
-    ticker: 'BSTR', name: 'Badger Comms', sector: 'TECH', rival: 'FCDE', basePrice: 52.10, vol: 0.040,
-    tagline: '"Connected. Always."',
-    desc: 'Badger Communications operates the third-largest mobile network in San Andreas. Known for solid rural coverage in Blaine County — where competitors drop signals — Badger has carved out a profitable niche among agricultural and mining businesses. A recent 5G rollout in central LS hit delays after protests over mast placement in Vinewood Hills.',
-    executives: [
-      { role: 'CEO', name: 'Patricia "Pat" Donnelly' },
-      { role: 'CFO', name: 'Robert Feng' },
-      { role: 'CTO', name: 'James Adeyemi' },
-    ],
-    founded: '1999', employees: '7,300', hq: 'Strawberry, LS',
-  },
-
-  // ─────────────────────── TRANSPORT ───────────────────────
-  {
-    ticker: 'FLYUS', name: 'FlyUS Airlines', sector: 'TRANSPORT', rival: 'AEMU', basePrice: 78.90, vol: 0.035,
-    tagline: '"The American Way. Up."',
-    desc: 'FlyUS is the flagship American carrier operating out of Los Santos International Airport. The airline connects San Andreas to destinations across the United States and internationally, with a particular stronghold on trans-continental routes. Despite multiple pilot strikes and a fleet modernisation programme, FlyUS maintains the highest passenger volume at LSIA.',
-    executives: [
-      { role: 'CEO', name: 'Patricia Holden-Walsh' },
-      { role: 'CFO', name: 'Marco Bianchi' },
-      { role: 'COO', name: 'Captain (ret.) Ray Sully' },
-    ],
-    founded: '1948', employees: '38,000', hq: 'LSIA, Los Santos',
-  },
-  {
-    ticker: 'AEMU', name: 'AirEmu', sector: 'TRANSPORT', rival: 'FLYUS', basePrice: 66.40, vol: 0.035,
-    tagline: '"Fly Smart. Fly Emu."',
-    desc: 'AirEmu is the budget carrier disrupting the San Andreas aviation market, offering deeply discounted fares on domestic routes. Known for its no-frills approach — passengers have been charged for carry-ons, blankets, and reportedly even eye contact — AirEmu turns a profit through ancillary fees that rival the ticket price itself.',
-    executives: [
-      { role: 'CEO', name: 'Barry "Baz" O\'Sullivan' },
-      { role: 'CFO', name: 'Christine Lau' },
-    ],
-    founded: '2002', employees: '12,400', hq: 'LSIA, Los Santos',
-  },
-  {
-    ticker: 'HKJ', name: 'Hijak Motors', sector: 'TRANSPORT', rival: 'VAPD', basePrice: 55.60, vol: 0.030,
-    tagline: '"Take The Wheel."',
-    desc: 'Hijak Motors produces affordable American muscle cars and utility vehicles that dominate the working-class LS market. Despite the unfortunate brand name — inherited from founder Hector J. Kline — Hijak has maintained strong truck sales across Blaine County ranches and LS construction sites.',
-    executives: [
-      { role: 'CEO', name: 'Sandra Kline-Barrow' },
-      { role: 'CFO', name: 'Mike Fogarty' },
-    ],
-    founded: '1969', employees: '14,200', hq: 'Cypress Flats, LS',
-  },
-  {
-    ticker: 'GOP', name: 'GoPostal', sector: 'TRANSPORT', rival: '', basePrice: 19.30, vol: 0.030,
-    tagline: '"Going Postal Since 1947."',
-    desc: 'GoPostal is San Andreas\'s dominant parcel delivery and logistics company. With its distinctive yellow delivery vans ubiquitous across LS, GoPostal handles the last-mile delivery for virtually every e-commerce company in the state. Despite a chronic reputation for lost packages and drivers who apparently interpret "front door" liberally, GoPostal\'s logistics monopoly makes it a safe dividend play.',
-    executives: [
-      { role: 'CEO', name: 'Dennis Trout' },
-      { role: 'CFO', name: 'Wanda Simmons' },
-      { role: 'VP Logistics', name: 'Chen Wei' },
-    ],
-    founded: '1947', employees: '62,000', hq: 'La Mesa, LS',
-  },
-  {
-    ticker: 'VAPD', name: 'Vapid', sector: 'TRANSPORT', rival: 'DECLSS', basePrice: 62.40, vol: 0.032,
-    tagline: '"American. All The Way."',
-    desc: 'Vapid is the quintessentially American automaker — big trucks, bigger engines, and a loyal patriotic fanbase. Their Dominator and Interceptor models are Blaine County staples, while the LSPD famously runs an entire Vapid Crown Victoria fleet. The company\'s recent electric pickup attempt was, diplomatically, not well-received by their core demographic.',
-    executives: [
-      { role: 'CEO', name: 'Earl Boatright' },
-      { role: 'CFO', name: 'Janet MacAllister' },
-      { role: 'Chief Designer', name: 'Todd Brubaker' },
-    ],
-    founded: '1924', employees: '31,000', hq: 'Rockford, SA',
-  },
-  {
-    ticker: 'DECLSS', name: 'Declasse', sector: 'TRANSPORT', rival: 'VAPD', basePrice: 54.80, vol: 0.032,
-    tagline: '"For The Rest Of Us."',
-    desc: 'Declasse occupies the affordable domestic car market in San Andreas, offering practical sedans and compact SUVs that lack prestige but make up for it in value. The Declasse Granger is a fixture of SA government motor pools, and the brand\'s no-nonsense approach has earned a steady if unspectacular following.',
-    executives: [
-      { role: 'CEO', name: 'Robert "Bob" Danforth' },
-      { role: 'CFO', name: 'Tanya Vickers' },
-    ],
-    founded: '1938', employees: '22,000', hq: 'Harmony, SA',
-  },
-  {
-    ticker: 'BRAVD', name: 'Bravado', sector: 'TRANSPORT', rival: 'DECLSS', basePrice: 71.20, vol: 0.030,
-    tagline: '"Bold Moves. Brave Roads."',
-    desc: 'Bravado is the truck-and-off-road specialist of the SA domestic auto market. Their Bravado Buffalo and Duneloader have become cultural icons, and the company\'s sponsorship of the Blaine County Off-Road Classic cements their rugged identity. Bravado\'s military vehicle division also holds several DoD contracts.',
-    executives: [
-      { role: 'CEO', name: 'Dale Hurst' },
-      { role: 'CFO', name: 'Yolanda Pierce' },
-      { role: 'SVP Defense', name: 'Colonel (ret.) James O\'Hara' },
-    ],
-    founded: '1952', employees: '18,600', hq: 'Paleto Bay',
-  },
-  {
-    ticker: 'PFSTR', name: 'Pfister', sector: 'TRANSPORT', rival: 'OCELOT', basePrice: 210.50, vol: 0.025,
-    tagline: '"German Precision. LS Streets."',
-    desc: 'Pfister is the premium German automaker with a strong foothold in the Rockford Hills and Vinewood Hills luxury market. Their 811 electric hypercar and Comet S2 have become status symbols among LS\'s financial elite. Pfister\'s SA sales are handled through a tight network of exclusive dealerships that maintain long waitlists by design.',
-    executives: [
-      { role: 'CEO', name: 'Klaus-Dieter Hofmann' },
-      { role: 'CFO', name: 'Sabine Ritter' },
-      { role: 'Head of SA Market', name: 'William Ashford-Grey' },
-    ],
-    founded: '1898', employees: '52,000 (Global)', hq: 'Stuttgart / Rockford Hills (SA HQ)',
-  },
-  {
-    ticker: 'OCELOT', name: 'Ocelot', sector: 'TRANSPORT', rival: 'PFSTR', basePrice: 198.30, vol: 0.025,
-    tagline: '"Electric. Elegant. Inevitable."',
-    desc: 'Ocelot is the British-Japanese luxury electric vehicle maker whose Pariah and Jugular models have taken Vinewood by storm. The company positioned itself early in SA\'s EV transition and now commands a loyal affluent fanbase. Ocelot\'s partnership with the Vinewood Racetrack for their annual showcase event is a calendar highlight for LS\'s elite.',
-    executives: [
-      { role: 'CEO', name: 'Harriet Blackwood' },
-      { role: 'CTO', name: 'Kenji Mori' },
-      { role: 'CFO', name: 'Philip Durant' },
-    ],
-    founded: '1961', employees: '28,000 (Global)', hq: 'London / Rockford Hills (SA HQ)',
-  },
-  {
-    ticker: 'INEVT', name: 'Invetero', sector: 'TRANSPORT', rival: 'OCELOT', basePrice: 182.70, vol: 0.028,
-    tagline: '"Italian Soul. American Road."',
-    desc: 'Invetero brings Italian coachbuilt excellence to the San Andreas supercar market. Their Coquette Classic is a Vinewood Hills staple, and the brand\'s bespoke customisation programme — where buyers spend six months working with Italian artisans — commands extraordinary premiums. Supply is deliberately constrained to maintain exclusivity.',
-    executives: [
-      { role: 'CEO', name: 'Giovanni Ferrero-Calabrese' },
-      { role: 'CFO', name: 'Federica Montini' },
-    ],
-    founded: '1934', employees: '4,200 (Global)', hq: 'Milan / Vinewood Hills (SA HQ)',
-  },
-  {
-    ticker: 'DINKA', name: 'Dinka', sector: 'TRANSPORT', rival: 'KARIN', basePrice: 88.60, vol: 0.030,
-    tagline: '"Japanese Engineering. Global Roads."',
-    desc: 'Dinka is the Japanese automaker best known in SA for its high-revving sports bikes and compact performance cars. The Dinka Thrust and Jester are iconic among Los Santos street racing communities, and the brand\'s reliability record is second to none. A recent expansion into electric scooters targeting the LS commuter market has shown early promise.',
-    executives: [
-      { role: 'CEO', name: 'Takashi Yamada' },
-      { role: 'CFO', name: 'Michelle Chen' },
-      { role: 'Chief Engineer', name: 'Ryo Hashimoto' },
-    ],
-    founded: '1953', employees: '44,000 (Global)', hq: 'Tokyo / Little Seoul (SA HQ)',
-  },
-  {
-    ticker: 'KARIN', name: 'Karin', sector: 'TRANSPORT', rival: 'DINKA', basePrice: 76.40, vol: 0.030,
-    tagline: '"Driven By Detail."',
-    desc: 'Karin competes with Dinka in the Japanese performance and family car segment. The Karin Previon and Sultan have achieved cult status in LS tuner circles, where aftermarket modification communities have built entire ecosystems around them. Karin\'s reputation for reliability and driver-focused engineering has earned it an intensely loyal ownership base.',
-    executives: [
-      { role: 'CEO', name: 'Hiroshi Kato' },
-      { role: 'CFO', name: 'Sarah Watanabe' },
-    ],
-    founded: '1961', employees: '38,000 (Global)', hq: 'Osaka / Little Seoul (SA HQ)',
-  },
-  {
-    ticker: 'ANNIS', name: 'Annis', sector: 'TRANSPORT', rival: 'KARIN', basePrice: 94.20, vol: 0.032,
-    tagline: '"The Art Of Motion."',
-    desc: 'Annis produces some of the most sought-after sports cars in San Andreas. The Annis ZR350 and Elegy RH8 are fixtures of both the street racing scene and Rockford Hills driveways. The company\'s recent eSports racing sponsorship deal brought significant youth brand exposure, and their limited-edition Remus hypercar sold out in 11 minutes.',
-    executives: [
-      { role: 'CEO', name: 'Naomi Ishikawa' },
-      { role: 'CFO', name: 'Ken Watanabe Jr.' },
-    ],
-    founded: '1966', employees: '19,000 (Global)', hq: 'Tokyo / Little Seoul (SA HQ)',
-  },
-  {
-    ticker: 'UBERMX', name: 'Übermacht', sector: 'TRANSPORT', rival: 'PFSTR', basePrice: 156.80, vol: 0.026,
-    tagline: '"Engineering. Perfected."',
-    desc: 'Übermacht is the German premium brand competing head-to-head with Pfister in the LS luxury segment. Known for their Sentinel and Oracle models favoured by LS executives and organised crime alike, Übermacht has a quietly dominant market share in the Mission Row business district. Their new electrification roadmap promises three fully electric models by 2026.',
-    executives: [
-      { role: 'CEO', name: 'Rolf Steinmetz' },
-      { role: 'CFO', name: 'Anna Bauer' },
-      { role: 'Head of SA Operations', name: 'David Ashton' },
-    ],
-    founded: '1916', employees: '68,000 (Global)', hq: 'Munich / Rockford Hills (SA HQ)',
-  },
-  {
-    ticker: 'TRUFFD', name: 'Truffade', sector: 'TRANSPORT', rival: 'PEGASS', basePrice: 520.00, vol: 0.022,
-    tagline: '"The Pinnacle. Full Stop."',
-    desc: 'Truffade is the most exclusive hypercar manufacturer listed on the LSX. Based in France with a tiny SA showroom by appointment only, the Truffade Adder and Thrax are owned by fewer than 80 people in all of San Andreas. Each car is hand-assembled over six months. Truffade doesn\'t advertise — if you have to ask the price, you already know the answer.',
-    executives: [
-      { role: 'Directeur Général', name: 'Jean-Pierre de Villeneuve' },
-      { role: 'Directeur Financier', name: 'Cécile Moreau' },
-    ],
-    founded: '1921', employees: '340 (Global)', hq: 'Paris / Appointment Only (SA)',
-  },
-  {
-    ticker: 'PEGASS', name: 'Pegassi', sector: 'TRANSPORT', rival: 'TRUFFD', basePrice: 480.50, vol: 0.022,
-    tagline: '"Italian Fire. No Limits."',
-    desc: 'Pegassi is Italy\'s answer to Truffade — a hypercar manufacturer whose Tempesta, Zentorno, and Osiris have graced more Vinewood Hills driveways than any other supercar brand. Backed by a racing heritage dating to the 1930s, Pegassi combines raw performance with Italian artistry. Their collaboration with the Vinewood International Motor Show generates annual headlines.',
-    executives: [
-      { role: 'CEO', name: 'Marco Pellegrino' },
-      { role: 'CFO', name: 'Isabella Rossi' },
-      { role: 'Racing Director', name: 'Fabio Colombo' },
-    ],
-    founded: '1929', employees: '1,200 (Global)', hq: 'Maranello / Rockford Hills (SA HQ)',
-  },
-  {
-    ticker: 'GROTTI', name: 'Grotti', sector: 'TRANSPORT', rival: 'PEGASS', basePrice: 445.20, vol: 0.024,
-    tagline: '"Speed Is Art."',
-    desc: 'Grotti is the third pillar of Italian hypercar excellence on the LSX. Their Cheetah, Turismo, and X80 Proto have won more Vinewood Hills concours awards than any other marque. Unlike rivals who lean on heritage, Grotti pushes radical design — each model is a polarising statement that either defines the era or confuses analysts.',
-    executives: [
-      { role: 'CEO', name: 'Stefano Grotti III' },
-      { role: 'Design Director', name: 'Enzo Battaglia' },
-      { role: 'CFO', name: 'Antonella Frescobaldi' },
-    ],
-    founded: '1947', employees: '2,800 (Global)', hq: 'Turin / Rockford Hills (SA HQ)',
-  },
-  {
-    ticker: 'MAIBT', name: 'Maibatsu', sector: 'TRANSPORT', rival: 'DINKA', basePrice: 102.30, vol: 0.028,
-    tagline: '"Built For Life."',
-    desc: 'Maibatsu is the Japanese conglomerate best known in SA for the legendary Sanchez dirt bike — the vehicle of choice for Blaine County desert racers and LS courier companies. Their commercial vehicle division supplies pickup trucks to the LS construction industry, and a new hybrid SUV line is targeting the suburban family market.',
-    executives: [
-      { role: 'CEO', name: 'Yoshiro Maibatsu' },
-      { role: 'CFO', name: 'Haruko Tanaka' },
-      { role: 'VP Commercial', name: 'David Cho' },
-    ],
-    founded: '1941', employees: '89,000 (Global)', hq: 'Nagoya / Little Seoul (SA HQ)',
-  },
-
-  // ─────────────────────── RETAIL ───────────────────────
-  {
-    ticker: 'DEB', name: 'Debonaire Cigarettes', sector: 'RETAIL', rival: 'REDW', basePrice: 63.70, vol: 0.030,
-    tagline: '"Sophisticated Smoke."',
-    desc: 'Debonaire is the premium cigarette brand targeting the Vinewood Hills set. Despite decades of declining smoking rates, Debonaire\'s pivot to menthol products and electronic cigarettes has maintained revenue. The brand\'s vintage advertising imagery — still plastered on Mission Row buildings — has achieved ironic cult status.',
-    executives: [
-      { role: 'CEO', name: 'Charles Worthington' },
-      { role: 'CFO', name: 'Adrienne Solis' },
-    ],
-    founded: '1921', employees: '5,600', hq: 'Pillbox Hill, LS',
-  },
-  {
-    ticker: 'REDW', name: 'Redwood Cigarettes', sector: 'RETAIL', rival: 'DEB', basePrice: 71.20, vol: 0.030,
-    tagline: '"Real American Smoke."',
-    desc: 'Redwood is the populist cigarette brand — bold, unfiltered, and unapologetic. The official smoke of Blaine County rodeos and LS construction sites, Redwood commands formidable market share through sheer working-class loyalty. Their recent sports sponsorships in SA stock car racing have driven brand exposure among younger demographics.',
-    executives: [
-      { role: 'CEO', name: 'Duke Harmon' },
-      { role: 'CFO', name: 'Sharon Fitz' },
-    ],
-    founded: '1935', employees: '7,200', hq: 'Harmony, SA',
-  },
-  {
-    ticker: 'ARK', name: 'AnimalArk', sector: 'RETAIL', rival: 'MAX', basePrice: 22.40, vol: 0.025,
-    tagline: '"Every Pet Deserves More."',
-    desc: 'AnimalArk is San Andreas\'s leading pet supply chain, operating 180 stores across the state. The company offers everything from dog food to exotic reptile terrariums, and its grooming division is booked weeks in advance in Rockford Hills. A recent expansion into pet insurance has opened a promising new revenue stream.',
-    executives: [
-      { role: 'CEO', name: 'Donna Fitzgerald' },
-      { role: 'CFO', name: 'Sam Osei' },
-    ],
-    founded: '1988', employees: '8,400', hq: 'Vinewood, LS',
-  },
-  {
-    ticker: 'MAX', name: 'MaxRenda', sector: 'RETAIL', rival: 'ARK', basePrice: 24.10, vol: 0.025,
-    tagline: '"Value. Every Aisle."',
-    desc: 'MaxRenda is the discount general merchandise chain filling the gap between convenience stores and big-box retail in San Andreas. With 320 locations including several in Blaine County\'s underserved communities, MaxRenda competes on price over everything. Their supply chain is a masterwork of ruthless efficiency.',
-    executives: [
-      { role: 'CEO', name: 'Victor Randolph' },
-      { role: 'CFO', name: 'Chloe Kim' },
-    ],
-    founded: '1973', employees: '19,800', hq: 'Davis, LS',
-  },
-  {
-    ticker: 'VAG', name: 'Vangelico Jewellers', sector: 'RETAIL', rival: 'PONSBY', basePrice: 84.60, vol: 0.020,
-    tagline: '"For Moments Worth Remembering."',
-    desc: 'Vangelico is the most prestigious jewellery house in Los Santos, operating its flagship boutique on Rockford Hills\' famous shopping strip. Favoured by Vinewood celebrities for engagement rings and red carpet pieces, Vangelico\'s vault holds some of the rarest gems in the Western United States. The company\'s security systems have been tested — repeatedly — by the LS criminal underworld.',
-    executives: [
-      { role: 'CEO', name: 'Alessandro Vangelico Jr.' },
-      { role: 'CFO', name: 'Sophia Marchetti' },
-      { role: 'Head of Security', name: 'Raymond Holt' },
-    ],
-    founded: '1952', employees: '680', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'AMMU', name: 'Ammu-Nation', sector: 'RETAIL', rival: 'SHRPSH', basePrice: 58.40, vol: 0.035,
-    tagline: '"The Right To Bear Discounts."',
-    desc: 'Ammu-Nation is the undisputed firearms retail giant of San Andreas, with stores on seemingly every other block in Los Santos. The chain stocks everything from handguns to military-grade hardware with minimal documentation requirements, making it the preferred armament destination for law-abiding citizens and various other parties. Their loyalty programme — "The Second Amendment Card" — rewards frequent purchasers.',
-    executives: [
-      { role: 'CEO', name: 'Frank Ballantyne' },
-      { role: 'CFO', name: 'Doris Higgins' },
-      { role: 'VP Compliance', name: 'Gary Loose' },
-    ],
-    founded: '1982', employees: '14,200', hq: 'South LS',
-  },
-  {
-    ticker: 'SHRPSH', name: 'Shrewsbury Arms', sector: 'RETAIL', rival: 'AMMU', basePrice: 44.20, vol: 0.038,
-    tagline: '"British Craft. American Freedom."',
-    desc: 'Shrewsbury Arms brings a British gunmaking heritage to the SA market, positioning itself as the premium alternative to Ammu-Nation\'s mass-market approach. Their custom rifle fitting service and private shooting range in Rockford Hills cater to the discerning enthusiast. The brand\'s limited-edition collector pieces command extraordinary premiums at auction.',
-    executives: [
-      { role: 'CEO', name: 'Sir Alistair Pemberton-Smythe' },
-      { role: 'CFO', name: 'Caroline Webb' },
-      { role: 'Master Gunsmith', name: 'Nigel Forsythe' },
-    ],
-    founded: '1887', employees: '3,100', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'HLWPNT', name: 'Hollow Point Inc.', sector: 'RETAIL', rival: 'SHRPSH', basePrice: 31.80, vol: 0.042,
-    tagline: '"Maximum Impact. Guaranteed."',
-    desc: 'Hollow Point Inc. is the ammunition manufacturer supplying both Ammu-Nation and Shrewsbury Arms retail chains. Their defensive hollow-point rounds are the top sellers in LS, and their military contract manufacturing division operates a secure facility in the industrial zone of Cypress Flats. The company\'s CEO recently appeared before a state senate committee investigating ammunition sales data practices.',
-    executives: [
-      { role: 'CEO', name: 'Brandon Kinsley' },
-      { role: 'CFO', name: 'Patricia Dunnmore' },
-      { role: 'VP Manufacturing', name: 'Craig Wolff' },
-    ],
-    founded: '1994', employees: '2,800', hq: 'Cypress Flats, LS',
-  },
-  {
-    ticker: 'PSTL', name: 'Pistol Pete Firearms', sector: 'RETAIL', rival: 'HLWPNT', basePrice: 22.60, vol: 0.045,
-    tagline: '"Affordable Protection. No Questions."',
-    desc: 'Pistol Pete operates a chain of budget-friendly firearms dealers targeting the cost-conscious Blaine County market. Their "Grab \'n\' Go" financing plan and drive-through collection window have proven controversial but popular. The company has been the subject of seven regulatory inquiries in the past three years, all resolved without significant penalty.',
-    executives: [
-      { role: 'Owner/CEO', name: 'Pete Hannigan' },
-      { role: 'CFO', name: 'Brenda Stokes' },
-    ],
-    founded: '2002', employees: '1,400', hq: 'Sandy Shores',
-  },
-  {
-    ticker: 'MILIT', name: 'Militant Defense Corp.', sector: 'RETAIL', rival: 'MRRWT', basePrice: 187.50, vol: 0.030,
-    tagline: '"Equipped For Anything."',
-    desc: 'Militant Defense Corp. is SA\'s premier defence contractor and military equipment supplier. Their vehicles and hardware appear in SA National Guard inventories, and several foreign government contracts have boosted revenue significantly. MDC\'s lobbying arm spent $12M last year influencing SA defence procurement policy.',
-    executives: [
-      { role: 'CEO', name: 'General (ret.) Howard Blackwell' },
-      { role: 'CFO', name: 'Amanda Sorrento' },
-      { role: 'VP Government Relations', name: 'Senator (fmr.) Dale Wyatt' },
-    ],
-    founded: '1976', employees: '9,400', hq: 'Fort Zancudo Adjacent, SA',
-  },
-  {
-    ticker: 'MRRWT', name: 'Merryweather Arms Div.', sector: 'RETAIL', rival: 'MILIT', basePrice: 142.30, vol: 0.032,
-    tagline: '"Merryweather. Armed For Tomorrow."',
-    desc: 'The arms division of Merryweather Security, spun off as a separate listed entity to sidestep defence procurement conflict-of-interest rules. The division manufactures weapons systems, surveillance equipment, and armoured vehicles. Their operations remain closely intertwined with the parent company\'s private military business.',
-    executives: [
-      { role: 'Division Head', name: 'Brigadier (ret.) Marcus Stone' },
-      { role: 'CFO', name: 'Elaine Haskell' },
-    ],
-    founded: '2008 (spin-off)', employees: '6,100', hq: 'Elysian Island, LS',
-  },
-  {
-    ticker: 'ROBLQ', name: "Rob's Liquor", sector: 'RETAIL', rival: 'TWNTFR', basePrice: 18.90, vol: 0.040,
-    tagline: '"Your Neighbourhood Bottle Shop."',
-    desc: "Rob's Liquor is the scrappy independent liquor chain that somehow went public. Operating 240 stores across greater LS, Rob's serves the off-licence market with an admirably democratic selection of everything from cheap spirits to mid-tier wine. The company's overnight hours and lax ID policies have made it a nightlife institution.",
-    executives: [
-      { role: 'CEO', name: "Rob 'Bobby' Fleischer" },
-      { role: 'CFO', name: 'Diana Kowalski' },
-    ],
-    founded: '1979', employees: '3,800', hq: 'Strawberry, LS',
-  },
-  {
-    ticker: 'TWNTFR', name: '24/7 Supermarkt', sector: 'RETAIL', rival: 'ROBLQ', basePrice: 31.20, vol: 0.022,
-    tagline: '"Open. Always."',
-    desc: "24/7 Supermarkt is San Andreas's most convenient convenience store chain — and the phrase isn't just marketing. The stores never close, rarely restock fast enough, and charge accordingly. With 820 locations statewide, 24/7 is the default for forgotten milk, emergency snacks, and late-night scratch cards. The company's acquisition of eight FasTrak highway service plazas has expanded its footprint.",
-    executives: [
-      { role: 'CEO', name: 'Jim-Paul Nakagawa' },
-      { role: 'CFO', name: 'Susan Delacroix' },
-    ],
-    founded: '1968', employees: '28,000', hq: 'La Puerta, LS',
-  },
-  {
-    ticker: 'PONSBY', name: 'Ponsonbys Fashion', sector: 'RETAIL', rival: 'SUBBN', basePrice: 112.80, vol: 0.025,
-    tagline: '"Dress The Part."',
-    desc: "Ponsonbys is Los Santos's premier luxury fashion retailer, dressing Vinewood's elite in European designer labels and exclusive SA fashion houses. The Rockford Hills flagship store has been a celebrity haunt since the 1980s, and the brand's personal styling service commands a $2,000 per session minimum. Ponsonbys recently launched a rental subscription to capture the aspiring-affluent market.",
-    executives: [
-      { role: 'CEO', name: 'Victoria Hartley-Moore' },
-      { role: 'CFO', name: 'Gilles Beaumont' },
-      { role: 'Creative Director', name: 'Nikolai Vasquez' },
-    ],
-    founded: '1962', employees: '4,200', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'SUBBN', name: 'SubUrban Clothing', sector: 'RETAIL', rival: 'PONSBY', basePrice: 44.60, vol: 0.028,
-    tagline: '"Street. Real. SA."',
-    desc: "SubUrban is the streetwear chain capturing the South LS and Davis youth market. Known for loud graphics, limited drops, and collabs with LS graffiti artists, SubUrban built its brand authentically before going public. The company's online resale platform has become surprisingly significant, with SubUrban gear trading at 3-4x retail on the secondary market.",
-    executives: [
-      { role: 'CEO', name: 'Marcus "Ace" Williams' },
-      { role: 'CFO', name: 'Tasha Oyelaran' },
-    ],
-    founded: '2001', employees: '6,800', hq: 'Davis, LS',
-  },
-  {
-    ticker: 'BINCO', name: 'Binco', sector: 'RETAIL', rival: 'SUBBN', basePrice: 22.10, vol: 0.030,
-    tagline: '"Fashion For The Functional."',
-    desc: "Binco occupies the budget fashion segment, offering affordable basics and workwear to the mass market. With stores in every LS neighbourhood and most Blaine County towns, Binco is where San Andreas shops when it needs clothes but not a statement. The chain's no-frills approach has made it consistently profitable despite razor-thin margins.",
-    executives: [
-      { role: 'CEO', name: 'Paul Deveraux' },
-      { role: 'CFO', name: 'Linda Santos' },
-    ],
-    founded: '1984', employees: '11,200', hq: 'Chamberlain Hills, LS',
-  },
-
-  // ─────────────────────── ENERGY ───────────────────────
-  {
-    ticker: 'GCD', name: 'Gold Coast Dev.', sector: 'ENERGY', rival: 'BOM', basePrice: 156.30, vol: 0.045,
-    tagline: '"Building San Andreas\'s Energy Future."',
-    desc: "Gold Coast Development is an energy infrastructure conglomerate with fingers in oil, gas, and real estate development along the SA coast. Their offshore platform operations generate significant revenue but have attracted environmental opposition. GCD's political connections run deep — three former SA governors sit on the board.",
-    executives: [
-      { role: 'CEO', name: 'Gordon Caldwell III' },
-      { role: 'CFO', name: 'Evelyn Tran' },
-      { role: 'VP Offshore Operations', name: 'Captain (ret.) Paul Mercer' },
-    ],
-    founded: '1958', employees: '18,400', hq: 'Pacific Bluffs, LS',
-  },
-  {
-    ticker: 'BOM', name: 'BobMulét Energy', sector: 'ENERGY', rival: 'GCD', basePrice: 18.70, vol: 0.040,
-    tagline: '"Energy. Delivered Differently."',
-    desc: "BobMulét is the scrappy energy startup attempting to disrupt the SA utility market through distributed microgrids and community solar programmes. Despite a charismatic founder and genuine technological ambition, the company burns cash at an alarming rate. Analysts are divided: some see the next Green Future Energy, others see an elaborate lifestyle brand.",
-    executives: [
-      { role: 'CEO', name: 'Roberto Mulé' },
-      { role: 'CTO', name: 'Dr. Wei Chen' },
-      { role: 'CFO', name: 'Angela Frost' },
-    ],
-    founded: '2019', employees: '620', hq: 'LSIA Business District',
-  },
-  {
-    ticker: 'HAF', name: 'Hammerstein & Faust', sector: 'ENERGY', rival: '', basePrice: 31.40, vol: 0.035,
-    tagline: '"Industrial Strength. Since 1889."',
-    desc: "Hammerstein & Faust is the German industrial energy group that quietly powers much of San Andreas's industrial infrastructure. Their Cypress Flats refinery and the Murrieta oil fields north of LS generate steady cash flows with minimal public profile. H&F deliberately avoids consumer branding, operating entirely in the B2B energy market.",
-    executives: [
-      { role: 'CEO', name: 'Friedrich Hammerstein' },
-      { role: 'CFO', name: 'Lars Bergmann' },
-      { role: 'Head of SA Operations', name: 'Derek Crane' },
-    ],
-    founded: '1889', employees: '11,800', hq: 'Cypress Flats, LS',
-  },
-  {
-    ticker: 'PVGAS', name: 'Paleto Bay Gas & Oil', sector: 'ENERGY', rival: 'GCD', basePrice: 48.70, vol: 0.042,
-    tagline: '"North SA\'s Energy Partner."',
-    desc: "Paleto Bay Gas & Oil is the regional energy company serving Northern Blaine County and the surrounding rural communities. Despite its small-town branding, PBGO operates serious extraction infrastructure in the Chiliad Mountain State Wilderness and holds several contentious fracking licences that have generated significant community opposition.",
-    executives: [
-      { role: 'CEO', name: 'Randy Higgins' },
-      { role: 'CFO', name: 'Carol-Ann Mosley' },
-    ],
-    founded: '1941', employees: '4,200', hq: 'Paleto Bay',
-  },
-  {
-    ticker: 'ALTPL', name: 'Alamo Travel Power', sector: 'ENERGY', rival: 'HAF', basePrice: 33.90, vol: 0.038,
-    tagline: '"Powering The Journey."',
-    desc: "Alamo Travel Power operates the electricity transmission infrastructure serving the Alamo Sea region and Route 1 corridor. As a regulated utility, ATP generates predictable revenue from government-set tariffs but faces pressure to accelerate grid upgrades for EV charging infrastructure. A major transformers failure last year triggered a 6-hour blackout affecting 200,000 customers.",
-    executives: [
-      { role: 'CEO', name: 'Sheila Moreno-Castillo' },
-      { role: 'CFO', name: 'Brian Kowalsky' },
-      { role: 'Chief Grid Officer', name: 'Dr. Felix Braun' },
-    ],
-    founded: '1952', employees: '6,700', hq: 'Alamo Sea Region',
-  },
-  {
-    ticker: 'SNDR', name: 'Sandy Shores Drilling', sector: 'ENERGY', rival: 'PVGAS', basePrice: 27.60, vol: 0.044,
-    tagline: '"Dig Deep. Profit More."',
-    desc: "Sandy Shores Drilling is the oil extraction specialist working the contested reserves beneath the Alamo Sea basin. The company's environmental record is, charitably, a work in progress — several sites are under active remediation orders. Despite this, recent core samples suggest untapped reserves that could significantly extend the company's operational runway.",
-    executives: [
-      { role: 'CEO', name: 'Jim Tackett' },
-      { role: 'CFO', name: 'Donna Briggs' },
-      { role: 'Chief Geologist', name: 'Dr. Miguel Reyes' },
-    ],
-    founded: '1968', employees: '2,900', hq: 'Sandy Shores',
-  },
-  {
-    ticker: 'NVRDE', name: 'NVerde Renewables', sector: 'ENERGY', rival: 'HAF', basePrice: 88.50, vol: 0.032,
-    tagline: '"A Greener San Andreas."',
-    desc: "NVerde Renewables is the darling of SA's green investment community. Operating the Tataviam Mountains Wind Farm and the Grand Senora Solar Array, NVerde generates clean energy for 180,000 SA households. A recent $500M bond issue to fund offshore wind expansion was oversubscribed within hours, reflecting strong institutional appetite for ESG-compliant infrastructure.",
-    executives: [
-      { role: 'CEO', name: 'Dr. Carolyn Marsh' },
-      { role: 'CFO', name: 'Arun Mehta' },
-      { role: 'Chief Sustainability Officer', name: 'Ingrid Larsen' },
-    ],
-    founded: '2012', employees: '3,800', hq: 'Downtown LS',
-  },
-
-  // ─────────────────────── PHARMA ───────────────────────
-  {
-    ticker: 'BPHM', name: 'Betta Pharmaceuticals', sector: 'PHARMA', rival: 'BILK', basePrice: 124.60, vol: 0.040,
-    tagline: '"Better Health. Better Returns."',
-    desc: "Betta Pharmaceuticals is San Andreas's largest domestic drug manufacturer, producing everything from common pain relievers to proprietary biologics. The company's pipeline of six late-stage drugs has analysts bullish, though a recent data falsification allegation by a former researcher has cast shadows over two key trials.",
-    executives: [
-      { role: 'CEO', name: 'Dr. Elizabeth Harrington' },
-      { role: 'CFO', name: 'Patrick Huang' },
-      { role: 'Chief Medical Officer', name: 'Dr. Randall Pierce' },
-      { role: 'General Counsel', name: 'Kathleen Burns' },
-    ],
-    founded: '1961', employees: '22,000', hq: 'Pillbox Hill, LS',
-  },
-  {
-    ticker: 'BILK', name: 'Bilkington Research', sector: 'PHARMA', rival: 'BPHM', basePrice: 89.30, vol: 0.040,
-    tagline: '"Science First. Profit Follows."',
-    desc: "Bilkington Research is the contract research organisation and generic drug manufacturer competing with Betta at the mid-market. Their generic equivalents undercut Betta's branded prices significantly, fuelling intense patent litigation between the two firms. Bilkington's acquisition of a SA biotech startup last quarter opened a new oncology pipeline.",
-    executives: [
-      { role: 'CEO', name: 'Gregory Bilkington II' },
-      { role: 'CFO', name: 'Mei-Ling Zhao' },
-      { role: 'Head of R&D', name: 'Dr. James Fortescue' },
-    ],
-    founded: '1978', employees: '14,600', hq: 'Mission Row, LS',
-  },
-  {
-    ticker: 'HUMNE', name: 'Humane Labs', sector: 'PHARMA', rival: 'BPHM', basePrice: 156.40, vol: 0.045,
-    tagline: '"For The Advancement Of Science."',
-    desc: "Humane Labs & Research is San Andreas's most controversial pharmaceutical and biotechnology company. Officially conducting research into neurological treatments and viral therapeutics, the company's remote desert facility has attracted persistent rumours about classified government contracts and non-consensual research programmes. Their stock performs inversely to media scrutiny.",
-    executives: [
-      { role: 'CEO', name: 'Dr. Albert Saperstein' },
-      { role: 'CFO', name: 'Constance Aldridge' },
-      { role: 'Director of Special Projects', name: '[CLASSIFIED]' },
-    ],
-    founded: '1993', employees: '4,100', hq: 'Grand Senora Desert (Secure Facility)',
-  },
-  {
-    ticker: 'MXMD', name: 'Maze Medical', sector: 'PHARMA', rival: 'BILK', basePrice: 72.30, vol: 0.038,
-    tagline: '"Healthcare. Without The Maze."',
-    desc: "Maze Medical is the healthcare division of the broader Maze Bank Group, operating a chain of private clinics across Los Santos. Their concierge medical service caters to the Vinewood elite, while a network of urgent care centres serves the mass market. The company recently won FDA-equivalent approval for a novel arthritis treatment.",
-    executives: [
-      { role: 'CEO', name: 'Dr. Sandra Wu' },
-      { role: 'CFO', name: 'Marcus Tate' },
-      { role: 'Medical Director', name: 'Dr. Christine Novak' },
-    ],
-    founded: '2004', employees: '8,200', hq: 'Pillbox Hill Medical Centre, LS',
-  },
-  {
-    ticker: 'DRGS', name: 'Dr. Friedlander Health', sector: 'PHARMA', rival: 'MXMD', basePrice: 41.60, vol: 0.042,
-    tagline: '"Your Wellness. Our Priority."',
-    desc: "Dr. Friedlander Health operates a network of psychiatric and wellness clinics across San Andreas. Founded by Dr. Isiah Friedlander — whose celebrity patient list reads like a Vinewood awards show — the company blends legitimate mental health services with aspirational wellness branding. Questions about patient confidentiality practices and billing irregularities remain unresolved.",
-    executives: [
-      { role: 'Founder & CEO', name: 'Dr. Isiah Friedlander' },
-      { role: 'CFO', name: 'Amanda Rowe' },
-    ],
-    founded: '2001', employees: '3,400', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'ZANK', name: 'Zanku Supplements', sector: 'PHARMA', rival: 'DRGS', basePrice: 19.80, vol: 0.048,
-    tagline: '"Maximum Gains. Minimum Questions."',
-    desc: "Zanku Supplements sells performance enhancement products through a network of gyms and online channels across San Andreas. Their products occupy the grey zone between legitimate supplementation and controlled substance territory, which has kept the SA Health Authority's interest piqued. Despite regulatory risk, Zanku's customer loyalty is cult-like.",
-    executives: [
-      { role: 'CEO', name: 'Tony "T-Rex" Rexford' },
-      { role: 'CFO', name: 'Gloria Ramos' },
-    ],
-    founded: '2009', employees: '1,100', hq: 'Vespucci Beach, LS',
-  },
-
-  // ─────────────────────── MEDIA ───────────────────────
-  {
-    ticker: 'RVSL', name: 'Rockford Vandals SL', sector: 'MEDIA', rival: 'WFM', basePrice: 22.10, vol: 0.060,
-    tagline: '"Destroy The Format."',
-    desc: "Rockford Vandals is the most unpredictable media property on the LSX. Part record label, part lifestyle brand, part vandalism advocacy collective, RVSL operates a streaming channel and live events business from a converted Rockford Hills warehouse. The stock is notoriously volatile, moving on viral moments rather than fundamentals.",
-    executives: [
-      { role: 'Creative Director', name: 'Ziggy Marlowe' },
-      { role: 'CFO', name: 'Janet Hsu' },
-    ],
-    founded: '2014', employees: '380', hq: 'Rockford Hills, LS',
-  },
-  {
-    ticker: 'WFM', name: 'Worldwide FM', sector: 'MEDIA', rival: 'RVSL', basePrice: 9.80, vol: 0.050,
-    tagline: '"Music Without Borders."',
-    desc: "Worldwide FM is the globally connected independent radio network that somehow became the hippest station in Los Santos. Broadcasting a DJ-selected mix of global beats from an undisclosed LS studio, WFM's low ad revenue is compensated by its outsized cultural influence on LS's creative class.",
-    executives: [
-      { role: 'Founder', name: 'Gilles Peterson' },
-      { role: 'Station Manager', name: 'Aisha Osei' },
-    ],
-    founded: '2013', employees: '140', hq: 'Vespucci Canals, LS',
-  },
-  {
-    ticker: 'BLSSM', name: 'Blaine County Radio', sector: 'MEDIA', rival: 'NSTOP', basePrice: 8.40, vol: 0.055,
-    tagline: '"Country. Community. Blaine."',
-    desc: "Blaine County Radio serves rural SA with a mix of country, talk radio, and agricultural programming. While the format won't win awards, BCR's community ties and local advertising relationships generate surprisingly stable revenue. The station's morning show is the most-listened-to broadcast in Sandy Shores and Paleto Bay combined.",
-    executives: [
-      { role: 'Owner/GM', name: 'Clem Hutchins' },
-      { role: 'CFO', name: 'Bev Morrissey' },
-    ],
-    founded: '1962', employees: '85', hq: 'Sandy Shores',
-  },
-  {
-    ticker: 'NSTOP', name: 'Non-Stop-Pop FM', sector: 'MEDIA', rival: 'BLSSM', basePrice: 11.20, vol: 0.050,
-    tagline: '"All Pop. All Day."',
-    desc: "Non-Stop-Pop FM is exactly what it says: a relentless stream of Top 40 hits targeting the 18-34 female demographic in Los Santos. Owned by a media conglomerate, NSP's predictable format drives consistent advertising CPMs from fashion, beauty, and fast food brands. The station's social media strategy is disproportionately effective for a traditional radio property.",
-    executives: [
-      { role: 'Program Director', name: 'Cara Vega' },
-      { role: 'CFO (Parent Co.)', name: 'David Michaels' },
-    ],
-    founded: '1998', employees: '220', hq: 'Vinewood, LS',
-  },
-  {
-    ticker: 'WCTR', name: 'West Coast Talk Radio', sector: 'MEDIA', rival: 'WEAZ', basePrice: 14.60, vol: 0.045,
-    tagline: '"The Conversation. Continues."',
-    desc: "West Coast Talk Radio is LS's longest-running AM talk station, a bastion of political commentary, conspiracy theories, and caller-driven programming that has somehow survived the digital media revolution. WCTR hosts like Lazlow Jones command audiences that defy conventional demographic logic, attracting both conspiracy enthusiasts and ironic fans.",
-    executives: [
-      { role: 'President', name: 'Barry Whelan' },
-      { role: 'CFO', name: 'Pam Kowalski' },
-    ],
-    founded: '1954', employees: '160', hq: 'Downtown LS',
-  },
-  {
-    ticker: 'WEAZ', name: 'Weazel News Corp', sector: 'MEDIA', rival: 'WCTR', basePrice: 19.30, vol: 0.048,
-    tagline: '"Fair. Balanced. Weazel."',
-    desc: "Weazel News Corp is the dominant news organisation in San Andreas, operating the Weazel TV network, Weazel FM, and several online news properties. Known for sensationalist coverage, questionable sourcing, and an editorial stance that has drawn comparisons to various real-world media controversies, Weazel nevertheless commands the largest news audience in the state.",
-    executives: [
-      { role: 'CEO', name: 'Richard Clarkson' },
-      { role: 'CFO', name: 'Susan Hartmann' },
-      { role: 'Editor-in-Chief', name: 'Dan Lazlow' },
-    ],
-    founded: '1982', employees: '4,800', hq: 'Vinewood, LS',
-  },
-  {
-    ticker: 'RLS', name: 'Radio Los Santos', sector: 'MEDIA', rival: 'VINWD', basePrice: 16.80, vol: 0.052,
-    tagline: '"The Voice Of The Street."',
-    desc: "Radio Los Santos is the hip-hop and R&B station that has defined South LS's musical identity for decades. Launching careers, breaking beats, and occasionally shutting down city blocks for street broadcasts, RLS is more cultural institution than media company. Their advertising inventory sells out months in advance during summer seasons.",
-    executives: [
-      { role: 'Program Director', name: 'DJ Whirl-i-Gig' },
-      { role: 'CFO', name: 'Marcus Johnson' },
-    ],
-    founded: '1991', employees: '190', hq: 'South LS',
-  },
-  {
-    ticker: 'VINWD', name: 'Vinewood Blvd Radio', sector: 'MEDIA', rival: 'RLS', basePrice: 12.40, vol: 0.055,
-    tagline: '"Alternative. Always."',
-    desc: "Vinewood Blvd Radio is the indie rock and alternative station beloved by LS's creative community. Broadcasting from a repurposed Vinewood recording studio, VBR's eclectic playlist and cult DJ personalities generate a devoted listenership that punches above their frequency in cultural influence. Advertising revenue underperforms relative to audience engagement.",
-    executives: [
-      { role: 'Station Director', name: 'Tommy Smith' },
-      { role: 'CFO', name: 'Heather Knox' },
-    ],
-    founded: '2006', employees: '145', hq: 'Vinewood, LS',
-  },
-  {
-    ticker: 'FLYLO', name: 'FlyLo FM', sector: 'MEDIA', rival: 'SWAX', basePrice: 10.10, vol: 0.060,
-    tagline: '"Electronic. Elevated."',
-    desc: "FlyLo FM is LS's premier electronic music station, broadcasting ambient, jazz fusion, and experimental beats to the city's creative night owls. Curated by producer Flying Lotus, the station's influence on LS's electronic music scene is disproportionate to its ratings. Brand partnership revenue from luxury and fashion clients compensates for limited mainstream advertising.",
-    executives: [
-      { role: 'Creative Director', name: 'Flying Lotus' },
-      { role: 'Business Manager', name: 'Naomi Chang' },
-    ],
-    founded: '2011', employees: '90', hq: 'Arts District, LS',
-  },
-  {
-    ticker: 'SWAX', name: 'Soulwax FM', sector: 'MEDIA', rival: 'FLYLO', basePrice: 9.60, vol: 0.060,
-    tagline: '"Pure Electronic. No Compromise."',
-    desc: "Soulwax FM delivers an uncompromising diet of electronic, techno, and dance music to Los Santos. The station operates on a deliberately anti-commercial philosophy — no talk breaks, no ads within music sets, no format. Revenue comes from branded live events and festival stages rather than traditional spots. This model is either visionary or financially unsustainable, depending on the quarter.",
-    executives: [
-      { role: 'Founding DJs', name: '2manydjs (Dave & Stephen Dewaele)' },
-      { role: 'CFO', name: 'Els Janssens' },
-    ],
-    founded: '2013', employees: '75', hq: 'LSIA District, LS',
-  },
-  {
-    ticker: 'REBEL', name: 'Rebel Radio', sector: 'MEDIA', rival: 'BLSSM', basePrice: 7.80, vol: 0.058,
-    tagline: '"Country Outlaw. Loud."',
-    desc: "Rebel Radio is the outlaw country station for people who find Blaine County Radio too polished. Broadcasting from a mobile transmitter whose location changes weekly (for legal reasons), Rebel Radio serves the Blaine County underground with a mix of outlaw country, southern rock, and host commentary that regularly attracts FCC attention.",
-    executives: [
-      { role: 'Owner', name: 'Jack \"Mad Jack\" Tillman' },
-      { role: 'Station Manager', name: 'Dolly Ray Barnes' },
-    ],
-    founded: '2004', employees: '45', hq: 'Mobile, Blaine County',
-  },
-  {
-    ticker: 'SPC', name: 'Space 103.2', sector: 'MEDIA', rival: 'FLYLO', basePrice: 13.20, vol: 0.050,
-    tagline: '"Funk. Soul. Space."',
-    desc: "Space 103.2 broadcasts a timeless blend of soul, funk, and disco to Los Santos, maintaining an audience that spans three generations. The station's vintage aesthetic and refusal to follow trends has paradoxically kept it perpetually fashionable. Space 103.2's New Year's Eve broadcast from Vespucci Beach is the most-listened-to single radio event in SA history.",
-    executives: [
-      { role: 'Program Director', name: 'Bootsy Collins' },
-      { role: 'GM', name: 'Phyllis Washington' },
-    ],
-    founded: '1972', employees: '130', hq: 'Vespucci Beach, LS',
-  },
-];
-
-// ═══════════════════════════════════════════════════════
-// SECTOR EMOJIS & COLORS
-// ═══════════════════════════════════════════════════════
-const SECTOR_EMOJI = {
-  FOOD: '🍔', FINANCE: '🏦', TECH: '💻', TRANSPORT: '🚗',
-  RETAIL: '🛒', ENERGY: '⚡', PHARMA: '💊', MEDIA: '📻'
-};
-
-// ═══════════════════════════════════════════════════════
-// VOLATILITY LABEL
-// ═══════════════════════════════════════════════════════
-function volLabel(v) {
-  if (v <= 0.022) return { label: 'Very Low', cls: 'vol-low',     pct: Math.round(v/0.065*100) };
-  if (v <= 0.030) return { label: 'Low',      cls: 'vol-low',     pct: Math.round(v/0.065*100) };
-  if (v <= 0.040) return { label: 'Medium',   cls: 'vol-mid',     pct: Math.round(v/0.065*100) };
-  if (v <= 0.050) return { label: 'High',     cls: 'vol-high',    pct: Math.round(v/0.065*100) };
-  return                  { label: 'Very High',cls: 'vol-veryhigh',pct: Math.round(v/0.065*100) };
-}
-
-// ═══════════════════════════════════════════════════════
-// RENDER NAV
-// ═══════════════════════════════════════════════════════
-function buildNav(filter = '') {
-  const grouped = {};
-  COMPANIES.forEach(c => {
-    if (!grouped[c.sector]) grouped[c.sector] = [];
-    grouped[c.sector].push(c);
-  });
-
-  const nav = document.getElementById('navList');
-  nav.innerHTML = '';
-
-  const order = ['FOOD','FINANCE','TECH','TRANSPORT','RETAIL','ENERGY','PHARMA','MEDIA'];
-  order.forEach(sector => {
-    const companies = (grouped[sector] || []).filter(c =>
-      !filter || c.name.toLowerCase().includes(filter) || c.ticker.toLowerCase().includes(filter)
+    // Load all company JSONs in parallel
+    const results = await Promise.all(
+      tickers.map(t =>
+        fetch(`companies/${t}.json`)
+          .then(r => r.json())
+          .catch(() => null)
+      )
     );
-    if (!companies.length) return;
 
-    const sectorEl = document.createElement('div');
-    sectorEl.className = 'nav-sector';
-    sectorEl.textContent = SECTOR_EMOJI[sector] + ' ' + sector;
-    nav.appendChild(sectorEl);
+    allCompanies = results.filter(Boolean);
+    init();
+  } catch(e) {
+    document.getElementById('cardList').innerHTML =
+      `<div class="loading" style="color:var(--red)">❌ Failed to load company data.<br><small>${e.message}</small></div>`;
+  }
+}
 
-    companies.forEach(c => {
-      const item = document.createElement('div');
-      item.className = 'nav-item';
-      item.dataset.ticker = c.ticker;
-      item.innerHTML = `<span class="nav-ticker">${c.ticker}</span><span class="nav-name">${c.name}</span>`;
-      item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        const card = document.getElementById('card-' + c.ticker);
-        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-      nav.appendChild(item);
-    });
+function init() {
+  buildSectorBar();
+  buildCards();
+  buildNav();
+  document.getElementById('statCount').textContent = allCompanies.length;
+}
+
+// ── Sector Bar ───────────────────────────────────────────
+function buildSectorBar() {
+  const bar = document.getElementById('sectorBar');
+  const sectors = [...new Set(allCompanies.map(c => c.sector))].sort();
+  SECTOR_ORDER.forEach(s => {
+    if (!sectors.includes(s)) return;
+    const btn = document.createElement('button');
+    btn.className = 'sec-btn';
+    btn.dataset.sector = s;
+    btn.textContent = (SECTOR_EMOJI[s] || '') + ' ' + s;
+    btn.onclick = () => filterSector(s, btn);
+    bar.appendChild(btn);
   });
 }
 
-// ═══════════════════════════════════════════════════════
-// RENDER CARDS
-// ═══════════════════════════════════════════════════════
+function filterSector(sector, btn) {
+  currentSector = sector;
+  document.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+// ── Build Cards ──────────────────────────────────────────
+function volText(v) {
+  if (v <= 0.022) return {label:'Very Low', pct: Math.round(v/0.065*100)};
+  if (v <= 0.030) return {label:'Low',      pct: Math.round(v/0.065*100)};
+  if (v <= 0.040) return {label:'Medium',   pct: Math.round(v/0.065*100)};
+  if (v <= 0.050) return {label:'High',     pct: Math.round(v/0.065*100)};
+  return                 {label:'Very High',pct: Math.round(v/0.065*100)};
+}
+
 function buildCards() {
-  const list = document.getElementById('companyList');
+  const list = document.getElementById('cardList');
   list.innerHTML = '';
 
-  COMPANIES.forEach(c => {
-    const v = volLabel(c.vol);
-    const rivalCompany = COMPANIES.find(x => x.ticker === c.rival);
+  // Sort by sector then name
+  const sorted = [...allCompanies].sort((a,b) =>
+    SECTOR_ORDER.indexOf(a.sector) - SECTOR_ORDER.indexOf(b.sector) ||
+    a.name.localeCompare(b.name)
+  );
 
-    const card = document.createElement('div');
-    card.className = 'company-card';
-    card.id = 'card-' + c.ticker;
-    card.dataset.sector = c.sector;
-    card.dataset.name = c.name.toLowerCase();
-    card.dataset.ticker = c.ticker.toLowerCase();
+  sorted.forEach(c => {
+    const v = volText(c.vol);
+    const rival = allCompanies.find(x => x.ticker === c.rival);
+    const rivalHtml = rival
+      ? `<span class="rival-link" onclick="scrollTo('${c.rival}')">${c.rival} — ${rival.name}</span>`
+      : `<span style="color:var(--dim)">—</span>`;
 
-    const mgmtHtml = c.executives.map(e => `
+    const mgmtHtml = (c.executives||[]).map(e => `
       <div class="mgmt-item">
         <div class="mgmt-role">${e.role}</div>
         <div class="mgmt-name">${e.name}</div>
       </div>`).join('');
 
-    const rivalHtml = rivalCompany
-      ? `<span class="rival-link" onclick="scrollToCard('${c.rival}')">${c.rival} — ${rivalCompany.name}</span>`
-      : '<span style="color:var(--dim)">—</span>';
+    const card = document.createElement('div');
+    card.className = 'company-card';
+    card.id = 'card-' + c.ticker;
+    card.dataset.sector = c.sector;
+    card.dataset.search = (c.ticker + ' ' + c.name + ' ' + c.sector).toLowerCase();
 
     card.innerHTML = `
-      <div class="card-header">
-        <div class="card-header-left">
+      <div class="card-top">
+        <div class="card-tl">
           <div class="card-ticker-row">
             <span class="card-ticker">${c.ticker}</span>
-            <span class="card-sector sector-${c.sector}">${SECTOR_EMOJI[c.sector]} ${c.sector}</span>
+            <span class="card-sector-badge badge-${c.sector}">${SECTOR_EMOJI[c.sector]||''} ${c.sector}</span>
           </div>
           <div class="card-name">${c.name}</div>
-          <div class="card-tagline">${c.tagline}</div>
+          <div class="card-tagline">"${c.tagline}"</div>
         </div>
         <div class="card-price-box">
-          <div class="card-price">$${c.basePrice.toFixed(2)}</div>
+          <div class="card-price">$${Number(c.basePrice).toFixed(2)}</div>
           <div class="card-price-lbl">BASE PRICE</div>
-          <div class="card-vol-lbl">
-            Vol: <span class="${v.cls}">${v.label}</span>
-            <div class="vol-bar-wrap">
-              <div class="vol-bar">
-                <div class="vol-bar-fill ${v.cls}" style="width:${v.pct}%;background:currentColor;opacity:.7;"></div>
-              </div>
-            </div>
-          </div>
+          <div class="vol-indicator">Vol: ${v.label} (${v.pct}%)</div>
         </div>
       </div>
-
       <p class="card-desc">${c.desc}</p>
-
       <div class="card-mgmt">${mgmtHtml}</div>
-
       <div class="card-stats">
-        <div class="card-stat">
-          <div class="card-stat-val">${c.founded}</div>
-          <div class="card-stat-lbl">Founded</div>
-        </div>
-        <div class="card-stat">
-          <div class="card-stat-val">${c.employees}</div>
-          <div class="card-stat-lbl">Employees</div>
-        </div>
-        <div class="card-stat">
-          <div class="card-stat-val" style="font-size:11px;line-height:1.4">${c.hq}</div>
-          <div class="card-stat-lbl">Headquarters</div>
-        </div>
-        <div class="card-stat">
-          <div class="card-stat-val" style="font-size:12px;">${rivalHtml}</div>
-          <div class="card-stat-lbl">Main Rival</div>
-        </div>
+        <div class="card-stat"><div class="stat-val">${c.founded||'—'}</div><div class="stat-lbl">Founded</div></div>
+        <div class="card-stat"><div class="stat-val">${c.employees||'—'}</div><div class="stat-lbl">Employees</div></div>
+        <div class="card-stat"><div class="stat-val" style="font-size:11px;line-height:1.4">${c.hq||'—'}</div><div class="stat-lbl">HQ</div></div>
+        <div class="card-stat"><div class="stat-val" style="font-size:12px">${rivalHtml}</div><div class="stat-lbl">Main Rival</div></div>
       </div>`;
 
     list.appendChild(card);
   });
-
-  document.getElementById('statCompanies').textContent = COMPANIES.length;
 }
 
-function scrollToCard(ticker) {
-  const card = document.getElementById('card-' + ticker);
-  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function scrollTo(ticker) {
+  const el = document.getElementById('card-' + ticker);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-// ═══════════════════════════════════════════════════════
-// FILTER
-// ═══════════════════════════════════════════════════════
-let currentSector = 'ALL';
-let currentSearch = '';
-
-function filterSector(sector, btn) {
-  currentSector = sector;
-  document.querySelectorAll('.sector-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  applyFilters();
+// ── Nav ──────────────────────────────────────────────────
+function buildNav(filter='') {
+  const nav = document.getElementById('navList');
+  nav.innerHTML = '';
+  const grouped = {};
+  allCompanies.forEach(c => {
+    if (filter && !c.ticker.toLowerCase().includes(filter) && !c.name.toLowerCase().includes(filter)) return;
+    if (!grouped[c.sector]) grouped[c.sector] = [];
+    grouped[c.sector].push(c);
+  });
+  SECTOR_ORDER.forEach(sector => {
+    const list = grouped[sector];
+    if (!list?.length) return;
+    const lbl = document.createElement('div');
+    lbl.className = 'nav-sector-label';
+    lbl.textContent = (SECTOR_EMOJI[sector]||'') + ' ' + sector;
+    nav.appendChild(lbl);
+    list.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'nav-item';
+      item.dataset.ticker = c.ticker;
+      item.innerHTML = `<span class="nav-ticker">${c.ticker}</span><span class="nav-name">${c.name}</span>`;
+      item.onclick = () => {
+        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+        item.classList.add('active');
+        scrollTo(c.ticker);
+      };
+      nav.appendChild(item);
+    });
+  });
 }
 
+// ── Filters ──────────────────────────────────────────────
 function applyFilters() {
-  const cards = document.querySelectorAll('.company-card');
   let visible = 0;
-  cards.forEach(card => {
-    const sectorMatch = currentSector === 'ALL' || card.dataset.sector === currentSector;
-    const searchMatch = !currentSearch ||
-      card.dataset.name.includes(currentSearch) ||
-      card.dataset.ticker.includes(currentSearch);
-    const show = sectorMatch && searchMatch;
+  document.querySelectorAll('.company-card').forEach(card => {
+    const sectorOk = currentSector === 'ALL' || card.dataset.sector === currentSector;
+    const searchOk = !currentSearch || card.dataset.search.includes(currentSearch);
+    const show = sectorOk && searchOk;
     card.classList.toggle('hidden', !show);
     if (show) visible++;
   });
-
-  document.getElementById('statCompanies').textContent = visible;
+  document.getElementById('statCount').textContent = visible;
   document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
 }
 
-// ═══════════════════════════════════════════════════════
-// SEARCH
-// ═══════════════════════════════════════════════════════
+// ── Search ───────────────────────────────────────────────
 document.getElementById('globalSearch').addEventListener('input', e => {
   currentSearch = e.target.value.toLowerCase().trim();
   document.getElementById('navSearch').value = e.target.value;
   applyFilters();
   buildNav(currentSearch);
 });
-
 document.getElementById('navSearch').addEventListener('input', e => {
   buildNav(e.target.value.toLowerCase().trim());
 });
 
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-buildCards();
-buildNav();
+// ── Boot ─────────────────────────────────────────────────
+loadCompanies();
 </script>
 </body>
 </html>

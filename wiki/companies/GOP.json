@@ -1,0 +1,27 @@
+{
+  "ticker": "GOP",
+  "name": "GoPostal",
+  "sector": "TRANSPORT",
+  "rival": "",
+  "basePrice": 19.3,
+  "vol": 0.03,
+  "tagline": "Going Postal Since 1947.",
+  "founded": "1947",
+  "employees": "62,000",
+  "hq": "La Mesa, LS",
+  "desc": "GoPostal is San Andreas's dominant parcel delivery and logistics company. With its distinctive yellow delivery vans ubiquitous across LS, GoPostal handles the last-mile delivery for virtually every e-commerce company in the state.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Dennis Trout"
+    },
+    {
+      "role": "CFO",
+      "name": "Wanda Simmons"
+    },
+    {
+      "role": "VP Logistics",
+      "name": "Chen Wei"
+    }
+  ]
+}

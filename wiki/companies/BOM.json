@@ -1,0 +1,27 @@
+{
+  "ticker": "BOM",
+  "name": "BobMulét Energy",
+  "sector": "ENERGY",
+  "rival": "GCD",
+  "basePrice": 18.7,
+  "vol": 0.04,
+  "tagline": "Energy. Delivered Differently.",
+  "founded": "2019",
+  "employees": "620",
+  "hq": "LSIA Business District",
+  "desc": "BobMulét is the scrappy energy startup attempting to disrupt the SA utility market through distributed microgrids and community solar programmes. Analysts are divided: some see the next Green Future Energy, others see an elaborate lifestyle brand.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Roberto Mulé"
+    },
+    {
+      "role": "CTO",
+      "name": "Dr. Wei Chen"
+    },
+    {
+      "role": "CFO",
+      "name": "Angela Frost"
+    }
+  ]
+}

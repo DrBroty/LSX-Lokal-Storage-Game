@@ -1,0 +1,27 @@
+{
+  "ticker": "VNWD",
+  "name": "Vinewood Digital",
+  "sector": "TECH",
+  "rival": "WZRD",
+  "basePrice": 67.8,
+  "vol": 0.035,
+  "tagline": "Hollywood Meets Silicon.",
+  "founded": "2016",
+  "employees": "4,100",
+  "hq": "Vinewood Hills, LS",
+  "desc": "Vinewood Digital is the streaming and digital distribution arm of the LS entertainment industry. Its VDTV platform hosts original content, live event streams, and archival Vinewood film libraries.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Gloria Mabela"
+    },
+    {
+      "role": "CFO",
+      "name": "Matthew Goldstein"
+    },
+    {
+      "role": "Chief Content Officer",
+      "name": "Jillian Norris-Watts"
+    }
+  ]
+}

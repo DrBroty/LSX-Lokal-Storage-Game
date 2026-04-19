@@ -1,0 +1,27 @@
+{
+  "ticker": "BEN",
+  "name": "BeanMachine",
+  "sector": "FOOD",
+  "rival": "BAN",
+  "basePrice": 13.2,
+  "vol": 0.02,
+  "tagline": "Fuel The Machine.",
+  "founded": "2011",
+  "employees": "3,800",
+  "hq": "Vinewood, LS",
+  "desc": "BeanMachine pitches itself to the tech and creative class of Los Santos, offering subscription-based specialty coffee delivered to co-working spaces across the city. The company's app-first model and loyalty NFT program generated buzz in 2023 before the LS digital asset market cooled.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Tyler Vance-Okafor"
+    },
+    {
+      "role": "CTO",
+      "name": "Priya Sharma"
+    },
+    {
+      "role": "CFO",
+      "name": "Brenda Castellanos"
+    }
+  ]
+}

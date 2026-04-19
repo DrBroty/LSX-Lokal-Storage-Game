@@ -1,0 +1,27 @@
+{
+  "ticker": "VAPD",
+  "name": "Vapid",
+  "sector": "TRANSPORT",
+  "rival": "DECLSS",
+  "basePrice": 62.4,
+  "vol": 0.032,
+  "tagline": "American. All The Way.",
+  "founded": "1924",
+  "employees": "31,000",
+  "hq": "Rockford, SA",
+  "desc": "Vapid is the quintessentially American automaker — big trucks, bigger engines, and a loyal patriotic fanbase. The LSPD famously runs an entire Vapid Crown Victoria fleet.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Earl Boatright"
+    },
+    {
+      "role": "CFO",
+      "name": "Janet MacAllister"
+    },
+    {
+      "role": "Chief Designer",
+      "name": "Todd Brubaker"
+    }
+  ]
+}

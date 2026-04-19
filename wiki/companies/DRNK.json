@@ -1,0 +1,27 @@
+{
+  "ticker": "DRNK",
+  "name": "Drone Solutions LS",
+  "sector": "TECH",
+  "rival": "FCDE",
+  "basePrice": 44.2,
+  "vol": 0.045,
+  "tagline": "Eyes In The Sky.",
+  "founded": "2015",
+  "employees": "890",
+  "hq": "La Mesa, LS",
+  "desc": "Drone Solutions LS provides commercial UAV services to the LSPD, real estate firms, and film studios. The company's proprietary Hawk-Eye surveillance drones are a regular sight over Los Santos.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Nathan Ashby"
+    },
+    {
+      "role": "CTO",
+      "name": "Lisa Tran"
+    },
+    {
+      "role": "CFO",
+      "name": "Robert Nakamura"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "ticker": "OCELOT",
+  "name": "Ocelot",
+  "sector": "TRANSPORT",
+  "rival": "PFSTR",
+  "basePrice": 198.3,
+  "vol": 0.025,
+  "tagline": "Electric. Elegant. Inevitable.",
+  "founded": "1961",
+  "employees": "28,000 (Global)",
+  "hq": "London / Rockford Hills (SA HQ)",
+  "desc": "Ocelot is the British-Japanese luxury electric vehicle maker whose Pariah and Jugular models have taken Vinewood by storm. Ocelot's partnership with the Vinewood Racetrack for their annual showcase event is a calendar highlight for LS's elite.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Harriet Blackwood"
+    },
+    {
+      "role": "CTO",
+      "name": "Kenji Mori"
+    },
+    {
+      "role": "CFO",
+      "name": "Philip Durant"
+    }
+  ]
+}

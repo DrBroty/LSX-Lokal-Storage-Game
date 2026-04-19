@@ -1,0 +1,27 @@
+{
+  "ticker": "MAIBT",
+  "name": "Maibatsu",
+  "sector": "TRANSPORT",
+  "rival": "DINKA",
+  "basePrice": 102.3,
+  "vol": 0.028,
+  "tagline": "Built For Life.",
+  "founded": "1941",
+  "employees": "89,000 (Global)",
+  "hq": "Nagoya / Little Seoul (SA HQ)",
+  "desc": "Maibatsu is the Japanese conglomerate best known in SA for the legendary Sanchez dirt bike — the vehicle of choice for Blaine County desert racers and LS courier companies.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Yoshiro Maibatsu"
+    },
+    {
+      "role": "CFO",
+      "name": "Haruko Tanaka"
+    },
+    {
+      "role": "VP Commercial",
+      "name": "David Cho"
+    }
+  ]
+}

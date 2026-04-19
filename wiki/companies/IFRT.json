@@ -1,0 +1,31 @@
+{
+  "ticker": "IFRT",
+  "name": "iFruit Corp.",
+  "sector": "TECH",
+  "rival": "LFI",
+  "basePrice": 388.5,
+  "vol": 0.028,
+  "tagline": "Think Fruit.",
+  "founded": "1995",
+  "employees": "42,000",
+  "hq": "Rockford Hills, LS",
+  "desc": "iFruit is the most valuable technology company in San Andreas and the maker of the iconic iFruit smartphone. With a cult following among Vinewood celebrities and tech workers alike, iFruit commands obscene margins on its hardware.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Jonathan Piece"
+    },
+    {
+      "role": "CFO",
+      "name": "Ellen Kwon"
+    },
+    {
+      "role": "SVP Design",
+      "name": "Sebastian Braun"
+    },
+    {
+      "role": "CTO",
+      "name": "Marcus Reid"
+    }
+  ]
+}

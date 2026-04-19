@@ -1,0 +1,27 @@
+{
+  "ticker": "HLWPNT",
+  "name": "Hollow Point Inc.",
+  "sector": "RETAIL",
+  "rival": "SHRPSH",
+  "basePrice": 31.8,
+  "vol": 0.042,
+  "tagline": "Maximum Impact. Guaranteed.",
+  "founded": "1994",
+  "employees": "2,800",
+  "hq": "Cypress Flats, LS",
+  "desc": "Hollow Point Inc. is the ammunition manufacturer supplying both Ammu-Nation and Shrewsbury Arms retail chains. Their defensive hollow-point rounds are the top sellers in LS.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Brandon Kinsley"
+    },
+    {
+      "role": "CFO",
+      "name": "Patricia Dunnmore"
+    },
+    {
+      "role": "VP Manufacturing",
+      "name": "Craig Wolff"
+    }
+  ]
+}

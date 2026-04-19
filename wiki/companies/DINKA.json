@@ -1,0 +1,27 @@
+{
+  "ticker": "DINKA",
+  "name": "Dinka",
+  "sector": "TRANSPORT",
+  "rival": "KARIN",
+  "basePrice": 88.6,
+  "vol": 0.03,
+  "tagline": "Japanese Engineering. Global Roads.",
+  "founded": "1953",
+  "employees": "44,000 (Global)",
+  "hq": "Tokyo / Little Seoul (SA HQ)",
+  "desc": "Dinka is the Japanese automaker best known in SA for its high-revving sports bikes and compact performance cars. The Dinka Thrust and Jester are iconic among Los Santos street racing communities.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Takashi Yamada"
+    },
+    {
+      "role": "CFO",
+      "name": "Michelle Chen"
+    },
+    {
+      "role": "Chief Engineer",
+      "name": "Ryo Hashimoto"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "ticker": "NVRDE",
+  "name": "NVerde Renewables",
+  "sector": "ENERGY",
+  "rival": "HAF",
+  "basePrice": 88.5,
+  "vol": 0.032,
+  "tagline": "A Greener San Andreas.",
+  "founded": "2012",
+  "employees": "3,800",
+  "hq": "Downtown LS",
+  "desc": "NVerde Renewables is the darling of SA's green investment community. Operating the Tataviam Mountains Wind Farm and the Grand Senora Solar Array, NVerde generates clean energy for 180,000 SA households.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Dr. Carolyn Marsh"
+    },
+    {
+      "role": "CFO",
+      "name": "Arun Mehta"
+    },
+    {
+      "role": "Chief Sustainability Officer",
+      "name": "Ingrid Larsen"
+    }
+  ]
+}

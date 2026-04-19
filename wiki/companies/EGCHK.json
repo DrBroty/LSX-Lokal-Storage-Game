@@ -1,0 +1,23 @@
+{
+  "ticker": "EGCHK",
+  "name": "EgoChaser Energy",
+  "sector": "FOOD",
+  "rival": "SPNK",
+  "basePrice": 18.6,
+  "vol": 0.035,
+  "tagline": "Chase More. Sleep Less.",
+  "founded": "2014",
+  "employees": "2,100",
+  "hq": "Sandy Shores",
+  "desc": "EgoChaser is the brash energy drink brand taking on the LS market with extreme sports sponsorships and controversial marketing. Its signature red-and-black cans are ubiquitous at Blaine County motocross events and skate parks.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Ricky Mansfield"
+    },
+    {
+      "role": "CFO",
+      "name": "Chandra Patel"
+    }
+  ]
+}

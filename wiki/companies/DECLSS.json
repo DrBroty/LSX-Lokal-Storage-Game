@@ -1,0 +1,23 @@
+{
+  "ticker": "DECLSS",
+  "name": "Declasse",
+  "sector": "TRANSPORT",
+  "rival": "VAPD",
+  "basePrice": 54.8,
+  "vol": 0.032,
+  "tagline": "For The Rest Of Us.",
+  "founded": "1938",
+  "employees": "22,000",
+  "hq": "Harmony, SA",
+  "desc": "Declasse occupies the affordable domestic car market in San Andreas, offering practical sedans and compact SUVs that lack prestige but make up for it in value. The Declasse Granger is a fixture of SA government motor pools.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Robert 'Bob' Danforth"
+    },
+    {
+      "role": "CFO",
+      "name": "Tanya Vickers"
+    }
+  ]
+}

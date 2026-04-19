@@ -1,0 +1,27 @@
+{
+  "ticker": "PEGASS",
+  "name": "Pegassi",
+  "sector": "TRANSPORT",
+  "rival": "TRUFFD",
+  "basePrice": 480.5,
+  "vol": 0.022,
+  "tagline": "Italian Fire. No Limits.",
+  "founded": "1929",
+  "employees": "1,200 (Global)",
+  "hq": "Maranello / Rockford Hills (SA HQ)",
+  "desc": "Pegassi is Italy's answer to Truffade — a hypercar manufacturer whose Tempesta, Zentorno, and Osiris have graced more Vinewood Hills driveways than any other supercar brand.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Marco Pellegrino"
+    },
+    {
+      "role": "CFO",
+      "name": "Isabella Rossi"
+    },
+    {
+      "role": "Racing Director",
+      "name": "Fabio Colombo"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "NYKA",
+  "name": "Nuka-Cola LS",
+  "sector": "FOOD",
+  "rival": "SPNK",
+  "basePrice": 29.3,
+  "vol": 0.03,
+  "tagline": "Taste The Future.",
+  "founded": "2019 (LS Division)",
+  "employees": "1,800",
+  "hq": "Little Seoul, LS",
+  "desc": "Nuka-Cola LS is the San Andreas subsidiary of a larger East Coast beverage conglomerate, selling its nuclear-themed cola brand through LS convenience stores and vending machines.",
+  "executives": [
+    {
+      "role": "CEO (SA Division)",
+      "name": "Gerald Swanson"
+    },
+    {
+      "role": "CFO",
+      "name": "Kim Nakashima"
+    }
+  ]
+}

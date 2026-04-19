@@ -1,0 +1,23 @@
+{
+  "ticker": "DRGS",
+  "name": "Dr. Friedlander Health",
+  "sector": "PHARMA",
+  "rival": "MXMD",
+  "basePrice": 41.6,
+  "vol": 0.042,
+  "tagline": "Your Wellness. Our Priority.",
+  "founded": "2001",
+  "employees": "3,400",
+  "hq": "Rockford Hills, LS",
+  "desc": "Dr. Friedlander Health operates a network of psychiatric and wellness clinics. Founded by Dr. Isiah Friedlander — whose celebrity patient list reads like a Vinewood awards show — questions about patient confidentiality practices remain unresolved.",
+  "executives": [
+    {
+      "role": "Founder & CEO",
+      "name": "Dr. Isiah Friedlander"
+    },
+    {
+      "role": "CFO",
+      "name": "Amanda Rowe"
+    }
+  ]
+}

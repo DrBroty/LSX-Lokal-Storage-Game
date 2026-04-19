@@ -1,0 +1,31 @@
+{
+  "ticker": "PACP",
+  "name": "Pacific Standard Finance",
+  "sector": "FINANCE",
+  "rival": "FLCA",
+  "basePrice": 198.6,
+  "vol": 0.018,
+  "tagline": "West Coast. Best Coast. Best Rates.",
+  "founded": "1902",
+  "employees": "7,800",
+  "hq": "Pillbox Hill, LS",
+  "desc": "Pacific Standard Finance is the premiere investment bank and public bond issuer of San Andreas. Their downtown LS tower holds the most valuable vault on the West Coast — a fact that has not gone unnoticed by the criminal underworld.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Howard Blanche III"
+    },
+    {
+      "role": "CFO",
+      "name": "Sophia Kim"
+    },
+    {
+      "role": "Chief Security Officer",
+      "name": "Major (ret.) Alan Sheppard"
+    },
+    {
+      "role": "General Counsel",
+      "name": "Nathaniel Burns"
+    }
+  ]
+}

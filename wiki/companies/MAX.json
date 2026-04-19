@@ -1,0 +1,23 @@
+{
+  "ticker": "MAX",
+  "name": "MaxRenda",
+  "sector": "RETAIL",
+  "rival": "ARK",
+  "basePrice": 24.1,
+  "vol": 0.025,
+  "tagline": "Value. Every Aisle.",
+  "founded": "1973",
+  "employees": "19,800",
+  "hq": "Davis, LS",
+  "desc": "MaxRenda is the discount general merchandise chain filling the gap between convenience stores and big-box retail in San Andreas. With 320 locations, MaxRenda competes on price over everything.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Victor Randolph"
+    },
+    {
+      "role": "CFO",
+      "name": "Chloe Kim"
+    }
+  ]
+}

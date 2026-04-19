@@ -1,0 +1,27 @@
+{
+  "ticker": "PFSTR",
+  "name": "Pfister",
+  "sector": "TRANSPORT",
+  "rival": "OCELOT",
+  "basePrice": 210.5,
+  "vol": 0.025,
+  "tagline": "German Precision. LS Streets.",
+  "founded": "1898",
+  "employees": "52,000 (Global)",
+  "hq": "Stuttgart / Rockford Hills (SA HQ)",
+  "desc": "Pfister is the premium German automaker with a strong foothold in the Rockford Hills and Vinewood Hills luxury market. Their 811 electric hypercar and Comet S2 have become status symbols among LS's financial elite.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Klaus-Dieter Hofmann"
+    },
+    {
+      "role": "CFO",
+      "name": "Sabine Ritter"
+    },
+    {
+      "role": "Head of SA Market",
+      "name": "William Ashford-Grey"
+    }
+  ]
+}

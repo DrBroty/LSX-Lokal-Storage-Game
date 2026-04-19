@@ -1,0 +1,23 @@
+{
+  "ticker": "VINWD",
+  "name": "Vinewood Blvd Radio",
+  "sector": "MEDIA",
+  "rival": "RLS",
+  "basePrice": 12.4,
+  "vol": 0.055,
+  "tagline": "Alternative. Always.",
+  "founded": "2006",
+  "employees": "145",
+  "hq": "Vinewood, LS",
+  "desc": "Vinewood Blvd Radio is the indie rock and alternative station beloved by LS's creative community. VBR's eclectic playlist and cult DJ personalities generate a devoted listenership that punches above their frequency in cultural influence.",
+  "executives": [
+    {
+      "role": "Station Director",
+      "name": "Tommy Smith"
+    },
+    {
+      "role": "CFO",
+      "name": "Heather Knox"
+    }
+  ]
+}

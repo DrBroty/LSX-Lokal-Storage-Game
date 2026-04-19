@@ -1,0 +1,23 @@
+{
+  "ticker": "JMBJ",
+  "name": "Jumberjack Diner",
+  "sector": "FOOD",
+  "rival": "BSTA",
+  "basePrice": 16.4,
+  "vol": 0.032,
+  "tagline": "Big Eats. Bigger Belt.",
+  "founded": "1974",
+  "employees": "9,700",
+  "hq": "Paleto Bay",
+  "desc": "Jumberjack Diner is San Andreas's beloved 24-hour roadside diner chain, serving enormous portions of American comfort food to truckers, night-shift workers, and tourists. The chain operates 220 locations, mostly near highways.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Bobby Ray Dalton"
+    },
+    {
+      "role": "CFO",
+      "name": "Sheila Morrissey"
+    }
+  ]
+}

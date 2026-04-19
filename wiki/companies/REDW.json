@@ -1,0 +1,23 @@
+{
+  "ticker": "REDW",
+  "name": "Redwood Cigarettes",
+  "sector": "RETAIL",
+  "rival": "DEB",
+  "basePrice": 71.2,
+  "vol": 0.03,
+  "tagline": "Real American Smoke.",
+  "founded": "1935",
+  "employees": "7,200",
+  "hq": "Harmony, SA",
+  "desc": "Redwood is the populist cigarette brand — bold, unfiltered, and unapologetic. The official smoke of Blaine County rodeos and LS construction sites, Redwood commands formidable market share through sheer working-class loyalty.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Duke Harmon"
+    },
+    {
+      "role": "CFO",
+      "name": "Sharon Fitz"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "ticker": "LFI",
+  "name": "Lifeinvader",
+  "sector": "TECH",
+  "rival": "IFRT",
+  "basePrice": 12.3,
+  "vol": 0.04,
+  "tagline": "Stalk Your Friends.",
+  "founded": "2003",
+  "employees": "28,000",
+  "hq": "Vinewood, LS",
+  "desc": "Lifeinvader is San Andreas's dominant social network — a fact its executives celebrate while its stock tells a different story. Despite 400 million registered accounts, the platform's aggressive data harvesting and political manipulation scandals have kept the stock in the gutter.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Jay Norris"
+    },
+    {
+      "role": "CFO",
+      "name": "Amanda Krebs"
+    },
+    {
+      "role": "COO",
+      "name": "Derek Fong"
+    }
+  ]
+}

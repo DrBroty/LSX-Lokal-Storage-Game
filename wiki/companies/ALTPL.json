@@ -1,0 +1,27 @@
+{
+  "ticker": "ALTPL",
+  "name": "Alamo Travel Power",
+  "sector": "ENERGY",
+  "rival": "HAF",
+  "basePrice": 33.9,
+  "vol": 0.038,
+  "tagline": "Powering The Journey.",
+  "founded": "1952",
+  "employees": "6,700",
+  "hq": "Alamo Sea Region",
+  "desc": "Alamo Travel Power operates the electricity transmission infrastructure serving the Alamo Sea region and Route 1 corridor. A major transformers failure last year triggered a 6-hour blackout affecting 200,000 customers.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Sheila Moreno-Castillo"
+    },
+    {
+      "role": "CFO",
+      "name": "Brian Kowalsky"
+    },
+    {
+      "role": "Chief Grid Officer",
+      "name": "Dr. Felix Braun"
+    }
+  ]
+}

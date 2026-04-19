@@ -1,0 +1,27 @@
+{
+  "ticker": "TBMB",
+  "name": "TacoBomb",
+  "sector": "FOOD",
+  "rival": "CLKB",
+  "basePrice": 41.5,
+  "vol": 0.025,
+  "tagline": "Drop The Bomb On Hunger.",
+  "founded": "1994",
+  "employees": "27,800",
+  "hq": "La Mesa, LS",
+  "desc": "TacoBomb exploded onto the San Andreas fast food scene in the 1990s, riding a wave of tex-mex fever to build one of the largest QSR franchises in the state. Their Bombito and Crunch Wrap Supreme have achieved near-legendary status among LS night owls. The company recently acquired three regional taco chains in Sandy Shores and Paleto Bay.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Carlos 'Chuck' Ramirez"
+    },
+    {
+      "role": "CFO",
+      "name": "Wendy Park"
+    },
+    {
+      "role": "CDO",
+      "name": "Jamal Brooks"
+    }
+  ]
+}

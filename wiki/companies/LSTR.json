@@ -1,0 +1,23 @@
+{
+  "ticker": "LSTR",
+  "name": "Lester Crest Capital",
+  "sector": "FINANCE",
+  "rival": "GRU",
+  "basePrice": 24.8,
+  "vol": 0.038,
+  "tagline": "The Smart Money.",
+  "founded": "2009",
+  "employees": "47",
+  "hq": "Sandy Shores",
+  "desc": "Lester Crest Capital is a boutique hedge fund and private intelligence operation that somehow obtained a public listing. The firm's exceptional track record — returns averaging 34% annually — has attracted both admiration and multiple SEC-equivalent investigations.",
+  "executives": [
+    {
+      "role": "Founder & CIO",
+      "name": "Lester Crest"
+    },
+    {
+      "role": "CFO",
+      "name": "Patricia Malone-Webb"
+    }
+  ]
+}

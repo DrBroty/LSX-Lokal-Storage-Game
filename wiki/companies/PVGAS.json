@@ -1,0 +1,23 @@
+{
+  "ticker": "PVGAS",
+  "name": "Paleto Bay Gas & Oil",
+  "sector": "ENERGY",
+  "rival": "GCD",
+  "basePrice": 48.7,
+  "vol": 0.042,
+  "tagline": "North SA's Energy Partner.",
+  "founded": "1941",
+  "employees": "4,200",
+  "hq": "Paleto Bay",
+  "desc": "Paleto Bay Gas & Oil is the regional energy company serving Northern Blaine County. PBGO operates serious extraction infrastructure in the Chiliad Mountain State Wilderness and holds several contentious fracking licences.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Randy Higgins"
+    },
+    {
+      "role": "CFO",
+      "name": "Carol-Ann Mosley"
+    }
+  ]
+}

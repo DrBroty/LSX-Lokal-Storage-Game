@@ -1,0 +1,23 @@
+{
+  "ticker": "TWNTFR",
+  "name": "24/7 Supermarkt",
+  "sector": "RETAIL",
+  "rival": "ROBLQ",
+  "basePrice": 31.2,
+  "vol": 0.022,
+  "tagline": "Open. Always.",
+  "founded": "1968",
+  "employees": "28,000",
+  "hq": "La Puerta, LS",
+  "desc": "24/7 Supermarkt is San Andreas's most convenient convenience store chain. The stores never close, rarely restock fast enough, and charge accordingly. With 820 locations statewide, 24/7 is the default for forgotten milk and emergency snacks.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Jim-Paul Nakagawa"
+    },
+    {
+      "role": "CFO",
+      "name": "Susan Delacroix"
+    }
+  ]
+}

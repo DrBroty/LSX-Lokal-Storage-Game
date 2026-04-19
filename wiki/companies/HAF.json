@@ -1,0 +1,27 @@
+{
+  "ticker": "HAF",
+  "name": "Hammerstein & Faust",
+  "sector": "ENERGY",
+  "rival": "",
+  "basePrice": 31.4,
+  "vol": 0.035,
+  "tagline": "Industrial Strength. Since 1889.",
+  "founded": "1889",
+  "employees": "11,800",
+  "hq": "Cypress Flats, LS",
+  "desc": "Hammerstein & Faust is the German industrial energy group that quietly powers much of San Andreas's industrial infrastructure. H&F deliberately avoids consumer branding, operating entirely in the B2B energy market.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Friedrich Hammerstein"
+    },
+    {
+      "role": "CFO",
+      "name": "Lars Bergmann"
+    },
+    {
+      "role": "Head of SA Operations",
+      "name": "Derek Crane"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "MRRWT",
+  "name": "Merryweather Arms Div.",
+  "sector": "RETAIL",
+  "rival": "MILIT",
+  "basePrice": 142.3,
+  "vol": 0.032,
+  "tagline": "Merryweather. Armed For Tomorrow.",
+  "founded": "2008 (spin-off)",
+  "employees": "6,100",
+  "hq": "Elysian Island, LS",
+  "desc": "The arms division of Merryweather Security, spun off as a separate listed entity. The division manufactures weapons systems, surveillance equipment, and armoured vehicles.",
+  "executives": [
+    {
+      "role": "Division Head",
+      "name": "Brigadier (ret.) Marcus Stone"
+    },
+    {
+      "role": "CFO",
+      "name": "Elaine Haskell"
+    }
+  ]
+}

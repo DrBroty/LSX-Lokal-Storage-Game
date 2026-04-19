@@ -1,0 +1,27 @@
+{
+  "ticker": "BAN",
+  "name": "CoolBeans Coffee",
+  "sector": "FOOD",
+  "rival": "BEN",
+  "basePrice": 15.6,
+  "vol": 0.02,
+  "tagline": "Your Morning, Sorted.",
+  "founded": "2008",
+  "employees": "6,200",
+  "hq": "Rockford Hills, LS",
+  "desc": "CoolBeans Coffee is attempting to bring third-wave coffee culture to the streets of Los Santos, with mixed results. The chain operates 340 artisanal coffee shops across LS, each decorated in reclaimed wood and exposed brick.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Amber Kowalski-Stern"
+    },
+    {
+      "role": "CFO",
+      "name": "Simon Ng"
+    },
+    {
+      "role": "Head of Experience",
+      "name": "Zoe Farquhar"
+    }
+  ]
+}

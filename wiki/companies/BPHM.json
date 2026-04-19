@@ -1,0 +1,31 @@
+{
+  "ticker": "BPHM",
+  "name": "Betta Pharmaceuticals",
+  "sector": "PHARMA",
+  "rival": "BILK",
+  "basePrice": 124.6,
+  "vol": 0.04,
+  "tagline": "Better Health. Better Returns.",
+  "founded": "1961",
+  "employees": "22,000",
+  "hq": "Pillbox Hill, LS",
+  "desc": "Betta Pharmaceuticals is San Andreas's largest domestic drug manufacturer. The company's pipeline of six late-stage drugs has analysts bullish, though a recent data falsification allegation by a former researcher has cast shadows over two key trials.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Dr. Elizabeth Harrington"
+    },
+    {
+      "role": "CFO",
+      "name": "Patrick Huang"
+    },
+    {
+      "role": "Chief Medical Officer",
+      "name": "Dr. Randall Pierce"
+    },
+    {
+      "role": "General Counsel",
+      "name": "Kathleen Burns"
+    }
+  ]
+}

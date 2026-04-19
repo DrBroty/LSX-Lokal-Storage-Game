@@ -1,0 +1,27 @@
+{
+  "ticker": "AUG",
+  "name": "Augury Insurance",
+  "sector": "FINANCE",
+  "rival": "MOR",
+  "basePrice": 48.9,
+  "vol": 0.03,
+  "tagline": "We See It Coming.",
+  "founded": "2000",
+  "employees": "5,400",
+  "hq": "Pillbox Hill, LS",
+  "desc": "Augury Insurance sells itself on predictive analytics and proactive coverage in the high-risk San Andreas market. Their 'Psychic Shield' premium tier has attracted scrutiny from the SA Insurance Commission.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Cassandra Foley"
+    },
+    {
+      "role": "CFO",
+      "name": "Benjamin Tran"
+    },
+    {
+      "role": "Chief Actuary",
+      "name": "Dr. Miriam Goldstein"
+    }
+  ]
+}

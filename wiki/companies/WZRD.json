@@ -1,0 +1,27 @@
+{
+  "ticker": "WZRD",
+  "name": "Weasel Tech",
+  "sector": "TECH",
+  "rival": "LFI",
+  "basePrice": 28.4,
+  "vol": 0.05,
+  "tagline": "Smart Moves.",
+  "founded": "2010",
+  "employees": "2,600",
+  "hq": "Vinewood, LS",
+  "desc": "Weasel Tech operates as a subsidiary of Weazel Media, providing the digital advertising and data analytics infrastructure behind SA's largest media network. Their audience targeting capabilities have attracted political campaign spending.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Scott Berkowitz"
+    },
+    {
+      "role": "CTO",
+      "name": "Hina Yamamoto"
+    },
+    {
+      "role": "CFO",
+      "name": "Derrick Okonkwo"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "ROBLQ",
+  "name": "Rob's Liquor",
+  "sector": "RETAIL",
+  "rival": "TWNTFR",
+  "basePrice": 18.9,
+  "vol": 0.04,
+  "tagline": "Your Neighbourhood Bottle Shop.",
+  "founded": "1979",
+  "employees": "3,800",
+  "hq": "Strawberry, LS",
+  "desc": "Rob's Liquor is the scrappy independent liquor chain that somehow went public. Operating 240 stores across greater LS, Rob's serves the off-licence market with an admirably democratic selection.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Rob 'Bobby' Fleischer"
+    },
+    {
+      "role": "CFO",
+      "name": "Diana Kowalski"
+    }
+  ]
+}

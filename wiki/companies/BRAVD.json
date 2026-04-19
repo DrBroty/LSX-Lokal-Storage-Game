@@ -1,0 +1,27 @@
+{
+  "ticker": "BRAVD",
+  "name": "Bravado",
+  "sector": "TRANSPORT",
+  "rival": "DECLSS",
+  "basePrice": 71.2,
+  "vol": 0.03,
+  "tagline": "Bold Moves. Brave Roads.",
+  "founded": "1952",
+  "employees": "18,600",
+  "hq": "Paleto Bay",
+  "desc": "Bravado is the truck-and-off-road specialist of the SA domestic auto market. Their Bravado Buffalo and Duneloader have become cultural icons. Bravado's military vehicle division also holds several DoD contracts.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Dale Hurst"
+    },
+    {
+      "role": "CFO",
+      "name": "Yolanda Pierce"
+    },
+    {
+      "role": "SVP Defense",
+      "name": "Colonel (ret.) James O'Hara"
+    }
+  ]
+}

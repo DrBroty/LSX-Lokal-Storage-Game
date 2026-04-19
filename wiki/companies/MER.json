@@ -1,0 +1,27 @@
+{
+  "ticker": "MER",
+  "name": "Merryweather Security",
+  "sector": "FINANCE",
+  "rival": "GRU",
+  "basePrice": 62.5,
+  "vol": 0.03,
+  "tagline": "Your Safety. Our Business.",
+  "founded": "2001",
+  "employees": "15,600",
+  "hq": "Elysian Island, LS",
+  "desc": "Merryweather Security is a private military company operating across San Andreas and internationally. Their Elysian Island base hints at capabilities far beyond a typical security firm. The company's founder, Don Percival, maintains close ties to several government officials.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Don Percival"
+    },
+    {
+      "role": "COO",
+      "name": "General (ret.) Barry Howell"
+    },
+    {
+      "role": "CFO",
+      "name": "Lucinda Chase"
+    }
+  ]
+}

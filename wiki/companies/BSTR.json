@@ -1,0 +1,27 @@
+{
+  "ticker": "BSTR",
+  "name": "Badger Comms",
+  "sector": "TECH",
+  "rival": "FCDE",
+  "basePrice": 52.1,
+  "vol": 0.04,
+  "tagline": "Connected. Always.",
+  "founded": "1999",
+  "employees": "7,300",
+  "hq": "Strawberry, LS",
+  "desc": "Badger Communications operates the third-largest mobile network in San Andreas. Known for solid rural coverage in Blaine County, Badger has carved out a profitable niche among agricultural and mining businesses.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Patricia 'Pat' Donnelly"
+    },
+    {
+      "role": "CFO",
+      "name": "Robert Feng"
+    },
+    {
+      "role": "CTO",
+      "name": "James Adeyemi"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "SPC",
+  "name": "Space 103.2",
+  "sector": "MEDIA",
+  "rival": "FLYLO",
+  "basePrice": 13.2,
+  "vol": 0.05,
+  "tagline": "Funk. Soul. Space.",
+  "founded": "1972",
+  "employees": "130",
+  "hq": "Vespucci Beach, LS",
+  "desc": "Space 103.2 broadcasts a timeless blend of soul, funk, and disco to Los Santos. The station's New Year's Eve broadcast from Vespucci Beach is the most-listened-to single radio event in SA history.",
+  "executives": [
+    {
+      "role": "Program Director",
+      "name": "Bootsy Collins"
+    },
+    {
+      "role": "GM",
+      "name": "Phyllis Washington"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "FLYLO",
+  "name": "FlyLo FM",
+  "sector": "MEDIA",
+  "rival": "SWAX",
+  "basePrice": 10.1,
+  "vol": 0.06,
+  "tagline": "Electronic. Elevated.",
+  "founded": "2011",
+  "employees": "90",
+  "hq": "Arts District, LS",
+  "desc": "FlyLo FM is LS's premier electronic music station, broadcasting ambient, jazz fusion, and experimental beats to the city's creative night owls. Curated by producer Flying Lotus.",
+  "executives": [
+    {
+      "role": "Creative Director",
+      "name": "Flying Lotus"
+    },
+    {
+      "role": "Business Manager",
+      "name": "Naomi Chang"
+    }
+  ]
+}

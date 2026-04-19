@@ -1,0 +1,23 @@
+{
+  "ticker": "PSTL",
+  "name": "Pistol Pete Firearms",
+  "sector": "RETAIL",
+  "rival": "HLWPNT",
+  "basePrice": 22.6,
+  "vol": 0.045,
+  "tagline": "Affordable Protection. No Questions.",
+  "founded": "2002",
+  "employees": "1,400",
+  "hq": "Sandy Shores",
+  "desc": "Pistol Pete operates a chain of budget-friendly firearms dealers targeting the cost-conscious Blaine County market. Their 'Grab 'n' Go' financing plan and drive-through collection window have proven controversial but popular.",
+  "executives": [
+    {
+      "role": "Owner/CEO",
+      "name": "Pete Hannigan"
+    },
+    {
+      "role": "CFO",
+      "name": "Brenda Stokes"
+    }
+  ]
+}

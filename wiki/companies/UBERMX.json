@@ -1,0 +1,27 @@
+{
+  "ticker": "UBERMX",
+  "name": "Übermacht",
+  "sector": "TRANSPORT",
+  "rival": "PFSTR",
+  "basePrice": 156.8,
+  "vol": 0.026,
+  "tagline": "Engineering. Perfected.",
+  "founded": "1916",
+  "employees": "68,000 (Global)",
+  "hq": "Munich / Rockford Hills (SA HQ)",
+  "desc": "Übermacht is the German premium brand competing head-to-head with Pfister in the LS luxury segment. Known for their Sentinel and Oracle models favoured by LS executives and organised crime alike.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Rolf Steinmetz"
+    },
+    {
+      "role": "CFO",
+      "name": "Anna Bauer"
+    },
+    {
+      "role": "Head of SA Operations",
+      "name": "David Ashton"
+    }
+  ]
+}

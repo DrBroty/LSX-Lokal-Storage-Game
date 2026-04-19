@@ -1,0 +1,27 @@
+{
+  "ticker": "CLKB",
+  "name": "Clucking Bell",
+  "sector": "FOOD",
+  "rival": "TBMB",
+  "basePrice": 52.8,
+  "vol": 0.025,
+  "tagline": "It's The Bell. Cluck Yeah.",
+  "founded": "1978",
+  "employees": "39,200",
+  "hq": "Chamberlain Hills, LS",
+  "desc": "Clucking Bell is San Andreas's premier fried chicken and fast Mexican food chain. With its signature Cluck Sandwich and Burrito Supreme, the company serves the late-night crowd with 24-hour locations across LS. A longstanding rivalry with TacoBomb has resulted in multiple trademark disputes and at least two lobbyist-funded city council hearings.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Reginald Fawkes III"
+    },
+    {
+      "role": "CFO",
+      "name": "Anne-Sophie Moreau"
+    },
+    {
+      "role": "CMO",
+      "name": "Troy Upshaw"
+    }
+  ]
+}

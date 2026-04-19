@@ -1,0 +1,27 @@
+{
+  "ticker": "MILIT",
+  "name": "Militant Defense Corp.",
+  "sector": "RETAIL",
+  "rival": "MRRWT",
+  "basePrice": 187.5,
+  "vol": 0.03,
+  "tagline": "Equipped For Anything.",
+  "founded": "1976",
+  "employees": "9,400",
+  "hq": "Fort Zancudo Adjacent, SA",
+  "desc": "Militant Defense Corp. is SA's premier defence contractor and military equipment supplier. Their vehicles and hardware appear in SA National Guard inventories, and several foreign government contracts have boosted revenue significantly.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "General (ret.) Howard Blackwell"
+    },
+    {
+      "role": "CFO",
+      "name": "Amanda Sorrento"
+    },
+    {
+      "role": "VP Government Relations",
+      "name": "Senator (fmr.) Dale Wyatt"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "ticker": "PISS",
+  "name": "Pisswasser Brewery",
+  "sector": "FOOD",
+  "rival": "LOG",
+  "basePrice": 34.5,
+  "vol": 0.028,
+  "tagline": "Cold. Cheap. Effective.",
+  "founded": "1962",
+  "employees": "8,400",
+  "hq": "Terminal, LS Port",
+  "desc": "Pisswasser is San Andreas's best-selling domestic beer, brewed in massive industrial facilities near the LS docklands. Despite its provocative name — a proud tribute to its working-class roots — the brand commands fierce loyalty among Blaine County residents and sports fans.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Hans Gerhardt Brösel"
+    },
+    {
+      "role": "CFO",
+      "name": "Linda Voss"
+    },
+    {
+      "role": "Master Brewer",
+      "name": "Otto Kleinfeld"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "ticker": "HUMNE",
+  "name": "Humane Labs",
+  "sector": "PHARMA",
+  "rival": "BPHM",
+  "basePrice": 156.4,
+  "vol": 0.045,
+  "tagline": "For The Advancement Of Science.",
+  "founded": "1993",
+  "employees": "4,100",
+  "hq": "Grand Senora Desert (Secure Facility)",
+  "desc": "Humane Labs & Research is San Andreas's most controversial pharmaceutical and biotechnology company. Their remote desert facility has attracted persistent rumours about classified government contracts and non-consensual research programmes.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Dr. Albert Saperstein"
+    },
+    {
+      "role": "CFO",
+      "name": "Constance Aldridge"
+    },
+    {
+      "role": "Director of Special Projects",
+      "name": "[CLASSIFIED]"
+    }
+  ]
+}

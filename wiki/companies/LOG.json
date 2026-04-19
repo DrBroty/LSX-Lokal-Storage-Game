@@ -1,0 +1,23 @@
+{
+  "ticker": "LOG",
+  "name": "Logger Beer",
+  "sector": "FOOD",
+  "rival": "PISS",
+  "basePrice": 28.8,
+  "vol": 0.028,
+  "tagline": "Brewed For The Outdoors.",
+  "founded": "1957",
+  "employees": "4,100",
+  "hq": "Sandy Shores",
+  "desc": "Logger Beer markets itself as the beer of rugged San Andreas — hunters, fishermen, and anyone who works with their hands. Brewed in the foothills of the Alamo Sea region, Logger has a devoted blue-collar fanbase and is the official beer of the Sandy Shores Off-Road Rally.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Buck Hartley"
+    },
+    {
+      "role": "CFO",
+      "name": "Rene Dupont-Leblanc"
+    }
+  ]
+}

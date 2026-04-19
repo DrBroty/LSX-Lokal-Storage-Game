@@ -1,0 +1,23 @@
+{
+  "ticker": "SWAX",
+  "name": "Soulwax FM",
+  "sector": "MEDIA",
+  "rival": "FLYLO",
+  "basePrice": 9.6,
+  "vol": 0.06,
+  "tagline": "Pure Electronic. No Compromise.",
+  "founded": "2013",
+  "employees": "75",
+  "hq": "LSIA District, LS",
+  "desc": "Soulwax FM delivers an uncompromising diet of electronic, techno, and dance music to Los Santos. The station operates on a deliberately anti-commercial philosophy — revenue comes from branded live events rather than traditional spots.",
+  "executives": [
+    {
+      "role": "Founding DJs",
+      "name": "2manydjs (Dave & Stephen Dewaele)"
+    },
+    {
+      "role": "CFO",
+      "name": "Els Janssens"
+    }
+  ]
+}

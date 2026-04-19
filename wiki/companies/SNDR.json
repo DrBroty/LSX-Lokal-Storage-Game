@@ -1,0 +1,27 @@
+{
+  "ticker": "SNDR",
+  "name": "Sandy Shores Drilling",
+  "sector": "ENERGY",
+  "rival": "PVGAS",
+  "basePrice": 27.6,
+  "vol": 0.044,
+  "tagline": "Dig Deep. Profit More.",
+  "founded": "1968",
+  "employees": "2,900",
+  "hq": "Sandy Shores",
+  "desc": "Sandy Shores Drilling is the oil extraction specialist working the contested reserves beneath the Alamo Sea basin. The company's environmental record is, charitably, a work in progress.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Jim Tackett"
+    },
+    {
+      "role": "CFO",
+      "name": "Donna Briggs"
+    },
+    {
+      "role": "Chief Geologist",
+      "name": "Dr. Miguel Reyes"
+    }
+  ]
+}

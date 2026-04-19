@@ -1,0 +1,27 @@
+{
+  "ticker": "BOL",
+  "name": "Bank of Liberty",
+  "sector": "FINANCE",
+  "rival": "MAZE",
+  "basePrice": 174.2,
+  "vol": 0.02,
+  "tagline": "Freedom To Bank.",
+  "founded": "1887",
+  "employees": "18,500",
+  "hq": "Mission Row, LS",
+  "desc": "Bank of Liberty is the East Coast challenger trying to crack the San Andreas market. With its Liberty City heritage and strong institutional banking division, BOL has made inroads with LS corporations seeking alternatives to Maze Bank.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Andrew Fitch-Kessler"
+    },
+    {
+      "role": "CFO",
+      "name": "Maria da Silva"
+    },
+    {
+      "role": "Head of SA Operations",
+      "name": "Thomas Park"
+    }
+  ]
+}

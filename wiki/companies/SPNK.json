@@ -1,0 +1,27 @@
+{
+  "ticker": "SPNK",
+  "name": "Sprunk Beverages",
+  "sector": "FOOD",
+  "rival": "PISS",
+  "basePrice": 42.1,
+  "vol": 0.028,
+  "tagline": "Get Sprunked.",
+  "founded": "1955",
+  "employees": "14,200",
+  "hq": "Cypress Flats, LS",
+  "desc": "Sprunk is the definitive soft drink of San Andreas — a neon-green citrus soda with a loyal following that borders on religious. As the title sponsor of multiple LS sports teams, Sprunk's brand recognition is second to none.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Barbara 'Bev' Whitmore"
+    },
+    {
+      "role": "CFO",
+      "name": "Nelson Frias"
+    },
+    {
+      "role": "CMO",
+      "name": "Kevin Chu"
+    }
+  ]
+}

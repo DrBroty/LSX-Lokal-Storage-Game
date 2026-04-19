@@ -1,0 +1,27 @@
+{
+  "ticker": "GCD",
+  "name": "Gold Coast Dev.",
+  "sector": "ENERGY",
+  "rival": "BOM",
+  "basePrice": 156.3,
+  "vol": 0.045,
+  "tagline": "Building San Andreas's Energy Future.",
+  "founded": "1958",
+  "employees": "18,400",
+  "hq": "Pacific Bluffs, LS",
+  "desc": "Gold Coast Development is an energy infrastructure conglomerate with fingers in oil, gas, and real estate development along the SA coast. Three former SA governors sit on the board.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Gordon Caldwell III"
+    },
+    {
+      "role": "CFO",
+      "name": "Evelyn Tran"
+    },
+    {
+      "role": "VP Offshore Operations",
+      "name": "Captain (ret.) Paul Mercer"
+    }
+  ]
+}

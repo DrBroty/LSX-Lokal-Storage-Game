@@ -1,0 +1,27 @@
+{
+  "ticker": "FCDE",
+  "name": "Facade Technologies",
+  "sector": "TECH",
+  "rival": "DRNK",
+  "basePrice": 38.6,
+  "vol": 0.042,
+  "tagline": "Build The Future.",
+  "founded": "2012",
+  "employees": "1,400",
+  "hq": "Pillbox Hill, LS",
+  "desc": "Facade Technologies builds enterprise software platforms for LS's construction and real estate industries. Their flagship product FacadeOS manages permit workflows, architectural compliance, and contractor payments for over 60% of active LS building projects.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Aisha Osei"
+    },
+    {
+      "role": "CFO",
+      "name": "Paul Whitfield"
+    },
+    {
+      "role": "CTO",
+      "name": "Daniel Park"
+    }
+  ]
+}

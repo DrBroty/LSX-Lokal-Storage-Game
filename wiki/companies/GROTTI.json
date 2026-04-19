@@ -1,0 +1,27 @@
+{
+  "ticker": "GROTTI",
+  "name": "Grotti",
+  "sector": "TRANSPORT",
+  "rival": "PEGASS",
+  "basePrice": 445.2,
+  "vol": 0.024,
+  "tagline": "Speed Is Art.",
+  "founded": "1947",
+  "employees": "2,800 (Global)",
+  "hq": "Turin / Rockford Hills (SA HQ)",
+  "desc": "Grotti is the third pillar of Italian hypercar excellence on the LSX. Their Cheetah, Turismo, and X80 Proto have won more Vinewood Hills concours awards than any other marque.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Stefano Grotti III"
+    },
+    {
+      "role": "Design Director",
+      "name": "Enzo Battaglia"
+    },
+    {
+      "role": "CFO",
+      "name": "Antonella Frescobaldi"
+    }
+  ]
+}

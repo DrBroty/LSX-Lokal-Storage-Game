@@ -1,0 +1,23 @@
+{
+  "ticker": "NSTOP",
+  "name": "Non-Stop-Pop FM",
+  "sector": "MEDIA",
+  "rival": "BLSSM",
+  "basePrice": 11.2,
+  "vol": 0.05,
+  "tagline": "All Pop. All Day.",
+  "founded": "1998",
+  "employees": "220",
+  "hq": "Vinewood, LS",
+  "desc": "Non-Stop-Pop FM is exactly what it says: a relentless stream of Top 40 hits targeting the 18-34 demographic. The station's social media strategy is disproportionately effective for a traditional radio property.",
+  "executives": [
+    {
+      "role": "Program Director",
+      "name": "Cara Vega"
+    },
+    {
+      "role": "CFO (Parent Co.)",
+      "name": "David Michaels"
+    }
+  ]
+}

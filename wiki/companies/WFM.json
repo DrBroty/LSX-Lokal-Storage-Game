@@ -1,0 +1,23 @@
+{
+  "ticker": "WFM",
+  "name": "Worldwide FM",
+  "sector": "MEDIA",
+  "rival": "RVSL",
+  "basePrice": 9.8,
+  "vol": 0.05,
+  "tagline": "Music Without Borders.",
+  "founded": "2013",
+  "employees": "140",
+  "hq": "Vespucci Canals, LS",
+  "desc": "Worldwide FM is the globally connected independent radio network that somehow became the hippest station in Los Santos. Broadcasting a DJ-selected mix of global beats, WFM's cultural influence on LS's creative class punches far above its revenue.",
+  "executives": [
+    {
+      "role": "Founder",
+      "name": "Gilles Peterson"
+    },
+    {
+      "role": "Station Manager",
+      "name": "Aisha Osei"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "ANNIS",
+  "name": "Annis",
+  "sector": "TRANSPORT",
+  "rival": "KARIN",
+  "basePrice": 94.2,
+  "vol": 0.032,
+  "tagline": "The Art Of Motion.",
+  "founded": "1966",
+  "employees": "19,000 (Global)",
+  "hq": "Tokyo / Little Seoul (SA HQ)",
+  "desc": "Annis produces some of the most sought-after sports cars in San Andreas. The Annis ZR350 and Elegy RH8 are fixtures of both the street racing scene and Rockford Hills driveways.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Naomi Ishikawa"
+    },
+    {
+      "role": "CFO",
+      "name": "Ken Watanabe Jr."
+    }
+  ]
+}

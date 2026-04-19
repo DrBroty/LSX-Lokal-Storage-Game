@@ -1,0 +1,27 @@
+{
+  "ticker": "FLYUS",
+  "name": "FlyUS Airlines",
+  "sector": "TRANSPORT",
+  "rival": "AEMU",
+  "basePrice": 78.9,
+  "vol": 0.035,
+  "tagline": "The American Way. Up.",
+  "founded": "1948",
+  "employees": "38,000",
+  "hq": "LSIA, Los Santos",
+  "desc": "FlyUS is the flagship American carrier operating out of Los Santos International Airport. Despite multiple pilot strikes and a fleet modernisation programme, FlyUS maintains the highest passenger volume at LSIA.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Patricia Holden-Walsh"
+    },
+    {
+      "role": "CFO",
+      "name": "Marco Bianchi"
+    },
+    {
+      "role": "COO",
+      "name": "Captain (ret.) Ray Sully"
+    }
+  ]
+}

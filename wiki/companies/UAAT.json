@@ -1,0 +1,27 @@
+{
+  "ticker": "UAAT",
+  "name": "Up-An-Atom",
+  "sector": "FOOD",
+  "rival": "BSTA",
+  "basePrice": 38.1,
+  "vol": 0.03,
+  "tagline": "Fresh. Fast. Radioactive.",
+  "founded": "1991",
+  "employees": "31,500",
+  "hq": "Rockford Hills, LS",
+  "desc": "Up-An-Atom Burger positions itself as the 'healthier' fast food alternative in Los Santos, despite offering largely identical caloric content to its main rival. The chain gained cult status after sponsoring the Rockstar Energy Stunt Race Series and is the official food partner of the Los Santos Dodgers. Known for its neon atom logo and quirky marketing campaigns, Up-An-Atom has aggressively expanded into the Blaine County market.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Tina Holbrook"
+    },
+    {
+      "role": "CFO",
+      "name": "Marcus J. Pellegrino"
+    },
+    {
+      "role": "COO",
+      "name": "Devin Rowe-Santos"
+    }
+  ]
+}

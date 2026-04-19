@@ -1,0 +1,23 @@
+{
+  "ticker": "SUBBN",
+  "name": "SubUrban Clothing",
+  "sector": "RETAIL",
+  "rival": "PONSBY",
+  "basePrice": 44.6,
+  "vol": 0.028,
+  "tagline": "Street. Real. SA.",
+  "founded": "2001",
+  "employees": "6,800",
+  "hq": "Davis, LS",
+  "desc": "SubUrban is the streetwear chain capturing the South LS and Davis youth market. Known for loud graphics, limited drops, and collabs with LS graffiti artists, SubUrban built its brand authentically before going public.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Marcus 'Ace' Williams"
+    },
+    {
+      "role": "CFO",
+      "name": "Tasha Oyelaran"
+    }
+  ]
+}

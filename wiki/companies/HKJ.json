@@ -1,0 +1,23 @@
+{
+  "ticker": "HKJ",
+  "name": "Hijak Motors",
+  "sector": "TRANSPORT",
+  "rival": "VAPD",
+  "basePrice": 55.6,
+  "vol": 0.03,
+  "tagline": "Take The Wheel.",
+  "founded": "1969",
+  "employees": "14,200",
+  "hq": "Cypress Flats, LS",
+  "desc": "Hijak Motors produces affordable American muscle cars and utility vehicles that dominate the working-class LS market. Despite the unfortunate brand name, Hijak has maintained strong truck sales across Blaine County ranches and LS construction sites.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Sandra Kline-Barrow"
+    },
+    {
+      "role": "CFO",
+      "name": "Mike Fogarty"
+    }
+  ]
+}

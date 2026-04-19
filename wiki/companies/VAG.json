@@ -1,0 +1,27 @@
+{
+  "ticker": "VAG",
+  "name": "Vangelico Jewellers",
+  "sector": "RETAIL",
+  "rival": "PONSBY",
+  "basePrice": 84.6,
+  "vol": 0.02,
+  "tagline": "For Moments Worth Remembering.",
+  "founded": "1952",
+  "employees": "680",
+  "hq": "Rockford Hills, LS",
+  "desc": "Vangelico is the most prestigious jewellery house in Los Santos. Favoured by Vinewood celebrities for engagement rings and red carpet pieces, Vangelico's vault holds some of the rarest gems in the Western United States.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Alessandro Vangelico Jr."
+    },
+    {
+      "role": "CFO",
+      "name": "Sophia Marchetti"
+    },
+    {
+      "role": "Head of Security",
+      "name": "Raymond Holt"
+    }
+  ]
+}

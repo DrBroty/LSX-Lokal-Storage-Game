@@ -1,0 +1,27 @@
+{
+  "ticker": "SHRPSH",
+  "name": "Shrewsbury Arms",
+  "sector": "RETAIL",
+  "rival": "AMMU",
+  "basePrice": 44.2,
+  "vol": 0.038,
+  "tagline": "British Craft. American Freedom.",
+  "founded": "1887",
+  "employees": "3,100",
+  "hq": "Rockford Hills, LS",
+  "desc": "Shrewsbury Arms brings a British gunmaking heritage to the SA market. Their custom rifle fitting service and private shooting range in Rockford Hills cater to the discerning enthusiast.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Sir Alistair Pemberton-Smythe"
+    },
+    {
+      "role": "CFO",
+      "name": "Caroline Webb"
+    },
+    {
+      "role": "Master Gunsmith",
+      "name": "Nigel Forsythe"
+    }
+  ]
+}

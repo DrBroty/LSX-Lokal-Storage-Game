@@ -1,0 +1,27 @@
+{
+  "ticker": "CHNK",
+  "name": "Cheval Systems",
+  "sector": "TECH",
+  "rival": "IFRT",
+  "basePrice": 91.3,
+  "vol": 0.038,
+  "tagline": "Precision Engineering. Redefined.",
+  "founded": "2017",
+  "employees": "3,200",
+  "hq": "LSIA District, LS",
+  "desc": "Cheval Systems is a LS-based autonomous vehicle and advanced mobility company. A high-profile recall of their self-driving taxi prototype set the stock back considerably. Cheval is currently lobbying the SA Department of Transport for expanded trial zones.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Valentina Cross"
+    },
+    {
+      "role": "CFO",
+      "name": "Andrew Yip"
+    },
+    {
+      "role": "Chief Engineer",
+      "name": "Dr. Klaus Brandt"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "BLSSM",
+  "name": "Blaine County Radio",
+  "sector": "MEDIA",
+  "rival": "NSTOP",
+  "basePrice": 8.4,
+  "vol": 0.055,
+  "tagline": "Country. Community. Blaine.",
+  "founded": "1962",
+  "employees": "85",
+  "hq": "Sandy Shores",
+  "desc": "Blaine County Radio serves rural SA with a mix of country, talk radio, and agricultural programming. The station's morning show is the most-listened-to broadcast in Sandy Shores and Paleto Bay combined.",
+  "executives": [
+    {
+      "role": "Owner/GM",
+      "name": "Clem Hutchins"
+    },
+    {
+      "role": "CFO",
+      "name": "Bev Morrissey"
+    }
+  ]
+}

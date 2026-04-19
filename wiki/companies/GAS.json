@@ -1,0 +1,27 @@
+{
+  "ticker": "GAS",
+  "name": "GastroBand",
+  "sector": "FOOD",
+  "rival": "PISS",
+  "basePrice": 27.5,
+  "vol": 0.028,
+  "tagline": "Street Food. Stadium Prices.",
+  "founded": "2003",
+  "employees": "12,600",
+  "hq": "Downtown LS",
+  "desc": "GastroBand operates a chain of food courts and stadium concession stands throughout San Andreas. As the exclusive food vendor at the Maze Bank Arena, GastroBand prints money on game nights.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Franco Bellini"
+    },
+    {
+      "role": "CFO",
+      "name": "Dana Hobbs"
+    },
+    {
+      "role": "VP Operations",
+      "name": "Kwame Asante"
+    }
+  ]
+}

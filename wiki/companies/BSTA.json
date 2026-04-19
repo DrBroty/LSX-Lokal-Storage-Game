@@ -1,0 +1,31 @@
+{
+  "ticker": "BSTA",
+  "name": "Burgershot",
+  "sector": "FOOD",
+  "rival": "UAAT",
+  "basePrice": 45.2,
+  "vol": 0.03,
+  "tagline": "Have It Your Way, Or Else.",
+  "founded": "1982",
+  "employees": "48,000",
+  "hq": "East Los Santos",
+  "desc": "Burgershot is the undisputed king of fast food in San Andreas. Founded in 1982 in East Los Santos, the chain operates over 1,200 locations across the state, serving its legendary Triple Stack Burger to millions of customers daily. Despite persistent health code violations and several FDA investigations, Burgershot continues to dominate the LS quick-service market through aggressive pricing and relentless advertising. The company recently launched a delivery drone pilot program in Rockford Hills.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Chad D. Fullerton"
+    },
+    {
+      "role": "CFO",
+      "name": "Patricia Wentz-Harlow"
+    },
+    {
+      "role": "COO",
+      "name": "Darnell McKnight"
+    },
+    {
+      "role": "CMO",
+      "name": "Stacy Bloom"
+    }
+  ]
+}

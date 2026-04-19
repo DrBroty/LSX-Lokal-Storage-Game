@@ -1,0 +1,23 @@
+{
+  "ticker": "REBEL",
+  "name": "Rebel Radio",
+  "sector": "MEDIA",
+  "rival": "BLSSM",
+  "basePrice": 7.8,
+  "vol": 0.058,
+  "tagline": "Country Outlaw. Loud.",
+  "founded": "2004",
+  "employees": "45",
+  "hq": "Mobile, Blaine County",
+  "desc": "Rebel Radio is the outlaw country station for people who find Blaine County Radio too polished. Broadcasting from a mobile transmitter whose location changes weekly (for legal reasons), Rebel Radio regularly attracts FCC attention.",
+  "executives": [
+    {
+      "role": "Owner",
+      "name": "Jack 'Mad Jack' Tillman"
+    },
+    {
+      "role": "Station Manager",
+      "name": "Dolly Ray Barnes"
+    }
+  ]
+}

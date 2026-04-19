@@ -1,0 +1,27 @@
+{
+  "ticker": "KRP",
+  "name": "Krapea",
+  "sector": "FOOD",
+  "rival": "CLKB",
+  "basePrice": 48.9,
+  "vol": 0.03,
+  "tagline": "Crepes. Done Different.",
+  "founded": "2006",
+  "employees": "18,300",
+  "hq": "Little Seoul, LS",
+  "desc": "Krapea is Los Santos's surprising fast food success story — a French-inspired crepe chain that managed to crack the American QSR market. With over 600 LS locations and a viral social media presence, Krapea appeals to the Instagrammable food crowd.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Dominique Leclerc"
+    },
+    {
+      "role": "CFO",
+      "name": "James Okonkwo"
+    },
+    {
+      "role": "Brand Director",
+      "name": "Misha Volkov"
+    }
+  ]
+}

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LSX Company Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#040810;--panel:#080f1e;--panel2:#0d1628;--border:rgba(0,212,255,0.12);--accent:#00d4ff;--green:#00ff88;--red:#ff3355;--gold:#ffd700;--text:#e8eaf0;--dim:#6b7a99;--font:'Rajdhani',sans-serif;--mono:'Share Tech Mono',monospace}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+
+    header{position:sticky;top:0;z-index:100;background:rgba(4,8,16,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:54px}
+    .logo{font-family:var(--mono);font-size:17px;color:var(--accent);letter-spacing:2px;text-decoration:none}
+    .gen-badge{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:var(--green);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:3px 9px;border-radius:3px}
+    .btn-link{font-family:var(--font);font-weight:700;font-size:12px;letter-spacing:1px;color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:4px;transition:all .2s;text-transform:uppercase;cursor:pointer;background:none}
+    .btn-link:hover{color:var(--accent);border-color:var(--accent)}
+
+    .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 24px 80px}
+
+    .page-tag{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--green);margin-bottom:8px}
+    h1{font-size:38px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+    .page-sub{color:var(--dim);font-size:14px;margin-bottom:36px}
+
+    /* ── Form ── */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    .form-grid.full{grid-template-columns:1fr}
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+    input,select,textarea{background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s;width:100%}
+    input:focus,select:focus,textarea:focus{border-color:rgba(0,212,255,0.5)}
+    select option{background:var(--panel)}
+    textarea{resize:vertical;min-height:120px;font-family:var(--font);font-size:14px;line-height:1.6}
+
+    .section-title{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin:28px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+    /* ── Executives builder ── */
+    .exec-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+    .exec-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center}
+    .exec-row input{font-size:13px}
+    .btn-remove{background:rgba(255,51,85,0.1);border:1px solid rgba(255,51,85,0.3);color:var(--red);padding:9px 12px;border-radius:6px;cursor:pointer;font-size:14px;font-family:var(--mono);transition:all .2s;white-space:nowrap}
+    .btn-remove:hover{background:rgba(255,51,85,0.2)}
+    .btn-add-exec{background:rgba(0,212,255,0.05);border:1px solid var(--border);color:var(--accent);padding:9px 18px;border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:13px;letter-spacing:1px;transition:all .2s;width:100%}
+    .btn-add-exec:hover{border-color:var(--accent);background:rgba(0,212,255,0.1)}
+
+    /* ── Preview ── */
+    .preview-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-top:28px;position:relative}
+    .preview-box::before{content:'PREVIEW';font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--dim);position:absolute;top:-1px;left:16px;background:var(--panel);padding:0 8px;transform:translateY(-50%)}
+    .preview-json{font-family:var(--mono);font-size:12px;color:var(--green);white-space:pre-wrap;overflow-x:auto;line-height:1.7}
+
+    /* ── Actions ── */
+    .actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+    .btn-primary{background:rgba(0,255,136,0.1);border:1px solid var(--green);color:var(--green);padding:12px 28px;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:14px;letter-spacing:1.5px;transition:all .2s;text-transform:uppercase}
+    .btn-primary:hover{background:rgba(0,255,136,0.2)}
+    .btn-secondary{background:rgba(0,212,255,0.05);border:1px solid var(--border);color:var(--accent);padding:12px 28px;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:14px;letter-spacing:1.5px;transition:all .2s;text-transform:uppercase}
+    .btn-secondary:hover{border-color:var(--accent);background:rgba(0,212,255,0.1)}
+
+    /* ── Toast ── */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-size:13px;padding:12px 24px;border-radius:8px;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ── Load existing ── */
+    .load-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:28px}
+    .load-box-title{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--dim);margin-bottom:10px}
+    .load-row{display:flex;gap:10px;align-items:center}
+    .load-row input[type=file]{display:none}
+    .btn-load{background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);color:var(--gold);padding:9px 18px;border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:13px;letter-spacing:1px;transition:all .2s}
+    .btn-load:hover{background:rgba(255,215,0,0.15)}
+    .load-hint{font-size:12px;color:var(--dim);font-family:var(--mono)}
+
+    @media(max-width:600px){.form-grid{grid-template-columns:1fr}.exec-row{grid-template-columns:1fr auto}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:14px">
+    <a href="https://wiki.los-santos-exchange.de" class="logo">📈 LSX</a>
+    <span class="gen-badge">GENERATOR</span>
+  </div>
+  <div style="display:flex;gap:10px">
+    <a href="index.html" class="btn-link">← Wiki</a>
+    <a href="https://los-santos-exchange.de" class="btn-link">Play LSX</a>
+  </div>
+</header>
+
+<div class="page">
+  <div class="page-tag">LSX · WIKI · COMPANY GENERATOR</div>
+  <h1>Add New Company</h1>
+  <p class="page-sub">Fill in the fields, download the JSON, then upload it to <code style="color:var(--accent)">wiki/companies/</code> and add the ticker to <code style="color:var(--accent)">companies/index.json</code>.</p>
+
+  <!-- Load existing JSON to edit -->
+  <div class="load-box">
+    <div class="load-box-title">EDIT EXISTING — load a company JSON to pre-fill the form</div>
+    <div class="load-row">
+      <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 Load JSON</button>
+      <input type="file" id="fileInput" accept=".json" onchange="loadJSON(this)">
+      <span class="load-hint">Select a TICKER.json from your companies/ folder</span>
+    </div>
+  </div>
+
+  <!-- ── Core Info ── -->
+  <div class="section-title">Core Information</div>
+  <div class="form-grid">
+    <div class="field">
+      <label>Ticker Symbol *</label>
+      <input id="f-ticker" type="text" placeholder="e.g. BSTA" maxlength="8" oninput="this.value=this.value.toUpperCase();updatePreview()">
+    </div>
+    <div class="field">
+      <label>Company Name *</label>
+      <input id="f-name" type="text" placeholder="e.g. Burgershot" oninput="updatePreview()">
+    </div>
+    <div class="field">
+      <label>Sector *</label>
+      <select id="f-sector" onchange="updatePreview()">
+        <option value="">— select sector —</option>
+        <option value="FOOD">🍔 FOOD</option>
+        <option value="FINANCE">🏦 FINANCE</option>
+        <option value="TECH">💻 TECH</option>
+        <option value="TRANSPORT">🚗 TRANSPORT</option>
+        <option value="RETAIL">🛒 RETAIL</option>
+        <option value="ENERGY">⚡ ENERGY</option>
+        <option value="PHARMA">💊 PHARMA</option>
+        <option value="MEDIA">📻 MEDIA</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Main Rival Ticker</label>
+      <input id="f-rival" type="text" placeholder="e.g. UAAT (leave blank if none)" maxlength="8" oninput="this.value=this.value.toUpperCase();updatePreview()">
+    </div>
+    <div class="field">
+      <label>Base Price ($) *</label>
+      <input id="f-basePrice" type="number" min="1" step="0.01" placeholder="e.g. 45.20" oninput="updatePreview()">
+    </div>
+    <div class="field">
+      <label>Volatility (vol) *
+        <span style="color:var(--dim);font-size:10px;margin-left:8px">0.018=stable · 0.030=normal · 0.045=volatile · 0.060=very volatile</span>
+      </label>
+      <input id="f-vol" type="number" min="0.01" max="0.10" step="0.001" placeholder="e.g. 0.030" oninput="updatePreview()">
+    </div>
+  </div>
+
+  <!-- ── Identity ── -->
+  <div class="section-title">Brand Identity</div>
+  <div class="form-grid">
+    <div class="field">
+      <label>Tagline / Slogan *</label>
+      <input id="f-tagline" type="text" placeholder="e.g. Have It Your Way, Or Else." oninput="updatePreview()">
+    </div>
+    <div class="field">
+      <label>Founded (year)</label>
+      <input id="f-founded" type="text" placeholder="e.g. 1982" oninput="updatePreview()">
+    </div>
+    <div class="field">
+      <label>Employees</label>
+      <input id="f-employees" type="text" placeholder="e.g. 48,000 or 12,400 (Global)" oninput="updatePreview()">
+    </div>
+    <div class="field">
+      <label>Headquarters</label>
+      <input id="f-hq" type="text" placeholder="e.g. East Los Santos" oninput="updatePreview()">
+    </div>
+  </div>
+  <div class="form-grid full">
+    <div class="field">
+      <label>Company Description *</label>
+      <textarea id="f-desc" placeholder="Write 2-4 sentences describing the company in the GTA V universe. Mention location, reputation, key products, controversies..." oninput="updatePreview()"></textarea>
+    </div>
+  </div>
+
+  <!-- ── Executives ── -->
+  <div class="section-title">Executive Team</div>
+  <div class="exec-list" id="execList"></div>
+  <button class="btn-add-exec" onclick="addExec()">+ ADD EXECUTIVE</button>
+
+  <!-- ── Preview ── -->
+  <div class="preview-box">
+    <pre class="preview-json" id="previewJson">{}</pre>
+  </div>
+
+  <!-- ── Actions ── -->
+  <div class="actions">
+    <button class="btn-primary" onclick="downloadJSON()">⬇ DOWNLOAD JSON</button>
+    <button class="btn-secondary" onclick="copyJSON()">📋 COPY JSON</button>
+    <button class="btn-secondary" onclick="resetForm()">🔄 RESET FORM</button>
+  </div>
+
+  <div style="margin-top:28px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px 20px">
+    <div class="section-title" style="margin-top:0">After Download</div>
+    <ol style="color:var(--dim);font-size:14px;line-height:2;margin-left:18px">
+      <li>Upload <code style="color:var(--accent)">TICKER.json</code> to your server at <code style="color:var(--accent)">wiki/companies/</code></li>
+      <li>Open <code style="color:var(--accent)">wiki/companies/index.json</code> and add the ticker to the array</li>
+      <li>The Wiki will automatically load and display the new company on next page load</li>
+    </ol>
+    <div style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--green);background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:6px;padding:12px 16px">
+      <div style="color:var(--dim);margin-bottom:6px">// index.json — add your ticker:</div>
+      ["BSTA", "UAAT", ..., "<span style="color:var(--gold)">YOURNEW</span>"]
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let executives = [
+  {role:'CEO', name:''},
+  {role:'CFO', name:''},
+];
+
+function renderExecs() {
+  const list = document.getElementById('execList');
+  list.innerHTML = executives.map((e, i) => `
+    <div class="exec-row">
+      <input type="text" value="${e.role}" placeholder="Role (e.g. CEO)" oninput="executives[${i}].role=this.value;updatePreview()">
+      <input type="text" value="${e.name}" placeholder="Full Name" oninput="executives[${i}].name=this.value;updatePreview()">
+      <button class="btn-remove" onclick="removeExec(${i})">✕</button>
+    </div>`).join('');
+}
+
+function addExec() {
+  executives.push({role:'', name:''});
+  renderExecs();
+  updatePreview();
+}
+
+function removeExec(i) {
+  executives.splice(i, 1);
+  renderExecs();
+  updatePreview();
+}
+
+function buildObject() {
+  return {
+    ticker:     document.getElementById('f-ticker').value.trim().toUpperCase(),
+    name:       document.getElementById('f-name').value.trim(),
+    sector:     document.getElementById('f-sector').value,
+    rival:      document.getElementById('f-rival').value.trim().toUpperCase(),
+    basePrice:  parseFloat(document.getElementById('f-basePrice').value) || 0,
+    vol:        parseFloat(document.getElementById('f-vol').value) || 0,
+    tagline:    document.getElementById('f-tagline').value.trim(),
+    founded:    document.getElementById('f-founded').value.trim(),
+    employees:  document.getElementById('f-employees').value.trim(),
+    hq:         document.getElementById('f-hq').value.trim(),
+    desc:       document.getElementById('f-desc').value.trim(),
+    executives: executives.filter(e => e.role || e.name),
+  };
+}
+
+function updatePreview() {
+  const obj = buildObject();
+  document.getElementById('previewJson').textContent = JSON.stringify(obj, null, 2);
+}
+
+function downloadJSON() {
+  const obj = buildObject();
+  if (!obj.ticker) { showToast('❌ Ticker is required', true); return; }
+  if (!obj.name)   { showToast('❌ Company name is required', true); return; }
+  if (!obj.sector) { showToast('❌ Sector is required', true); return; }
+  if (!obj.basePrice) { showToast('❌ Base price is required', true); return; }
+
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = obj.ticker + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`✅ Downloaded ${obj.ticker}.json — upload to wiki/companies/`);
+}
+
+function copyJSON() {
+  const json = JSON.stringify(buildObject(), null, 2);
+  navigator.clipboard.writeText(json).then(() => showToast('📋 Copied to clipboard'));
+}
+
+function resetForm() {
+  ['f-ticker','f-name','f-rival','f-tagline','f-founded','f-employees','f-hq','f-desc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-sector').value = '';
+  document.getElementById('f-basePrice').value = '';
+  document.getElementById('f-vol').value = '';
+  executives = [{role:'CEO',name:''},{role:'CFO',name:''}];
+  renderExecs();
+  updatePreview();
+}
+
+function loadJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const obj = JSON.parse(e.target.result);
+      document.getElementById('f-ticker').value    = obj.ticker    || '';
+      document.getElementById('f-name').value      = obj.name      || '';
+      document.getElementById('f-sector').value    = obj.sector    || '';
+      document.getElementById('f-rival').value     = obj.rival     || '';
+      document.getElementById('f-basePrice').value = obj.basePrice || '';
+      document.getElementById('f-vol').value       = obj.vol       || '';
+      document.getElementById('f-tagline').value   = obj.tagline   || '';
+      document.getElementById('f-founded').value   = obj.founded   || '';
+      document.getElementById('f-employees').value = obj.employees || '';
+      document.getElementById('f-hq').value        = obj.hq        || '';
+      document.getElementById('f-desc').value      = obj.desc      || '';
+      executives = obj.executives?.length
+        ? obj.executives
+        : [{role:'CEO',name:''},{role:'CFO',name:''}];
+      renderExecs();
+      updatePreview();
+      showToast(`✅ Loaded ${obj.ticker} — edit and re-download`);
+    } catch(err) {
+      showToast('❌ Invalid JSON file', true);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+let toastTimer;
+function showToast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isErr ? 'var(--red)' : 'var(--green)';
+  t.style.color = isErr ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Init ────────────────────────────────────────────────
+renderExecs();
+updatePreview();
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "ticker": "RVSL",
+  "name": "Rockford Vandals SL",
+  "sector": "MEDIA",
+  "rival": "WFM",
+  "basePrice": 22.1,
+  "vol": 0.06,
+  "tagline": "Destroy The Format.",
+  "founded": "2014",
+  "employees": "380",
+  "hq": "Rockford Hills, LS",
+  "desc": "Rockford Vandals is the most unpredictable media property on the LSX. Part record label, part lifestyle brand, part vandalism advocacy collective, RVSL operates a streaming channel and live events business from a converted Rockford Hills warehouse.",
+  "executives": [
+    {
+      "role": "Creative Director",
+      "name": "Ziggy Marlowe"
+    },
+    {
+      "role": "CFO",
+      "name": "Janet Hsu"
+    }
+  ]
+}

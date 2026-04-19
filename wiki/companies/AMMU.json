@@ -1,0 +1,27 @@
+{
+  "ticker": "AMMU",
+  "name": "Ammu-Nation",
+  "sector": "RETAIL",
+  "rival": "SHRPSH",
+  "basePrice": 58.4,
+  "vol": 0.035,
+  "tagline": "The Right To Bear Discounts.",
+  "founded": "1982",
+  "employees": "14,200",
+  "hq": "South LS",
+  "desc": "Ammu-Nation is the undisputed firearms retail giant of San Andreas, with stores on seemingly every other block in Los Santos. Their loyalty programme — 'The Second Amendment Card' — rewards frequent purchasers.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Frank Ballantyne"
+    },
+    {
+      "role": "CFO",
+      "name": "Doris Higgins"
+    },
+    {
+      "role": "VP Compliance",
+      "name": "Gary Loose"
+    }
+  ]
+}

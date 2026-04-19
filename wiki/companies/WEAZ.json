@@ -1,0 +1,27 @@
+{
+  "ticker": "WEAZ",
+  "name": "Weazel News Corp",
+  "sector": "MEDIA",
+  "rival": "WCTR",
+  "basePrice": 19.3,
+  "vol": 0.048,
+  "tagline": "Fair. Balanced. Weazel.",
+  "founded": "1982",
+  "employees": "4,800",
+  "hq": "Vinewood, LS",
+  "desc": "Weazel News Corp is the dominant news organisation in San Andreas, operating the Weazel TV network, Weazel FM, and several online news properties. Known for sensationalist coverage and questionable sourcing.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Richard Clarkson"
+    },
+    {
+      "role": "CFO",
+      "name": "Susan Hartmann"
+    },
+    {
+      "role": "Editor-in-Chief",
+      "name": "Dan Lazlow"
+    }
+  ]
+}

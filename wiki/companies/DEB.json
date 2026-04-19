@@ -1,0 +1,23 @@
+{
+  "ticker": "DEB",
+  "name": "Debonaire Cigarettes",
+  "sector": "RETAIL",
+  "rival": "REDW",
+  "basePrice": 63.7,
+  "vol": 0.03,
+  "tagline": "Sophisticated Smoke.",
+  "founded": "1921",
+  "employees": "5,600",
+  "hq": "Pillbox Hill, LS",
+  "desc": "Debonaire is the premium cigarette brand targeting the Vinewood Hills set. Despite decades of declining smoking rates, Debonaire's pivot to menthol products and electronic cigarettes has maintained revenue.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Charles Worthington"
+    },
+    {
+      "role": "CFO",
+      "name": "Adrienne Solis"
+    }
+  ]
+}

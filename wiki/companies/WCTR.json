@@ -1,0 +1,23 @@
+{
+  "ticker": "WCTR",
+  "name": "West Coast Talk Radio",
+  "sector": "MEDIA",
+  "rival": "WEAZ",
+  "basePrice": 14.6,
+  "vol": 0.045,
+  "tagline": "The Conversation. Continues.",
+  "founded": "1954",
+  "employees": "160",
+  "hq": "Downtown LS",
+  "desc": "West Coast Talk Radio is LS's longest-running AM talk station, a bastion of political commentary, conspiracy theories, and caller-driven programming that has somehow survived the digital media revolution.",
+  "executives": [
+    {
+      "role": "President",
+      "name": "Barry Whelan"
+    },
+    {
+      "role": "CFO",
+      "name": "Pam Kowalski"
+    }
+  ]
+}

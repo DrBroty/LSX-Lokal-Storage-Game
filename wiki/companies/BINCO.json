@@ -1,0 +1,23 @@
+{
+  "ticker": "BINCO",
+  "name": "Binco",
+  "sector": "RETAIL",
+  "rival": "SUBBN",
+  "basePrice": 22.1,
+  "vol": 0.03,
+  "tagline": "Fashion For The Functional.",
+  "founded": "1984",
+  "employees": "11,200",
+  "hq": "Chamberlain Hills, LS",
+  "desc": "Binco occupies the budget fashion segment, offering affordable basics and workwear to the mass market. With stores in every LS neighbourhood and most Blaine County towns, Binco is where San Andreas shops when it needs clothes but not a statement.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Paul Deveraux"
+    },
+    {
+      "role": "CFO",
+      "name": "Linda Santos"
+    }
+  ]
+}

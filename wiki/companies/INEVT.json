@@ -1,0 +1,23 @@
+{
+  "ticker": "INEVT",
+  "name": "Invetero",
+  "sector": "TRANSPORT",
+  "rival": "OCELOT",
+  "basePrice": 182.7,
+  "vol": 0.028,
+  "tagline": "Italian Soul. American Road.",
+  "founded": "1934",
+  "employees": "4,200 (Global)",
+  "hq": "Milan / Vinewood Hills (SA HQ)",
+  "desc": "Invetero brings Italian coachbuilt excellence to the San Andreas supercar market. Their Coquette Classic is a Vinewood Hills staple, and the brand's bespoke customisation programme commands extraordinary premiums.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Giovanni Ferrero-Calabrese"
+    },
+    {
+      "role": "CFO",
+      "name": "Federica Montini"
+    }
+  ]
+}

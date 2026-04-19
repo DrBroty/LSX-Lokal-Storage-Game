@@ -1,0 +1,23 @@
+{
+  "ticker": "ARK",
+  "name": "AnimalArk",
+  "sector": "RETAIL",
+  "rival": "MAX",
+  "basePrice": 22.4,
+  "vol": 0.025,
+  "tagline": "Every Pet Deserves More.",
+  "founded": "1988",
+  "employees": "8,400",
+  "hq": "Vinewood, LS",
+  "desc": "AnimalArk is San Andreas's leading pet supply chain, operating 180 stores across the state. A recent expansion into pet insurance has opened a promising new revenue stream.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Donna Fitzgerald"
+    },
+    {
+      "role": "CFO",
+      "name": "Sam Osei"
+    }
+  ]
+}

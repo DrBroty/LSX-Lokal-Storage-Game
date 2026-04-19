@@ -1,0 +1,27 @@
+{
+  "ticker": "FLCA",
+  "name": "Fleeca Bank",
+  "sector": "FINANCE",
+  "rival": "MAZE",
+  "basePrice": 142.3,
+  "vol": 0.022,
+  "tagline": "Fast. Simple. Fleeca.",
+  "founded": "1991",
+  "employees": "11,200",
+  "hq": "Strawberry, LS",
+  "desc": "Fleeca Bank is everywhere in Los Santos — the bright blue branch fronts are a fixture on every major street corner. Specialising in personal loans, car financing, and small business banking, Fleeca built its empire on accessibility. Unfortunately, its accessibility extends to would-be robbers.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Susan Morales-Vega"
+    },
+    {
+      "role": "CFO",
+      "name": "Derek Huang"
+    },
+    {
+      "role": "Head of Security",
+      "name": "Carl 'Stonewall' Dixon"
+    }
+  ]
+}

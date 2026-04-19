@@ -1,0 +1,23 @@
+{
+  "ticker": "AEMU",
+  "name": "AirEmu",
+  "sector": "TRANSPORT",
+  "rival": "FLYUS",
+  "basePrice": 66.4,
+  "vol": 0.035,
+  "tagline": "Fly Smart. Fly Emu.",
+  "founded": "2002",
+  "employees": "12,400",
+  "hq": "LSIA, Los Santos",
+  "desc": "AirEmu is the budget carrier disrupting the San Andreas aviation market with deeply discounted fares. Known for its no-frills approach — passengers have been charged for carry-ons, blankets, and reportedly even eye contact.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Barry 'Baz' O'Sullivan"
+    },
+    {
+      "role": "CFO",
+      "name": "Christine Lau"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "ticker": "MOR",
+  "name": "MorsMutual Insurance",
+  "sector": "FINANCE",
+  "rival": "AUG",
+  "basePrice": 53.2,
+  "vol": 0.03,
+  "tagline": "Death Is Certain. Coverage Shouldn't Be.",
+  "founded": "1946",
+  "employees": "4,200",
+  "hq": "Morningwood, LS",
+  "desc": "MorsMutual is the dark horse of LS insurance — a company whose macabre branding has paradoxically become a marketing asset. Their actuarial models reportedly account for the elevated frequency of gang violence, police pursuits, and unexplained explosions.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Edgar Grimsley"
+    },
+    {
+      "role": "CFO",
+      "name": "Carol Vanthorpe"
+    }
+  ]
+}

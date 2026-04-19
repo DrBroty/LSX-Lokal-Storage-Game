@@ -1,0 +1,31 @@
+{
+  "ticker": "MAZE",
+  "name": "Maze Bank",
+  "sector": "FINANCE",
+  "rival": "BOL",
+  "basePrice": 218.5,
+  "vol": 0.02,
+  "tagline": "Your Money. Our Maze.",
+  "founded": "1923",
+  "employees": "24,000",
+  "hq": "Maze Bank Tower, Downtown LS",
+  "desc": "Maze Bank is the largest financial institution in San Andreas and the tallest skyscraper in Los Santos is their headquarters. Offering retail banking, private wealth management, and investment services, Maze Bank handles the accounts of everyone from Vinewood celebrities to Blaine County ranchers.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Victor 'Vic' Moorland"
+    },
+    {
+      "role": "CFO",
+      "name": "Rebecca Ashworth-Crane"
+    },
+    {
+      "role": "CRO",
+      "name": "Gerald Fung"
+    },
+    {
+      "role": "General Counsel",
+      "name": "Diana Pemberton"
+    }
+  ]
+}

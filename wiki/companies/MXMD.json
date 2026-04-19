@@ -1,0 +1,27 @@
+{
+  "ticker": "MXMD",
+  "name": "Maze Medical",
+  "sector": "PHARMA",
+  "rival": "BILK",
+  "basePrice": 72.3,
+  "vol": 0.038,
+  "tagline": "Healthcare. Without The Maze.",
+  "founded": "2004",
+  "employees": "8,200",
+  "hq": "Pillbox Hill Medical Centre, LS",
+  "desc": "Maze Medical is the healthcare division of the broader Maze Bank Group, operating a chain of private clinics across Los Santos. The company recently won FDA-equivalent approval for a novel arthritis treatment.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Dr. Sandra Wu"
+    },
+    {
+      "role": "CFO",
+      "name": "Marcus Tate"
+    },
+    {
+      "role": "Medical Director",
+      "name": "Dr. Christine Novak"
+    }
+  ]
+}

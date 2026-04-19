@@ -1,0 +1,23 @@
+{
+  "ticker": "ZANK",
+  "name": "Zanku Supplements",
+  "sector": "PHARMA",
+  "rival": "DRGS",
+  "basePrice": 19.8,
+  "vol": 0.048,
+  "tagline": "Maximum Gains. Minimum Questions.",
+  "founded": "2009",
+  "employees": "1,100",
+  "hq": "Vespucci Beach, LS",
+  "desc": "Zanku Supplements sells performance enhancement products through a network of gyms and online channels. Their products occupy the grey zone between legitimate supplementation and controlled substance territory.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Tony 'T-Rex' Rexford"
+    },
+    {
+      "role": "CFO",
+      "name": "Gloria Ramos"
+    }
+  ]
+}

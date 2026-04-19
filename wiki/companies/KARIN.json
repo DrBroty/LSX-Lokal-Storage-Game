@@ -1,0 +1,23 @@
+{
+  "ticker": "KARIN",
+  "name": "Karin",
+  "sector": "TRANSPORT",
+  "rival": "DINKA",
+  "basePrice": 76.4,
+  "vol": 0.03,
+  "tagline": "Driven By Detail.",
+  "founded": "1961",
+  "employees": "38,000 (Global)",
+  "hq": "Osaka / Little Seoul (SA HQ)",
+  "desc": "Karin competes with Dinka in the Japanese performance and family car segment. The Karin Previon and Sultan have achieved cult status in LS tuner circles, where aftermarket modification communities have built entire ecosystems around them.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Hiroshi Kato"
+    },
+    {
+      "role": "CFO",
+      "name": "Sarah Watanabe"
+    }
+  ]
+}

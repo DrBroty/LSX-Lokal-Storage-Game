@@ -1,0 +1,27 @@
+{
+  "ticker": "BILK",
+  "name": "Bilkington Research",
+  "sector": "PHARMA",
+  "rival": "BPHM",
+  "basePrice": 89.3,
+  "vol": 0.04,
+  "tagline": "Science First. Profit Follows.",
+  "founded": "1978",
+  "employees": "14,600",
+  "hq": "Mission Row, LS",
+  "desc": "Bilkington Research is the contract research organisation and generic drug manufacturer competing with Betta at the mid-market. Their generic equivalents undercut Betta's branded prices significantly, fuelling intense patent litigation.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Gregory Bilkington II"
+    },
+    {
+      "role": "CFO",
+      "name": "Mei-Ling Zhao"
+    },
+    {
+      "role": "Head of R&D",
+      "name": "Dr. James Fortescue"
+    }
+  ]
+}

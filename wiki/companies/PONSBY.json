@@ -1,0 +1,27 @@
+{
+  "ticker": "PONSBY",
+  "name": "Ponsonbys Fashion",
+  "sector": "RETAIL",
+  "rival": "SUBBN",
+  "basePrice": 112.8,
+  "vol": 0.025,
+  "tagline": "Dress The Part.",
+  "founded": "1962",
+  "employees": "4,200",
+  "hq": "Rockford Hills, LS",
+  "desc": "Ponsonbys is Los Santos's premier luxury fashion retailer, dressing Vinewood's elite in European designer labels. The Rockford Hills flagship store has been a celebrity haunt since the 1980s.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Victoria Hartley-Moore"
+    },
+    {
+      "role": "CFO",
+      "name": "Gilles Beaumont"
+    },
+    {
+      "role": "Creative Director",
+      "name": "Nikolai Vasquez"
+    }
+  ]
+}

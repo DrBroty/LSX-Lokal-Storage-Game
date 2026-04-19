@@ -1,0 +1,23 @@
+{
+  "ticker": "RLS",
+  "name": "Radio Los Santos",
+  "sector": "MEDIA",
+  "rival": "VINWD",
+  "basePrice": 16.8,
+  "vol": 0.052,
+  "tagline": "The Voice Of The Street.",
+  "founded": "1991",
+  "employees": "190",
+  "hq": "South LS",
+  "desc": "Radio Los Santos is the hip-hop and R&B station that has defined South LS's musical identity for decades. Their advertising inventory sells out months in advance during summer seasons.",
+  "executives": [
+    {
+      "role": "Program Director",
+      "name": "DJ Whirl-i-Gig"
+    },
+    {
+      "role": "CFO",
+      "name": "Marcus Johnson"
+    }
+  ]
+}

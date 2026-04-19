@@ -1,0 +1,23 @@
+{
+  "ticker": "BLNE",
+  "name": "Blaine County Savings",
+  "sector": "FINANCE",
+  "rival": "BOL",
+  "basePrice": 31.4,
+  "vol": 0.032,
+  "tagline": "Small Town. Safe Money.",
+  "founded": "1931",
+  "employees": "1,200",
+  "hq": "Sandy Shores",
+  "desc": "Blaine County Savings is the community bank serving rural San Andreas. With branches in Sandy Shores, Grapeseed, and Paleto Bay, BCS offers agricultural loans, ranch financing, and basic personal banking.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Earl Whitaker"
+    },
+    {
+      "role": "CFO",
+      "name": "Jean-Ann Kowalczyk"
+    }
+  ]
+}

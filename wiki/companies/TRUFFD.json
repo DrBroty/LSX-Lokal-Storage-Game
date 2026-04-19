@@ -1,0 +1,23 @@
+{
+  "ticker": "TRUFFD",
+  "name": "Truffade",
+  "sector": "TRANSPORT",
+  "rival": "PEGASS",
+  "basePrice": 520.0,
+  "vol": 0.022,
+  "tagline": "The Pinnacle. Full Stop.",
+  "founded": "1921",
+  "employees": "340 (Global)",
+  "hq": "Paris / Appointment Only (SA)",
+  "desc": "Truffade is the most exclusive hypercar manufacturer listed on the LSX. Based in France with a tiny SA showroom by appointment only, the Truffade Adder and Thrax are owned by fewer than 80 people in all of San Andreas.",
+  "executives": [
+    {
+      "role": "Directeur Général",
+      "name": "Jean-Pierre de Villeneuve"
+    },
+    {
+      "role": "Directeur Financier",
+      "name": "Cécile Moreau"
+    }
+  ]
+}

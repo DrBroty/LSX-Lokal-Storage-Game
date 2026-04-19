@@ -1,0 +1,27 @@
+{
+  "ticker": "GRU",
+  "name": "GruppeSechs Security",
+  "sector": "FINANCE",
+  "rival": "MER",
+  "basePrice": 36.8,
+  "vol": 0.03,
+  "tagline": "Six Is Enough.",
+  "founded": "1987",
+  "employees": "8,900",
+  "hq": "La Mesa, LS",
+  "desc": "GruppeSechs is San Andreas's largest private security and armoured transport firm. Their distinctively branded white and orange vans are a common sight transporting cash between Maze Bank branches and casinos.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Helmut Grünwald"
+    },
+    {
+      "role": "COO",
+      "name": "Frank O'Brien"
+    },
+    {
+      "role": "CFO",
+      "name": "Ingrid Svensson"
+    }
+  ]
+}
