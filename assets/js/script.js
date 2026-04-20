@@ -229,6 +229,7 @@ const STOCKS = [
   { ticker:'PEGASS',name:'Pegassi',                 sector:'TRANSPORT', rival:'TRUFFD',basePrice:480.50, vol:0.022 },
   { ticker:'GROTTI',name:'Grotti',                  sector:'TRANSPORT', rival:'PEGASS',basePrice:445.20, vol:0.024 },
   { ticker:'MAIBT', name:'Maibatsu',                sector:'TRANSPORT', rival:'DINKA', basePrice:102.30, vol:0.028 },
+  { ticker:'RBLG',  name:'Rabe Logistics',            sector:'TRANSPORT', rival:'GOP',   basePrice:45.20,  vol:0.045 },
 
   // ═══════════════ FINANCE (6) ═══════════════
   { ticker:'MAZE',  name:'Maze Bank',               sector:'FINANCE',   rival:'BOL',   basePrice:218.50, vol:0.020 },
@@ -398,6 +399,8 @@ const NEWS_EVENTS = [
   { msg: 'Oil prices crash — transport sector margins expand',         impact:  0.14, sector: 'TRANSPORT' },
   { msg: 'San Andreas airport expansion approved by city council',     impact:  0.12, sector: 'TRANSPORT' },
   { msg: 'Nationwide logistics strike paralyses delivery networks',    impact: -0.13, sector: 'TRANSPORT' },
+  { msg: 'Rabe Logistics wins exclusive Vinewood Studios event contract',  impact:  0.18, sector: 'TRANSPORT' },
+  { msg: 'Rabe Logistics discreet cargo operation under federal scrutiny', impact: -0.20, sector: 'TRANSPORT' },
 
   // ── ENERGY ────────────────────────────────────────────────
   { msg: 'San Andreas green energy bill passes — fossil fuels drop',   impact: -0.14, sector: 'ENERGY' },

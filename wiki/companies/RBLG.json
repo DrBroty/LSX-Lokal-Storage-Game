@@ -1,0 +1,23 @@
+{
+  "ticker": "RBLG",
+  "name": "Rabe Logistics",
+  "sector": "TRANSPORT",
+  "rival": "",
+  "basePrice": 45.2,
+  "vol": 0.045,
+  "tagline": "We Deliver EVERYTHING!",
+  "founded": "1999",
+  "employees": "42000",
+  "hq": "Vinewood Hills",
+  "desc": "Rabe Logistics ist ein diskretes Logistikunternehmen mit Sitz in Vinewood, Los Santos, das sich auf schnelle und zuverlässige Spezialtransporte für anspruchsvolle Kunden spezialisiert hat.\nDie Firma ist besonders in der Film- und Eventbranche bekannt und überzeugt durch Effizienz, Sicherheit und absolute Vertraulichkeit.\nIn der Stadt gilt Rabe Logistics als zuverlässiger Partner – besonders dann, wenn ein Auftrag keine Aufmerksamkeit erregen darf.",
+  "executives": [
+    {
+      "role": "CEO",
+      "name": "Adam Rabe"
+    },
+    {
+      "role": "CFO",
+      "name": "Maximilian Brotmeister"
+    }
+  ]
+}
