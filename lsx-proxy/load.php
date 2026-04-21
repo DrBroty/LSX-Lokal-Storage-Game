@@ -1,55 +1,55 @@
 <?php
 require_once 'config.php';
 
-header('Access-Control-Allow-Origin: https://los-santos-exchange.de');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json');
-// FIX: Browser soll load.php NIE cachen — sonst kommt beim Reload der alte Stand
+header('Access-Control-Allow-Origin: https://los-santos-exchange.de');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
-header('Expires: 0');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+
+// ── CSRF-Token erzeugen ───────────────────────────────
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-if (!isset($_SESSION['discord_id'])) {
+// ── Auth ──────────────────────────────────────────────
+if (empty($_SESSION['discord_id'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Not logged in']);
     exit;
 }
 
-// ── CSRF-Token erzeugen (einmal pro Session) ──────────
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $user = [
     'id'       => $_SESSION['discord_id'],
-    'username' => $_SESSION['discord_username'],
-    'avatar'   => $_SESSION['discord_avatar'], // bereits vollständige URL
-    'csrf'     => $_SESSION['csrf_token'],      // sicher: nur über session
+    'username' => $_SESSION['discord_username'] ?? '',
+    'avatar'   => $_SESSION['discord_avatar']   ?? '',
+    'csrf'     => $_SESSION['csrf_token'],
 ];
 
-$file = SAVES_DIR . $_SESSION['discord_id'] . '.json';
+// ── Aus DB laden ──────────────────────────────────────
+try {
+    $db   = getDB();
+    $stmt = $db->prepare("SELECT save_data FROM saves WHERE discord_id = :id");
+    $stmt->execute([':id' => $_SESSION['discord_id']]);
+    $row  = $stmt->fetch();
 
-if (!file_exists($file)) {
-    echo json_encode(['newGame' => true, 'user' => $user]);
-    exit;
+    if (!$row) {
+        echo json_encode(['newGame' => true, 'user' => $user]);
+        exit;
+    }
+
+    $save = json_decode($row['save_data'], true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        echo json_encode(['newGame' => true, 'user' => $user]);
+        exit;
+    }
+
+    $save['user'] = $user;
+    echo json_encode($save);
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'DB error: ' . $e->getMessage()]);
 }
-
-$raw     = file_get_contents($file);
-$decoded = json_decode($raw, true);
-
-// ── Korrupte Datei abfangen ───────────────────────────
-if (json_last_error() !== JSON_ERROR_NONE) {
-    rename($file, $file . '.corrupt_' . time());
-    echo json_encode(['newGame' => true, 'user' => $user]);
-    exit;
-}
-
-$decoded['user'] = $user;
-echo json_encode($decoded);

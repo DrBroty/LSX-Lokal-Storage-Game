@@ -1,57 +1,3 @@
-let csrfToken = ''; // Global, wird von checkLogin gesetzt
-
-// ═══════════════════════════════════════════════════════
-// LOGGING SYSTEM — Errors via Discord Webhook
-// ═══════════════════════════════════════════════════════
-function lsxLog(level, context, message, data = {}) {
-  const fn = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
-  fn('[LSX ' + level.toUpperCase() + '] ' + context + ': ' + message, data);
-  if (level === 'info') return;
-
-  const color = level === 'error' ? 0xff3355 : 0xffd700;
-  const emoji = level === 'error' ? '🔴' : '🟡';
-  const nw    = (() => { try { return fmt(getNetWorth()); } catch(e) { return '?'; } })();
-  const cash  = (() => { try { return fmt(state.cash);    } catch(e) { return '?'; } })();
-
-  const fields = [
-    { name: 'Net Worth', value: nw,                              inline: true },
-    { name: 'Cash',      value: cash,                            inline: true },
-    { name: 'Game Day',  value: String(state?.totalGameDays ?? '?'), inline: true },
-    ...Object.entries(data).slice(0, 3).map(([k,v]) => ({
-      name: k, value: String(v).slice(0, 100), inline: true
-    })),
-  ];
-
-  // Nur senden wenn CSRF-Token bereits gesetzt (nach Login)
-  if (!csrfToken) return;
-  fetch(PROXY_URL, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-    body: JSON.stringify({
-      embeds: [{
-        title:       emoji + ' LSX ' + level.toUpperCase() + ' — ' + context,
-        description: '```' + message + '```',
-        color,
-        fields,
-        footer:    { text: 'LSX Logger · ' + new Date().toLocaleString('de-DE') },
-        timestamp: new Date().toISOString(),
-      }]
-    }),
-  }).catch(() => {});
-}
-
-// Globale Error-Handler
-window.addEventListener('error', e => {
-  lsxLog('error', 'UncaughtError', e.message, {
-    file: (e.filename || '').split('/').pop(),
-    line: e.lineno,
-  });
-});
-window.addEventListener('unhandledrejection', e => {
-  lsxLog('error', 'UnhandledPromise', String(e.reason), {});
-});
-
 let sortCol = null;
 let sortDir = 'desc';
 let searchQuery = '';
@@ -65,6 +11,7 @@ const API = 'https://los-santos-exchange.de/lsx-proxy';
 const PROXY_URL = 'https://los-santos-exchange.de/lsx-proxy/webhook.php';
 
 function sendDiscordWebhook(embed) {
+  // CSRF-Token mitsenden — webhook.php erwartet diesen Header
   fetch(PROXY_URL, {
     method: 'POST',
     credentials: 'include',
@@ -84,7 +31,7 @@ function gameTimeStr() {
 // Net Worth berechnen
 function getNetWorth() {
   return state.cash + Object.entries(state.holdings)
-    .reduce((a, [t, h]) => a + h.qty * (state.prices[t] ?? 0), 0);
+    .reduce((a, [t, h]) => a + h.qty * state.prices[t], 0);
 }
 
 // ── Milestones ─────────────────────────────────────────
@@ -173,24 +120,6 @@ function checkNetWorthATH() {
 // ═══════════════════════════════════════════════════════
 // STOCKS DATA
 // ═══════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════
-// ✏️  NEUE FIRMA HINZUFÜGEN — CHECKLISTE
-// ═══════════════════════════════════════════════════════
-//
-// Schritt 1 — STOCKS Array (hier unten):
-//   { ticker:'XXX', name:'Firmenname', sector:'SECTOR', rival:'YYY', basePrice:100.00, vol:0.030 }
-//
-// Schritt 2 — NEWS_EVENTS Array (weiter unten bei den Events):
-//   { msg: 'Schlagzeile über die Firma', impact: 0.15, sector: 'SECTOR' }
-//
-// Schritt 3 — DIVIDEND_RATES (nur bei NEUEM Sektor nötig):
-//   NEUER_SEKTOR: [0.005, '0.5'],
-//
-// Schritt 4 — index.html (nur bei NEUEM Sektor nötig):
-//   <button class="tab" data-sector="NEUER_SEKTOR">NEUER_SEKTOR</button>
-//
-// vol-Richtwerte: 0.018=stabil · 0.030=normal · 0.045=volatil · 0.060=sehr volatil
-// ═══════════════════════════════════════════════════════
 const STOCKS = [
   // ═══════════════ FOOD (10) ═══════════════
   { ticker:'BSTA',  name:'Burgershot',             sector:'FOOD',      rival:'UAAT',  basePrice:45.20,  vol:0.030 },
@@ -229,7 +158,6 @@ const STOCKS = [
   { ticker:'PEGASS',name:'Pegassi',                 sector:'TRANSPORT', rival:'TRUFFD',basePrice:480.50, vol:0.022 },
   { ticker:'GROTTI',name:'Grotti',                  sector:'TRANSPORT', rival:'PEGASS',basePrice:445.20, vol:0.024 },
   { ticker:'MAIBT', name:'Maibatsu',                sector:'TRANSPORT', rival:'DINKA', basePrice:102.30, vol:0.028 },
-  { ticker:'RBLG',  name:'Rabe Logistics',            sector:'TRANSPORT', rival:'GOP',   basePrice:45.20,  vol:0.045 },
 
   // ═══════════════ FINANCE (6) ═══════════════
   { ticker:'MAZE',  name:'Maze Bank',               sector:'FINANCE',   rival:'BOL',   basePrice:218.50, vol:0.020 },
@@ -245,15 +173,7 @@ const STOCKS = [
   { ticker:'ARK',   name:'AnimalArk',               sector:'RETAIL',    rival:'MAX',   basePrice:22.40,  vol:0.025 },
   { ticker:'MAX',   name:'MaxRenda',                sector:'RETAIL',    rival:'ARK',   basePrice:24.10,  vol:0.025 },
   { ticker:'VAG',   name:'Vangelico Jewellers',     sector:'RETAIL',    rival:'PONSBY',basePrice:84.60,  vol:0.020 },
-  { ticker:'AMMU',  name:'Ammu-Nation',             sector:'RETAIL',    rival:'SHRPSH',basePrice:58.40,  vol:0.035 },
-
-  // ═══════════════ RETAIL — Waffenhersteller ═══════════════
-  // (im GTA-Stil — manche echt aus dem Spiel, manche inspiriert)
-  { ticker:'SHRPSH', name:'Shrewsbury Arms',          sector:'RETAIL',    rival:'AMMU',  basePrice:44.20,  vol:0.038 },
-  { ticker:'HLWPNT', name:'Hollow Point Inc.',         sector:'RETAIL',    rival:'SHRPSH',basePrice:31.80,  vol:0.042 },
-  { ticker:'PSTL',   name:'Pistol Pete Firearms',     sector:'RETAIL',    rival:'HLWPNT',basePrice:22.60,  vol:0.045 },
-  { ticker:'MILIT',  name:'Militant Defense Corp.',   sector:'RETAIL',    rival:'MRRWT', basePrice:187.50, vol:0.030 },
-  { ticker:'MRRWT',  name:'Merryweather Arms Div.',   sector:'RETAIL',    rival:'MILIT', basePrice:142.30, vol:0.032 },
+  { ticker:'AMMU',  name:'Ammu-Nation',             sector:'RETAIL',    rival:'',      basePrice:58.40,  vol:0.035 },
   { ticker:'ROBLQ', name:"Rob's Liquor",            sector:'RETAIL',    rival:'TWNTFR',basePrice:18.90,  vol:0.040 },
   { ticker:'TWNTFR',name:'24/7 Supermarkt',         sector:'RETAIL',    rival:'ROBLQ', basePrice:31.20,  vol:0.022 },
   { ticker:'PONSBY',name:'Ponsonbys Fashion',        sector:'RETAIL',    rival:'SUBBN', basePrice:112.80, vol:0.025 },
@@ -282,38 +202,6 @@ const STOCKS = [
   // ═══════════════ TECH (2) – Die wichtigsten! ═══════════════
   { ticker:'IFRT',  name:'iFruit Corp.',            sector:'TECH',      rival:'LFI',   basePrice:388.50, vol:0.028 },
   { ticker:'LFI',   name:'Lifeinvader',             sector:'TECH',      rival:'IFRT',  basePrice:12.30,  vol:0.040 },
-  // ═══════════════ TECH — 6 neue (+2 = 8 gesamt) ═══════════════
-  { ticker:'DRNK',  name:'Drone Solutions LS',      sector:'TECH',      rival:'FCDE',  basePrice:44.20,  vol:0.045 },
-  { ticker:'FCDE',  name:'Facade Technologies',     sector:'TECH',      rival:'DRNK',  basePrice:38.60,  vol:0.042 },
-  { ticker:'CHNK',  name:'Cheval Systems',          sector:'TECH',      rival:'IFRT',  basePrice:91.30,  vol:0.038 },
-  { ticker:'WZRD',  name:'Weasel Tech',             sector:'TECH',      rival:'LFI',   basePrice:28.40,  vol:0.050 },
-  { ticker:'VNWD',  name:'Vinewood Digital',        sector:'TECH',      rival:'WZRD',  basePrice:67.80,  vol:0.035 },
-  { ticker:'BSTR',  name:'Badger Comms',            sector:'TECH',      rival:'FCDE',  basePrice:52.10,  vol:0.040 },
-
-  // ═══════════════ PHARMA — 4 neue (+2 = 6 gesamt) ═══════════════
-  { ticker:'HUMNE', name:'Humane Labs',             sector:'PHARMA',    rival:'BPHM',  basePrice:156.40, vol:0.045 },
-  { ticker:'MXMD',  name:'Maze Medical',            sector:'PHARMA',    rival:'BILK',  basePrice:72.30,  vol:0.038 },
-  { ticker:'DRGS',  name:'Dr. Friedlander Health',  sector:'PHARMA',    rival:'MXMD',  basePrice:41.60,  vol:0.042 },
-  { ticker:'ZANK',  name:'Zanku Supplements',       sector:'PHARMA',    rival:'DRGS',  basePrice:19.80,  vol:0.048 },
-
-  // ═══════════════ ENERGY — 4 neue (+3 = 7 gesamt) ═══════════════
-  { ticker:'PVGAS', name:'Paleto Bay Gas & Oil',    sector:'ENERGY',    rival:'GCD',   basePrice:48.70,  vol:0.042 },
-  { ticker:'ALTPL', name:'Alamo Travel Power',      sector:'ENERGY',    rival:'HAF',   basePrice:33.90,  vol:0.038 },
-  { ticker:'SNDR',  name:'Sandy Shores Drilling',   sector:'ENERGY',    rival:'PVGAS', basePrice:27.60,  vol:0.044 },
-  { ticker:'NVRDE', name:'NVerde Renewables',       sector:'ENERGY',    rival:'HAF',   basePrice:88.50,  vol:0.032 },
-
-  // ═══════════════ FINANCE — 4 neue (+6 = 10 gesamt) ═══════════════
-  { ticker:'FLCA',  name:'Fleeca Bank',             sector:'FINANCE',   rival:'MAZE',  basePrice:142.30, vol:0.022 },
-  { ticker:'BLNE',  name:'Blaine County Savings',   sector:'FINANCE',   rival:'BOL',   basePrice:31.40,  vol:0.032 },
-  { ticker:'LSTR',  name:'Lester Crest Capital',    sector:'FINANCE',   rival:'GRU',   basePrice:24.80,  vol:0.038 },
-  { ticker:'PACP',  name:'Pacific Standard Finance',sector:'FINANCE',   rival:'FLCA',  basePrice:198.60, vol:0.018 },
-
-  // ═══════════════ FOOD — 4 neue (+10 = 14 gesamt) ═══════════════
-  { ticker:'SPNK',  name:'Sprunk Beverages',        sector:'FOOD',      rival:'PISS',  basePrice:42.10,  vol:0.028 },
-  { ticker:'EGCHK', name:'EgoChaser Energy',        sector:'FOOD',      rival:'SPNK',  basePrice:18.60,  vol:0.035 },
-  { ticker:'NYKA',  name:'Nuka-Cola LS',            sector:'FOOD',      rival:'SPNK',  basePrice:29.30,  vol:0.030 },
-  { ticker:'JMBJ',  name:'Jumberjack Diner',        sector:'FOOD',      rival:'BSTA',  basePrice:16.40,  vol:0.032 },
-
 ];
 
 const NEWS_STATIC = [
@@ -399,23 +287,12 @@ const NEWS_EVENTS = [
   { msg: 'Oil prices crash — transport sector margins expand',         impact:  0.14, sector: 'TRANSPORT' },
   { msg: 'San Andreas airport expansion approved by city council',     impact:  0.12, sector: 'TRANSPORT' },
   { msg: 'Nationwide logistics strike paralyses delivery networks',    impact: -0.13, sector: 'TRANSPORT' },
-  { msg: 'Rabe Logistics wins exclusive Vinewood Studios event contract',  impact:  0.18, sector: 'TRANSPORT' },
-  { msg: 'Rabe Logistics discreet cargo operation under federal scrutiny', impact: -0.20, sector: 'TRANSPORT' },
 
   // ── ENERGY ────────────────────────────────────────────────
   { msg: 'San Andreas green energy bill passes — fossil fuels drop',   impact: -0.14, sector: 'ENERGY' },
   { msg: 'Cold snap drives record energy demand across the state',     impact:  0.16, sector: 'ENERGY' },
   { msg: 'New offshore drilling rights approved by SA government',     impact:  0.13, sector: 'ENERGY' },
   { msg: 'Environmental protesters block major LS pipeline',           impact: -0.11, sector: 'ENERGY' },
-
-
-  // ── RETAIL — Waffen ───────────────────────────────────────────
-  { msg: 'San Andreas assault weapons ban collapses in Senate — gun stocks surge', impact:  0.18, sector: 'RETAIL' },
-  { msg: 'Shrewsbury Arms faces mass tort over defective rifle recall',             impact: -0.20, sector: 'RETAIL' },
-  { msg: 'LSPD doubles weapon procurement budget — defense retailers rally',        impact:  0.15, sector: 'RETAIL' },
-  { msg: 'Ammu-Nation robbery spree forces temporary closures across LS',           impact: -0.12, sector: 'RETAIL' },
-  { msg: 'Militant Defense Corp. wins exclusive SA National Guard contract',        impact:  0.22, sector: 'RETAIL' },
-  { msg: 'Hollow Point Inc. CEO arrested — illegal arms trafficking charges',       impact: -0.28, sector: 'RETAIL' },
 
   // ── RETAIL ────────────────────────────────────────────────
   { msg: 'Consumer confidence index hits 5-year high in San Andreas',  impact:  0.12, sector: 'RETAIL' },
@@ -436,39 +313,6 @@ const NEWS_EVENTS = [
   { msg: 'Lifeinvader user data sold to third parties — scandal erupts',  impact:-0.20, sector: 'TECH' },
   { msg: 'iFruit OS update bricks millions of devices',                   impact:-0.12, sector: 'TECH' },
   { msg: 'Lifeinvader monthly active users hit all-time high',            impact: 0.14, sector: 'TECH' },
-  // ── TECH (erweitert) ──────────────────────────────────────────
-  { msg: 'Badger Comms loses 5G contract to rival — shares tank',      impact: -0.14, sector: 'TECH' },
-  { msg: 'Drone Solutions LS lands LSPD surveillance deal',            impact:  0.17, sector: 'TECH' },
-  { msg: 'Facade Technologies IPO analyst coverage initiates BUY',     impact:  0.12, sector: 'TECH' },
-  { msg: 'Vinewood Digital streaming platform hits 10M subscribers',   impact:  0.15, sector: 'TECH' },
-  { msg: 'Weasel Tech social network faces federal privacy probe',      impact: -0.18, sector: 'TECH' },
-  { msg: 'Cheval Systems autonomous vehicle recall issued statewide',   impact: -0.13, sector: 'TECH' },
-
-  // ── PHARMA (erweitert) ────────────────────────────────────────
-  { msg: 'Humane Labs scandal — unauthorized human trials exposed',     impact: -0.22, sector: 'PHARMA' },
-  { msg: 'Zanku Supplements banned — performance-enhancing compounds',  impact: -0.16, sector: 'PHARMA' },
-  { msg: 'Dr. Friedlander Health settles malpractice suit for $200M',   impact: -0.14, sector: 'PHARMA' },
-  { msg: 'Maze Medical wins FDA equivalent approval for new drug',       impact:  0.20, sector: 'PHARMA' },
-  { msg: 'Humane Labs secures LS government biodefense contract',        impact:  0.18, sector: 'PHARMA' },
-
-  // ── ENERGY (erweitert) ────────────────────────────────────────
-  { msg: 'Sandy Shores Drilling hits major new oil reserve',             impact:  0.19, sector: 'ENERGY' },
-  { msg: 'Paleto Bay oil spill triggers state environmental inquiry',    impact: -0.18, sector: 'ENERGY' },
-  { msg: 'NVerde Renewables secures $500M solar farm contract in SA',    impact:  0.17, sector: 'ENERGY' },
-  { msg: 'Alamo Travel Power grid failure leaves LS blackout for hours', impact: -0.15, sector: 'ENERGY' },
-
-  // ── FINANCE (erweitert) ───────────────────────────────────────
-  { msg: 'Fleeca Bank branches robbed simultaneously across LS',         impact: -0.20, sector: 'FINANCE' },
-  { msg: 'Pacific Standard Finance acquires rival in $2B deal',          impact:  0.16, sector: 'FINANCE' },
-  { msg: 'Lester Crest Capital flagged by SEC for insider trading',      impact: -0.22, sector: 'FINANCE' },
-  { msg: 'Blaine County Savings collapses — FDIC equivalent steps in',   impact: -0.25, sector: 'FINANCE' },
-
-  // ── FOOD (erweitert) ──────────────────────────────────────────
-  { msg: 'Sprunk Beverages launches new energy drink — market surge',    impact:  0.13, sector: 'FOOD' },
-  { msg: 'EgoChaser Energy drink linked to hospitalisations in LS',      impact: -0.19, sector: 'FOOD' },
-  { msg: 'Jumberjack Diner announces 50 new LS locations',               impact:  0.11, sector: 'FOOD' },
-  { msg: 'Sprunk vs EgoChaser price war hits both margins hard',         impact: -0.10, sector: 'FOOD' },
-
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -496,12 +340,12 @@ const TRADE_LOG_MAX = 30; // Maximale Einträge in der Trade History
 // FEES AND DIVIDENS (DAYS)
 // ═══════════════════════════════════════════════════════
 
-// ── TRADING FEES (erhöht für mehr Challenge) ──────────
-const FEE_FLAT        = 50;      // unter $1.000          (war: $25)
-const FEE_TIER_1      = 0.020;   // 2.00% · $1.000–$9.999    (war: 1.20%)
-const FEE_TIER_2      = 0.015;   // 1.50% · $10.000–$49.999  (war: 0.80%)
-const FEE_TIER_3      = 0.010;   // 1.00% · $50.000–$199.999 (war: 0.50%)
-const FEE_TIER_4      = 0.006;   // 0.60% · ab $200.000       (war: 0.25%)
+// ── TRADING FEES ──────────────────────────────────────
+const FEE_FLAT        = 25;      // unter $1.000
+const FEE_TIER_1      = 0.012;   // 1.20% · $1.000 – $9.999
+const FEE_TIER_2      = 0.008;   // 0.80% · $10.000 – $49.999
+const FEE_TIER_3      = 0.005;   // 0.50% · $50.000 – $199.999
+const FEE_TIER_4      = 0.0025;  // 0.25% · ab $200.000
 
 // ── DIVIDENDS ─────────────────────────────────────────
 const DIVIDEND_RATES = {
@@ -537,8 +381,6 @@ let beforeUnloadAdded = false;
 let pendingNewsEvent   = null; // { ticker, stockObj, eventObj, applyAt }
 let pendingNewsTimer   = null;
 let pendingCountdownId = null;
-const newsTickerCooldown = new Map();
-const NEWS_COOLDOWN_MS   = 120_000;
 
 function defaultState() {
   const prices = {}, histories = {}, volumes = {};
@@ -548,7 +390,7 @@ function defaultState() {
     const hist = [];
     let hp = p;
     for (let i = 0; i < 30; i++) {
-      hp = Math.max(s.basePrice * 0.10, hp * (1 + (Math.random()-.5) * s.vol * 2));
+      hp = Math.max(1, hp * (1 + (Math.random()-.5) * s.vol * 2));
       hist.push(+hp.toFixed(2));
     }
     hist.push(p);
@@ -560,7 +402,7 @@ function defaultState() {
     prices, histories, volumes,
     holdings:    {},
     shorts: {},  // ticker -> { qty, entryPrice, collateral }
-    cash:        10000,
+    cash:        50000,
     watchlist:   [],
     limitOrders: [],
     stopLosses:  {},
@@ -574,21 +416,14 @@ function defaultState() {
     realizedPnl:    0,
     bestTrade:      0,
     worstTrade:     0,
-    startCash:      10000,
+    startCash:      50000,
     totalFeesPaid:  0,
     totalDividends: 0,
-    netWorthATH:    10000,
+    netWorthATH:    50000,
     },
-    lastDividendDay: 0,   // FIX: wird durch totalGameDays ersetzt
-    totalGameDays:   0,   // FIX: globaler Spieltag-Zähler für Dividenden
-    lastMilestone: 0,
+    lastDividendDay: 0,
+    lastMilestone: 0,   // ← NEU
     orderIdSeq: 1,
-    // ── Wirtschaftszyklen ──────────────────────────────
-    marketCycle:     'SIDEWAYS', // 'BULL' | 'BEAR' | 'SIDEWAYS'
-    cycleDay:        0,          // Tage im aktuellen Zyklus
-    // ── Achievements ──────────────────────────────────
-    achievements:    {},         // { id: true } wenn freigeschaltet
-    achievementLog:  [],         // [ { id, time } ] Chronik
   };
 }
 
@@ -629,14 +464,8 @@ function simulateTick(n = 1) {
         state.gameDay === 5 ? 0.60 :   // SAT – ruhiger Markt
         state.gameDay === 6 ? 0.60 :   // SUN – ruhiger Markt
         1.0;                            // DI–DO normal
-      // Mean-Reversion: zieht Kurs zurück zum basePrice wenn zu weit abgedriftet
-      const distanceFromBase = (old - s.basePrice) / s.basePrice;
-      const reversionForce   = -distanceFromBase * 0.015; // sanfte Rückzugskraft
-      const cycleDrift = getCycleDrift();
-      const drift = (Math.random() - 0.495) * s.vol * dayMod * 0.65 + reversionForce + cycleDrift;
-      // Price Floor: mindestens 10% des basePrice (kein $1-Penny-Stock)
-      const priceFloor = s.basePrice * 0.10;
-      const np = Math.max(priceFloor, +(old * (1 + drift)).toFixed(2));
+      const drift = (Math.random() - 0.495) * s.vol * dayMod * 0.65;
+      const np = Math.max(1, +(old * (1 + drift)).toFixed(2));
       state.prices[s.ticker] = np;
       state.histories[s.ticker].push(np);
       if (state.histories[s.ticker].length > 60) state.histories[s.ticker].shift();
@@ -647,9 +476,7 @@ function simulateTick(n = 1) {
         updated.add(s.rival);
         const ro = state.prices[s.rival];
         const rd = -drift * (0.4 + Math.random() * 0.3);
-        const rivalStock = STOCKS.find(x => x.ticker === s.rival);
-        const rivalFloor = rivalStock ? rivalStock.basePrice * 0.10 : 1;
-        const rn = Math.max(rivalFloor, +(ro * (1 + rd)).toFixed(2));
+        const rn = Math.max(1, +(ro * (1 + rd)).toFixed(2));
         state.prices[s.rival] = rn;
         state.histories[s.rival].push(rn);
         if (state.histories[s.rival].length > 60) state.histories[s.rival].shift();
@@ -658,20 +485,16 @@ function simulateTick(n = 1) {
       updated.add(s.ticker);
     });
 
-    // FIX #1 (gameHour): Spielzeit pro Tick vorantreiben (4s realtime = 1 Spielstunde)
-    state.gameHour++;
+    // Den bestehenden if (state.gameHour >= 24) Block ersetzen:
     if (state.gameHour >= 24) {
-      state.gameHour = 6;
-      state.gameDay  = (state.gameDay + 1) % 7;
-      state.gameDayOfMonth++;
-      state.totalGameDays = (state.totalGameDays || 0) + 1; // FIX #3 (Dividenden): globaler Counter
-      if (state.gameDayOfMonth > 28) {
+    state.gameHour = 6;
+    state.gameDay  = (state.gameDay + 1) % 7;
+    state.gameDayOfMonth++;
+    if (state.gameDayOfMonth > 28) {
         state.gameDayOfMonth = 1;
         state.gameMonth = (state.gameMonth + 1) % 12;
-      }
-      checkShortFees();    // Leihgebühr einmal täglich
-      checkMarketCycle();  // Wirtschaftszyklus prüfen
-      checkMarginCalls();  // Margin Calls für Shorts
+    }
+    checkShortFees(); // Leihgebühr einmal täglich
     }
   }
 
@@ -688,8 +511,6 @@ function simulateTick(n = 1) {
   checkShortStopLosses();  
   checkMilestone();
   checkNetWorthATH();
-  checkAchievements();
-  checkBankruptcy();
   renderAll();
 }
 
@@ -718,212 +539,12 @@ function renderAll() {
   renderScoreboard();
   renderTradeHistory();
   renderPortfolioChart();
-  renderMarketSummary();
-  renderTopMovers();
-  if (heatmapMode) renderHeatmap();
-  // FIX #2 (Tab-Sektionen): Tab-spezifische Elemente mitrendern
-  renderTabSections();
-  renderAchievements();
+  renderMarketSummary();  // NEU
+  renderTopMovers();      // NEU
+  if (heatmapMode) renderHeatmap(); // NEU
   updateHeader();
   updateGameTime();
   if (modalTicker) refreshModal();
-}
-
-// renderTabSections: befüllt rechte Sidebar (Stop-Losses, Alerts)
-// Portfolio + Shorts + Orders werden bereits von renderPortfolioSidebar,
-// renderShortsSidebar, renderOrders befüllt
-function renderTabSections() {
-  // ── PORTFOLIO TAB ──────────────────────────────
-  const portFull  = document.getElementById('portfolioElFull');
-  const shortFull = document.getElementById('shortsElFull');
-  const chartFull = document.getElementById('portfolioChartFull');
-
-  if (portFull) {
-    const entries = Object.entries(state.holdings);
-    portFull.innerHTML = entries.length ? entries.map(([ticker, h]) => {
-      const cur = state.prices[ticker];
-      const val = cur * h.qty;
-      const pnl = (cur - h.avgCost) * h.qty;
-      const pct = (cur - h.avgCost) / h.avgCost * 100;
-      const cls = pnl >= 0 ? 'up' : 'down';
-      return `<div class="portfolio-row" data-ticker="${ticker}" style="cursor:pointer">
-        <div class="portfolio-row-left">
-          <div class="portfolio-row-tick">${ticker}</div>
-          <div class="portfolio-row-qty">${h.qty} @ ${fmt(h.avgCost)}</div>
-        </div>
-        <div class="portfolio-row-right">
-          <div class="portfolio-row-val">${fmt(val)}</div>
-          <div class="portfolio-row-pnl ${cls}">${pnl>=0?'+':''}${fmt(pnl)} (${pct.toFixed(1)}%)</div>
-        </div>
-      </div>`;
-    }).join('') : '<div class="watch-empty">No open positions.</div>';
-    portFull.onclick = e => {
-      const row = e.target.closest('.portfolio-row');
-      if (row) openModal(row.dataset.ticker);
-    };
-  }
-
-  if (shortFull) {
-    const entries = Object.entries(state.shorts || {});
-    shortFull.innerHTML = entries.length ? entries.map(([ticker, sh]) => {
-      const cur = state.prices[ticker];
-      const pnl = (sh.entryPrice - cur) * sh.qty;
-      const pct = (sh.entryPrice - cur) / sh.entryPrice * 100;
-      const cls = pnl >= 0 ? 'up' : 'down';
-      return `<div class="portfolio-row" data-ticker="${ticker}" style="cursor:pointer">
-        <div class="portfolio-row-left">
-          <div class="portfolio-row-tick"><span style="color:var(--red);font-size:10px;margin-right:4px;">▼</span>${ticker}</div>
-          <div class="portfolio-row-qty">${sh.qty} @ ${fmt(sh.entryPrice)}</div>
-        </div>
-        <div class="portfolio-row-right">
-          <div class="portfolio-row-val">${fmt(cur * sh.qty)}</div>
-          <div class="portfolio-row-pnl ${cls}">${pnl>=0?'+':''}${fmt(pnl)} (${pct.toFixed(1)}%)</div>
-        </div>
-      </div>`;
-    }).join('') : '<div class="watch-empty">No open shorts.</div>';
-    shortFull.onclick = e => {
-      const row = e.target.closest('.portfolio-row');
-      if (row) openModal(row.dataset.ticker);
-    };
-  }
-
-  if (chartFull && state.netWorthHistory?.length > 1) {
-    const ctx = chartFull.getContext('2d');
-    const data = state.netWorthHistory.slice(-120);
-    const cw = chartFull.parentElement.clientWidth - 24;
-    const h  = 160;
-    chartFull.width  = cw;
-    chartFull.height = h;
-    const min = Math.min(...data), max = Math.max(...data), range = max - min || 1;
-    const pad = 6;
-    const isUp = data[data.length-1] >= data[0];
-    const col  = isUp ? 'rgba(0,255,136,0.9)' : 'rgba(255,51,85,0.9)';
-    ctx.clearRect(0,0,cw,h);
-    const coords = data.map((v,i) => ({
-      x: (i/(data.length-1))*(cw-pad*2)+pad,
-      y: h-pad-((v-min)/range)*(h-pad*2)
-    }));
-    const grad = ctx.createLinearGradient(0,0,0,h);
-    grad.addColorStop(0, isUp?'rgba(0,255,136,0.18)':'rgba(255,51,85,0.18)');
-    grad.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.beginPath();
-    coords.forEach((c,i) => i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
-    ctx.lineTo(coords[coords.length-1].x,h-pad);
-    ctx.lineTo(pad,h-pad);
-    ctx.closePath();
-    ctx.fillStyle=grad; ctx.fill();
-    ctx.beginPath();
-    coords.forEach((c,i) => i===0?ctx.moveTo(c.x,c.y):ctx.lineTo(c.x,c.y));
-    ctx.strokeStyle=col; ctx.lineWidth=2; ctx.stroke();
-  }
-
-  // ── ORDERS TAB ────────────────────────────────
-  const ordersFull = document.getElementById('ordersElFull');
-  if (ordersFull) {
-    ordersFull.innerHTML = state.limitOrders.length
-      ? state.limitOrders.map(o => `
-        <div class="order-item">
-          <div>
-            <span class="order-ticker">${o.ticker}</span>
-            <span class="order-meta" style="margin-left:8px">${o.type==='buy-below'?'BUY ≤':'SELL ≥'} ${fmt(o.price)} × ${o.qty}</span>
-          </div>
-          <button class="order-cancel" data-order-id="${o.id}">✕</button>
-        </div>`).join('')
-      : '<div class="watch-empty">No active limit orders.</div>';
-    ordersFull.onclick = e => {
-      const btn = e.target.closest('.order-cancel');
-      if (!btn) return;
-      state.limitOrders = state.limitOrders.filter(o => o.id !== +btn.dataset.orderId);
-      renderTabSections();
-      showToast('Order cancelled');
-    };
-  }
-
-  const slEl = document.getElementById('stopLossesEl');
-  if (slEl) {
-    const entries = Object.entries(state.stopLosses || {});
-    slEl.innerHTML = entries.length
-      ? entries.map(([ticker, pct]) => {
-          const isShort = ticker.startsWith('short_');
-          const label   = isShort ? ticker.replace('short_','') + ' (SHORT)' : ticker;
-          return `<div class="order-item">
-            <div>
-              <span class="order-ticker">${label}</span>
-              <span class="order-meta" style="margin-left:8px">Stop at −${pct}%</span>
-            </div>
-            <button class="order-cancel" data-sl-ticker="${ticker}">✕</button>
-          </div>`;
-        }).join('')
-      : '<div class="watch-empty">No active stop-losses.</div>';
-    slEl.onclick = e => {
-      const btn = e.target.closest('.order-cancel');
-      if (!btn) return;
-      delete state.stopLosses[btn.dataset.slTicker];
-      renderTabSections();
-      showToast('Stop-loss removed');
-    };
-  }
-
-  const alertEl = document.getElementById('priceAlertsEl');
-  if (alertEl) {
-    const entries = Object.entries(state.priceAlerts || {});
-    alertEl.innerHTML = entries.length
-      ? entries.map(([ticker, target]) => {
-          const cur = state.prices[ticker];
-          const dir = target > cur ? '▲' : '▼';
-          return `<div class="order-item">
-            <div>
-              <span class="order-ticker">${ticker}</span>
-              <span class="order-meta" style="margin-left:8px">${dir} ${fmt(target)}</span>
-            </div>
-            <button class="order-cancel" data-alert-ticker="${ticker}">✕</button>
-          </div>`;
-        }).join('')
-      : '<div class="watch-empty">No active price alerts.</div>';
-    alertEl.onclick = e => {
-      const btn = e.target.closest('.order-cancel');
-      if (!btn) return;
-      delete state.priceAlerts[btn.dataset.alertTicker];
-      renderTabSections();
-      showToast('Alert removed');
-    };
-  }
-
-  // ── HISTORY TAB ───────────────────────────────
-  renderHistoryTab();
-}
-
-function renderHistoryTab() {
-  const el = document.getElementById('tradeHistoryFull');
-  if (!el) return;
-  const filterEl = document.getElementById('historyFilter');
-  const filter   = filterEl ? filterEl.value : 'ALL';
-  const log      = state.tradeLog || [];
-  const filtered = filter === 'ALL' ? log : log.filter(t => t.mode === filter);
-
-  if (!filtered.length) {
-    el.innerHTML = '<div class="watch-empty">No trades yet.</div>';
-    return;
-  }
-
-  el.innerHTML = filtered.map(t => {
-    const modeClass = t.mode === 'BUY' ? 'buy' : t.mode === 'SELL' ? 'sell' : t.mode === 'SHORT' ? 'sell' : 'buy';
-    const pnlHtml = t.pnl !== null
-      ? `<div class="th-pnl ${t.pnl>=0?'up':'down'}">${t.pnl>=0?'+':''}${fmt(t.pnl)}</div>`
-      : '';
-    return `<div class="trade-hist-row">
-      <div class="th-left">
-        <span class="th-mode ${modeClass}">${t.mode}</span>
-        <span class="th-ticker">${t.ticker}</span>
-        <span class="th-meta">${t.qty} @ ${fmt(t.price)}</span>
-      </div>
-      <div class="th-right">
-        ${pnlHtml}
-        <div class="th-fee">Fee: ${fmt(t.fee)}</div>
-        <div class="th-time">${t.time}</div>
-      </div>
-    </div>`;
-  }).join('');
 }
 
 function renderTable() {
@@ -1163,19 +784,12 @@ function renderMarketSummary() {
   });
 
   const avgChg   = totalChg / STOCKS.length;
-  const cycle      = state.marketCycle || 'SIDEWAYS';
-  const cycleStr   = `${CYCLE_EMOJI[cycle]} ${cycle}`;
-  const sentiment  = avgChg > 0.5 ? '🐂 BULL' : avgChg < -0.5 ? '🐻 BEAR' : '➡ NEUTRAL';
+  const sentiment = avgChg > 0.5 ? '🐂 BULL' : avgChg < -0.5 ? '🐻 BEAR' : '➡ NEUTRAL';
   const sentCol   = avgChg > 0.5 ? 'var(--green)' : avgChg < -0.5 ? 'var(--red)' : 'var(--dim)';
 
   el.innerHTML = `
     <div class="ms-item">
-      <span class="ms-label">CYCLE</span>
-      <span class="ms-val" style="color:${CYCLE_COLORS[cycle]}">${cycleStr}</span>
-    </div>
-    <div class="ms-divider"></div>
-    <div class="ms-item">
-      <span class="ms-label">SENTIMENT</span>
+      <span class="ms-label">MARKET</span>
       <span class="ms-val" style="color:${sentCol}">${sentiment}</span>
     </div>
     <div class="ms-divider"></div>
@@ -1357,161 +971,25 @@ function updateGameTime() {
 function openModal(ticker) {
   modalTicker = ticker;
   modalMode   = 'buy';
-
-  // Tab-System: immer auf TRADE zurücksetzen
-  switchModalTab('trade');
-
-  // BUY als Standard
+  refreshModal();
   document.getElementById('mTabBuy').className  = 'trade-tab2 buy-active';
   document.getElementById('mTabSell').className = 'trade-tab2';
   document.getElementById('btnModalTrade').className   = 'btn-modal-trade btn-modal-buy';
   document.getElementById('btnModalTrade').textContent = 'BUY SHARES';
   document.getElementById('mQtyInput').value = 1;
   updateMTotal();
-
+  // Inner tabs zurücksetzen
+  document.getElementById('mpanelTrade').style.display  = '';
+  document.getElementById('mpanelOrders').style.display = 'none';
+  document.getElementById('mtabTrade').classList.add('active');
+  document.getElementById('mtabOrders').classList.remove('active');
   document.getElementById('stockModal').classList.add('open');
-  refreshModal();
-  updateWatchBtn();
-}
 
-// Neues 4-Tab-System für das Modal
-function switchModalTab(tab) {
-  const panels = ['trade','short','orders','alert'];
-  panels.forEach(p => {
-    const panel = document.getElementById('mpanel' + p.charAt(0).toUpperCase() + p.slice(1));
-    if (panel) panel.style.display = p === tab ? '' : 'none';
-  });
-  document.querySelectorAll('.modal-inner-tab').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.mtab === tab);
-  });
-  // Tab-spezifische Inhalte aktualisieren
-  if (tab === 'short')  refreshShortTab();
-  if (tab === 'orders') refreshOrdersTab();
-  if (tab === 'alert')  refreshAlertTab();
-}
-
-function refreshShortTab() {
-  if (!modalTicker) return;
-  const sh  = state.shorts?.[modalTicker];
-  const el  = document.getElementById('shortPosDisplay');
-  const ssl = state.stopLosses['short_' + modalTicker];
-
-  if (sh) {
-    const cur    = state.prices[modalTicker];
-    const pnl    = (sh.entryPrice - cur) * sh.qty;
-    const pnlPct = ((sh.entryPrice - cur) / sh.entryPrice * 100).toFixed(1);
-    el.innerHTML = `
-      <div class="modal-short-pos-card">
-        <div class="msp-row">
-          <span class="msp-label">POSITION</span>
-          <span class="msp-val">${sh.qty} shares</span>
-        </div>
-        <div class="msp-row">
-          <span class="msp-label">ENTRY</span>
-          <span class="msp-val">${fmt(sh.entryPrice)}</span>
-        </div>
-        <div class="msp-row">
-          <span class="msp-label">CURRENT</span>
-          <span class="msp-val">${fmt(cur)}</span>
-        </div>
-        <div class="msp-row">
-          <span class="msp-label">P&L</span>
-          <span class="msp-val ${pnl>=0?'up':'down'}">${pnl>=0?'+':''}${fmt(pnl)} (${pnlPct}%)</span>
-        </div>
-        <div class="msp-row">
-          <span class="msp-label">COLLATERAL</span>
-          <span class="msp-val">${fmt(sh.collateral)}</span>
-        </div>
-      </div>`;
-    document.getElementById('shortCoverQtyInput').value = sh.qty;
-  } else {
-    el.innerHTML = '<div class="watch-empty">No short position on ' + modalTicker + '.</div>';
-  }
-
-  // Short Stop-Loss Status
-  const sslInput  = document.getElementById('shortStopLossInput');
-  const sslStatus = document.getElementById('shortStopLossStatus');
-  const sslBtn    = document.getElementById('btnClearShortStopLoss');
-  if (ssl) {
-    sslInput.value          = ssl;
-    sslStatus.textContent   = `Active: auto-cover at +${ssl}% loss`;
-    sslBtn.style.display    = '';
-  } else {
-    sslInput.value          = '';
-    sslStatus.textContent   = '';
-    sslBtn.style.display    = 'none';
-  }
-}
-
-function refreshOrdersTab() {
-  if (!modalTicker) return;
-
-  // Stop-Loss (Long)
-  const sl = state.stopLosses[modalTicker];
+  const sl = state.stopLosses[ticker];
   document.getElementById('stopLossInput').value = sl || '';
   document.getElementById('stopLossStatus').textContent = sl ? `Active: auto-sell at −${sl}% loss` : '';
   document.getElementById('btnClearStopLoss').style.display = sl ? '' : 'none';
-
-  // Aktive Orders für diesen Ticker
-  const el = document.getElementById('modalActiveOrders');
-  const orders = state.limitOrders.filter(o => o.ticker === modalTicker);
-  el.innerHTML = orders.length
-    ? orders.map(o => `
-      <div class="order-item">
-        <div>
-          <span class="order-meta">${o.type==='buy-below'?'BUY ≤':'SELL ≥'} ${fmt(o.price)} × ${o.qty}</span>
-        </div>
-        <button class="order-cancel" data-order-id="${o.id}">✕</button>
-      </div>`).join('')
-    : '<div class="watch-empty">No active orders for this stock.</div>';
-
-  el.onclick = e => {
-    const btn = e.target.closest('.order-cancel');
-    if (!btn) return;
-    state.limitOrders = state.limitOrders.filter(o => o.id !== +btn.dataset.orderId);
-    renderOrders();
-    renderTabSections();
-    refreshOrdersTab();
-    showToast('Order cancelled');
-  };
-}
-
-function refreshAlertTab() {
-  if (!modalTicker) return;
-  const a   = state.priceAlerts?.[modalTicker];
-  const cur = state.prices[modalTicker];
-
-  // Current alert display
-  const alertDisplay = document.getElementById('currentAlertDisplay');
-  if (a) {
-    const dir = a > cur ? '▲ above' : '▼ below';
-    alertDisplay.innerHTML = `
-      <div class="modal-alert-active">
-        🔔 Alert set at <strong>${fmt(a)}</strong> (${dir} current ${fmt(cur)})
-        <button onclick="clearPriceAlert('${modalTicker}')" class="btn-sm btn-danger" style="margin-left:8px;">REMOVE</button>
-      </div>`;
-    document.getElementById('priceAlertInput').value = a;
-  } else {
-    alertDisplay.innerHTML = '<div class="watch-empty">No alert set.</div>';
-    document.getElementById('priceAlertInput').value = '';
-  }
-
-  // Watchlist toggle
-  const watched = state.watchlist.includes(modalTicker);
-  const wBtn    = document.getElementById('btnWatchFull');
-  const wDisp   = document.getElementById('watchlistToggleDisplay');
-  wDisp.innerHTML = watched
-    ? `<div class="modal-alert-active">★ ${modalTicker} is on your watchlist.</div>`
-    : `<div class="watch-empty">${modalTicker} is not on your watchlist.</div>`;
-  wBtn.textContent = watched ? '★ REMOVE FROM WATCHLIST' : '☆ ADD TO WATCHLIST';
-  wBtn.onclick = () => {
-    const idx = state.watchlist.indexOf(modalTicker);
-    if (idx === -1) { state.watchlist.push(modalTicker); showToast('★ Added to watchlist'); }
-    else            { state.watchlist.splice(idx, 1);    showToast('Removed from watchlist'); }
-    updateWatchBtn();
-    renderWatchlist();
-    refreshAlertTab();
-  };
+  updateWatchBtn();
 }
 
 function closeModal() {
@@ -1576,22 +1054,35 @@ function refreshModal() {
 
   drawChart('modalChart', modalTicker, 200, 120);
   updateMTotal();
-  updateQuickActions();
 
-  // Status-Pills: Short & Alert — kompaktes Summary in der Header-Row
+  // ── Short-Status ──────────────────────────────────────
   const shortStatus = document.getElementById('shortStatus');
   if (shortStatus) {
     const sh = state.shorts?.[modalTicker];
-    shortStatus.innerHTML = sh
-      ? `<span class="status-pill status-short">📉 SHORT ${sh.qty}×</span>`
-      : '';
+    if (sh) {
+      const pnl    = (sh.entryPrice - price) * sh.qty;
+      const pnlPct = ((sh.entryPrice - price) / sh.entryPrice * 100).toFixed(1);
+      shortStatus.innerHTML = `📉 Short: ${sh.qty} @ ${fmt(sh.entryPrice)} · P&L: <span class="${pnl >= 0 ? 'up' : 'down'}">${pnl >= 0 ? '+' : ''}${fmt(pnl)} (${pnlPct}%)</span>`;
+    } else {
+      shortStatus.textContent = '';
+    }
   }
+
+  // ── Preis-Alarm Status ────────────────────────────────
   const alertStatus = document.getElementById('priceAlertStatus');
+  const alertInput  = document.getElementById('priceAlertInput');
   if (alertStatus) {
     const a = state.priceAlerts?.[modalTicker];
-    alertStatus.innerHTML = a
-      ? `<span class="status-pill status-alert">🔔 ALERT ${fmt(a)}</span>`
-      : '';
+    if (a) {
+      const dir = a > state.prices[modalTicker] ? '▲' : '▼';
+      alertStatus.innerHTML = `🔔 Alert set: ${dir} ${fmt(a)}
+        <span onclick="clearPriceAlert('${modalTicker}')"
+              style="color:var(--red);cursor:pointer;margin-left:8px;">✕ Remove</span>`;
+      if (alertInput) alertInput.value = a;
+    } else {
+      alertStatus.textContent = '';
+      if (alertInput) alertInput.value = '';
+    }
   }
 }
 
@@ -1674,57 +1165,44 @@ function calcFee(total) {
 // TRADING
 // ═══════════════════════════════════════════════════════
 function executeTrade(ticker, mode, qty) {
-  // Market Hours Check
-  if (!isMarketOpen()) {
-    showToast(`🔒 Market closed · Open Mon–Fri 09:00–17:00`, true);
-    return false;
-  }
   const price = state.prices[ticker];
   const total = qty * price;
   const fee   = calcFee(total);
- 
+
   if (mode === 'buy') {
     if (total + fee > state.cash) {
       showToast(`Insufficient funds! Need ${fmt(total + fee)} (incl. ${fmt(fee)} fee)`, true);
       return false;
     }
     state.cash -= (total + fee);
-    if (!state.holdings[ticker]) state.holdings[ticker] = { qty: 0, avgCost: 0 };
+    if (!state.holdings[ticker]) state.holdings[ticker] = { qty:0, avgCost:0 };
     const h  = state.holdings[ticker];
- 
-    // FIX: avgCost = nur Kaufpreis (ohne Fee), so wie es Standard ist
-    // Fee wird separat in totalFeesPaid getrackt
-    const newTotal = h.qty * h.avgCost + total;
-    h.qty    += qty;
-    h.avgCost = newTotal / h.qty;
- 
+    const nt = h.qty * h.avgCost + total + fee;
+    h.qty += qty;
+    h.avgCost = nt / h.qty;
     state.stats.totalFeesPaid += fee;
     state.stats.totalTrades++;
-    state.tradeLog.unshift({
-      time: `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2, '0')}:00`,
-      ticker, mode: 'BUY', qty, price, pnl: null, fee,
-    });
+    state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'BUY', qty, price, pnl: null, fee});
     if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
     showToast(`✓ Bought ${qty} × ${ticker} @ ${fmt(price)} · Fee: ${fmt(fee)}`);
- 
     if (total >= 10_000) {
       sendDiscordWebhook({
         title:       `📈 Großer Kauf — ${ticker}`,
         description: `Position im Wert von **${fmt(total)}** eröffnet.`,
         color:       0x00ff88,
         fields: [
-          { name: 'Aktie',       value: ticker,         inline: true },
-          { name: 'Stück',       value: `${qty}`,       inline: true },
-          { name: 'Kurs',        value: fmt(price),     inline: true },
-          { name: 'Total',       value: fmt(total),     inline: true },
-          { name: 'Fee',         value: fmt(fee),       inline: true },
+          { name: 'Aktie',  value: ticker,       inline: true },
+          { name: 'Stück',  value: `${qty}`,     inline: true },
+          { name: 'Kurs',   value: fmt(price),   inline: true },
+          { name: 'Total',  value: fmt(total),   inline: true },
+          { name: 'Fee',    value: fmt(fee),      inline: true },
           { name: 'Cash danach', value: fmt(state.cash), inline: true },
         ],
         footer:    { text: gameTimeStr() },
         timestamp: new Date().toISOString(),
       });
     }
- 
+
   } else {
     if (!state.holdings[ticker] || state.holdings[ticker].qty < qty) {
       showToast('Not enough shares!', true); return false;
@@ -1734,22 +1212,18 @@ function executeTrade(ticker, mode, qty) {
     state.cash += (total - fee);
     state.holdings[ticker].qty -= qty;
     if (state.holdings[ticker].qty === 0) delete state.holdings[ticker];
-    state.stats.realizedPnl    += pnl;
-    state.stats.totalFeesPaid  += fee;
+    state.stats.realizedPnl  += pnl;
+    state.stats.totalFeesPaid += fee;
     if (pnl > state.stats.bestTrade)  state.stats.bestTrade  = pnl;
     if (pnl < state.stats.worstTrade) state.stats.worstTrade = pnl;
     state.stats.totalTrades++;
-    state.tradeLog.unshift({
-      time: `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2, '0')}:00`,
-      ticker, mode: 'SELL', qty, price, pnl, fee,
-    });
-    if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
-    showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl >= 0 ? '+' : ''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
- 
+    state.tradeLog.unshift({  time:   `${DAYS[state.gameDay]} ${state.gameHour.toString().padStart(2,'0')}:00`,  ticker, mode: 'SELL', qty, price, pnl, fee});
+if (state.tradeLog.length > TRADE_LOG_MAX) state.tradeLog.pop();
+    showToast(`✓ Sold ${qty} × ${ticker} @ ${fmt(price)} · P&L: ${pnl>=0?'+':''}${fmt(pnl)} · Fee: ${fmt(fee)}`);
     if (total >= 10_000 || pnl <= -3_000) {
       const isBigLoss = pnl <= -3_000;
       sendDiscordWebhook({
-        title: isBigLoss && total < 10_000
+        title:       isBigLoss && total < 10_000
           ? `💸 Herber Verlust — ${ticker}`
           : `💹 Großer Verkauf — ${ticker}`,
         description: isBigLoss
@@ -1757,12 +1231,12 @@ function executeTrade(ticker, mode, qty) {
           : `Position über **${fmt(total)}** verkauft.`,
         color: pnl >= 0 ? 0x00ff88 : 0xff3355,
         fields: [
-          { name: 'Aktie',  value: ticker,                           inline: true },
-          { name: 'Stück',  value: `${qty}`,                         inline: true },
-          { name: 'Kurs',   value: fmt(price),                       inline: true },
-          { name: 'Total',  value: fmt(total),                       inline: true },
-          { name: 'P&L',    value: `**${pnl >= 0 ? '+' : ''}${fmt(pnl)}**`, inline: true },
-          { name: 'Fee',    value: fmt(fee),                         inline: true },
+          { name: 'Aktie',  value: ticker,                                       inline: true },
+          { name: 'Stück',  value: `${qty}`,                                     inline: true },
+          { name: 'Kurs',   value: fmt(price),                                   inline: true },
+          { name: 'Total',  value: fmt(total),                                   inline: true },
+          { name: 'P&L',    value: `**${pnl>=0?'+':''}${fmt(pnl)}**`,           inline: true },
+          { name: 'Fee',    value: fmt(fee),                                     inline: true },
         ],
         footer:    { text: gameTimeStr() },
         timestamp: new Date().toISOString(),
@@ -1777,10 +1251,6 @@ function executeTrade(ticker, mode, qty) {
 // SHORT SELLING
 // ═══════════════════════════════════════════════════════
 function openShort(ticker, qty) {
-  if (!isMarketOpen()) {
-    showToast(`🔒 Market closed · Open Mon–Fri 09:00–17:00`, true);
-    return false;
-  }
   const price      = state.prices[ticker];
   const total      = qty * price;
   const fee        = calcFee(total);
@@ -1880,11 +1350,6 @@ function closeShort(ticker, qty) {
 function checkShortFees() {
   Object.entries(state.shorts).forEach(([ticker, sh]) => {
     const dailyFee = +(state.prices[ticker] * sh.qty * SHORT_FEE_DAILY).toFixed(2);
-    if (state.cash < dailyFee) {
-      // Nicht genug Cash → Warnung anzeigen, aber trotzdem abziehen
-      // (Cash kann negativ werden als Penalty)
-      showToast(`⚠️ Insufficient cash for short fee on ${ticker}! Consider covering.`, true);
-    }
     state.cash -= dailyFee;
     state.stats.totalFeesPaid += dailyFee;
   });
@@ -1920,7 +1385,7 @@ function checkLimitOrders() {
     state.limitOrders = state.limitOrders.filter(x => x.id !== o.id);
     const execPrice = state.prices[o.ticker];
     executeTrade(o.ticker, o.mode, o.qty);
-    showToast(`⏱ Limit order executed: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(execPrice)}`);
+    showNewsEvent(o.ticker, `Limit order triggered: ${o.mode.toUpperCase()} ${o.qty} × ${o.ticker} @ ${fmt(execPrice)}`, o.mode==='buy'?0.01:-0.01, false);
     sendDiscordWebhook({
       title:       `⏱ Limit-Order ausgeführt — ${o.ticker}`,
       description: `Order automatisch ausgelöst.`,
@@ -1948,7 +1413,7 @@ function checkStopLosses() {
       const pnlEst = (sellPrice - h.avgCost) * qty;
       delete state.stopLosses[ticker];
       executeTrade(ticker, 'sell', qty);
-      showToast(`🛡 Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, true);
+      showNewsEvent(ticker, `Stop-loss triggered: sold ${qty} × ${ticker} at −${Math.abs(lossPct).toFixed(1)}%`, -0.02, false);
       sendDiscordWebhook({
         title:       `🛡 Stop-Loss ausgelöst — ${ticker}`,
         description: `Automatischer Verkauf bei **−${Math.abs(lossPct).toFixed(1)}%** Verlust.`,
@@ -1969,12 +1434,9 @@ function checkStopLosses() {
 }
 
 function checkDividends() {
-  // FIX #3 (Dividenden): totalGameDays statt gameDay % 7
-  // gameDay geht nur 0-6, daher konnte die alte Logik fast nie korrekt feuern
-  const tgd = state.totalGameDays || 0;
-  if (tgd === 0 || tgd % DIVIDEND_INTERVAL_DAYS !== 0) return;
-  if (state.lastDividendDay === tgd) return; // schon ausgezahlt heute
-  state.lastDividendDay = tgd;
+  // Alle 14 Spieltage auszahlen
+  if (state.gameDay % DIVIDEND_INTERVAL_DAYS !== 0 || state.gameDay === state.lastDividendDay) return;
+  state.lastDividendDay = state.gameDay;
 
   let totalPayout = 0;
   const payouts   = [];
@@ -1994,32 +1456,16 @@ function checkDividends() {
 
   if (totalPayout === 0) return;
 
-  // Dividend-Toast anzeigen
+  // Aufwändiger Dividend-Toast via showNewsEvent
   const lines = payouts
     .map(p => `${p.ticker} +${fmt(p.payout)} (${p.rate}%)`)
     .join(' · ');
 
-  // FIX: kein showNewsToast(null,...) mehr → zeigt "null" als Ticker
-  showToast(`💰 Dividends: +${fmt(totalPayout)}`);
-  // Kurze Info im News-Event-Toast ohne Ticker/Chart-Button
-  const _divEl = document.getElementById('newsEventToast');
-  _divEl.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:6px;">
-          💰 DIVIDEND PAYOUT
-        </div>
-        <div style="font-size:12px;color:var(--dim);line-height:1.6;">${lines}</div>
-        <div style="font-size:14px;font-weight:700;color:var(--green);margin-top:8px;">
-          Total: +${fmt(totalPayout)}
-        </div>
-      </div>
-      <button onclick="closeNewsToast()"
-        style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:0;">✕</button>
-    </div>`;
-  _divEl.classList.add('show');
-  clearTimeout(newsEventTimerToast);
-  newsEventTimerToast = setTimeout(() => _divEl.classList.remove('show'), 8000);
+  showNewsEvent(null,
+    `💰 DIVIDEND PAYOUT · ${fmt(totalPayout)} · ${lines}`,
+    0.0, false
+  );
+  showToast(`💰 Dividends received: ${fmt(totalPayout)}`);
 
   // Discord-Ping wenn Dividende über $1.000
   if (totalPayout >= 1_000) {
@@ -2053,36 +1499,28 @@ let newsEventTimerToast = null;
  */
 function fireNewsEvent() {
   if (pendingNewsEvent) return;
- 
+
   const ev = NEWS_EVENTS[Math.floor(Math.random() * NEWS_EVENTS.length)];
- 
+
   let s;
-  let attempts = 0;
-  do {
-    if (ev.sector) {
-      const sectorStocks = STOCKS.filter(x => x.sector === ev.sector);
-      s = sectorStocks[Math.floor(Math.random() * sectorStocks.length)];
-    } else {
-      s = STOCKS[Math.floor(Math.random() * STOCKS.length)];
-    }
-    attempts++;
-    // Nach 10 Versuchen Cooldown ignorieren (Fallback)
-    if (attempts >= 10) break;
-  } while (
-    newsTickerCooldown.has(s.ticker) &&
-    Date.now() - newsTickerCooldown.get(s.ticker) < NEWS_COOLDOWN_MS
-  );
- 
-  // Cooldown setzen
-  newsTickerCooldown.set(s.ticker, Date.now());
- 
+  if (ev.sector) {
+    // Sektor-Event: zufällige Aktie aus dem betroffenen Sektor
+    const sectorStocks = STOCKS.filter(x => x.sector === ev.sector);
+    s = sectorStocks[Math.floor(Math.random() * sectorStocks.length)];
+  } else {
+    // Global: komplett zufällige Aktie
+    s = STOCKS[Math.floor(Math.random() * STOCKS.length)];
+  }
+
   pendingNewsEvent = { ticker: s.ticker, stockObj: s, eventObj: ev };
- 
-  // FIX: Sektor-Badge wird separat in showNewsToast gerendert
-  const label = `${s.name}: ${ev.msg}`;
- 
+
+  // Sektor-Badge im Toast anzeigen
+  const label = ev.sector
+    ? `[${ev.sector}] ${s.name}: ${ev.msg}`
+    : `${s.name}: ${ev.msg}`;
+
   showNewsToast(s.ticker, label, ev.impact, ev.sector);
- 
+
   let remaining = NEWS_REACTION_TIME;
   pendingCountdownId = setInterval(() => {
     remaining--;
@@ -2092,7 +1530,7 @@ function fireNewsEvent() {
       pendingCountdownId = null;
     }
   }, 1000);
- 
+
   pendingNewsTimer = setTimeout(applyPendingNews, NEWS_REACTION_TIME * 1000);
   renderTable();
 }
@@ -2103,9 +1541,7 @@ function applyPendingNews() {
 
   // Kurs anwenden
   const oldPrice = state.prices[ticker];
-  const newsStock1 = STOCKS.find(x => x.ticker === ticker);
-  const newsFloor1  = newsStock1 ? newsStock1.basePrice * 0.10 : 1;
-  const newPrice = Math.max(newsFloor1, +(oldPrice * (1 + eventObj.impact)).toFixed(2));
+  const newPrice = Math.max(1, +(oldPrice * (1 + eventObj.impact)).toFixed(2));
   state.prices[ticker] = newPrice;
   state.histories[ticker].push(newPrice);
   if (state.histories[ticker].length > 60) state.histories[ticker].shift();
@@ -2115,9 +1551,7 @@ function applyPendingNews() {
   if (stockObj?.rival && state.prices[stockObj.rival] !== undefined) {
     const rivalOld = state.prices[stockObj.rival];
     const rivalImpact = -eventObj.impact * (0.4 + Math.random() * 0.3);
-    const newsRivalStock = STOCKS.find(x => x.ticker === stockObj.rival);
-    const newsRivalFloor = newsRivalStock ? newsRivalStock.basePrice * 0.10 : 1;
-    const rivalNew = Math.max(newsRivalFloor, +(rivalOld * (1 + rivalImpact)).toFixed(2));
+    const rivalNew = Math.max(1, +(rivalOld * (1 + rivalImpact)).toFixed(2));
     state.prices[stockObj.rival] = rivalNew;
     state.histories[stockObj.rival].push(rivalNew);
     if (state.histories[stockObj.rival].length > 60) state.histories[stockObj.rival].shift();
@@ -2235,38 +1669,21 @@ function closeNewsToast() {
 // ═══════════════════════════════════════════════════════
 async function saveGame() {
   state.savedAt = Date.now();
+
+    // Sicherheitsnetz: niemals undefined speichern
   if (state.lastMilestone === undefined) state.lastMilestone = 0;
- 
+
   try {
     await fetch(API + '/save.php', {
       method: 'POST',
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': csrfToken,
-      },
-      body: JSON.stringify(state),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
     });
     showToast('💾 Gespeichert');
   } catch {
     showToast('Speichern fehlgeschlagen', true);
   }
-}
-
-function saveGameBeacon() {
-  // FIX: sendBeacon unterstützt keine CSRF-Header → 403
-  // keepalive:true wird vom Browser auch beim Tab-Schließen gesendet
-  state.savedAt = Date.now();
-  fetch(API + '/save.php', {
-    method: 'POST',
-    credentials: 'include',
-    keepalive: true, // wird auch beim beforeunload zuverlässig gesendet
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': csrfToken,
-    },
-    body: JSON.stringify(state),
-  }).catch(() => {});
 }
 
 function startTimers() {
@@ -2281,7 +1698,7 @@ function startTimers() {
   insiderIntervalId  = setInterval(fireInsiderTip, INSIDER_INTERVAL_MS);
 
   if (!beforeUnloadAdded) {
-    window.addEventListener('beforeunload', saveGameBeacon);
+    window.addEventListener('beforeunload', saveGame);
     beforeUnloadAdded = true;
   }
 }
@@ -2328,26 +1745,15 @@ function showLoginScreen() {
   document.getElementById('loginScreen').style.display = 'flex';
 }
 
-function showSkeleton() {
-  const el = document.getElementById('skeletonScreen');
-  if (el) el.style.display = 'flex';
-  document.querySelector('.app-layout')?.style.setProperty('visibility', 'hidden');
-  document.querySelector('header')?.style.setProperty('opacity', '0.3');
-}
-
-function hideSkeleton() {
-  const el = document.getElementById('skeletonScreen');
-  if (el) el.style.display = 'none';
-  document.querySelector('.app-layout')?.style.setProperty('visibility', 'visible');
-  document.querySelector('header')?.style.setProperty('opacity', '1');
-}
-
 function showUserBadge(user) {
   if (!user) return;
-  const badge = document.getElementById('userBadge');
-  document.getElementById('userAvatar').src       = user.avatar || '';
-  document.getElementById('userName').textContent = user.username || '';
-  badge.classList.add('user-badge-visible');
+  const badge  = document.getElementById('userBadge');
+  const avatar = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`;
+  document.getElementById('userAvatar').src         = avatar;
+  document.getElementById('userName').textContent   = user.username;
+  badge.style.display     = 'flex';
+  badge.style.alignItems  = 'center';
+  badge.style.gap         = '8px';
 }
 
 document.getElementById('btnLogout').addEventListener('click', async () => {
@@ -2355,23 +1761,10 @@ document.getElementById('btnLogout').addEventListener('click', async () => {
   location.reload();
 });
 
-function mergeStats(saved, base) {
-  return {
-    totalTrades:    saved?.totalTrades    ?? base.totalTrades    ?? 0,
-    realizedPnl:    saved?.realizedPnl    ?? base.realizedPnl    ?? 0,
-    bestTrade:      saved?.bestTrade      ?? base.bestTrade      ?? 0,
-    worstTrade:     saved?.worstTrade     ?? base.worstTrade     ?? 0,
-    startCash:      saved?.startCash      ?? base.startCash,
-    totalFeesPaid:  saved?.totalFeesPaid  ?? base.totalFeesPaid  ?? 0,
-    totalDividends: saved?.totalDividends ?? base.totalDividends ?? 0,
-    netWorthATH:    saved?.netWorthATH    ?? base.netWorthATH    ?? (saved?.startCash || base.startCash),
-  };
-}
-
 async function checkLogin() {
-  showSkeleton();
   try {
     const resp = await fetch(API + '/load.php', { credentials: 'include' });
+    console.log('Status:', resp.status);
 
     if (resp.status === 401) {
       showLoginScreen();
@@ -2379,11 +1772,7 @@ async function checkLogin() {
     }
 
     const data = await resp.json();
-
-    // FIX: CSRF-Token aus Response speichern
-    if (data.user?.csrf) {
-      csrfToken = data.user.csrf;
-    }
+    console.log('Data:', data);
 
     // User-Badge anzeigen & Login-Screen verstecken
     if (data.user) showUserBadge(data.user);
@@ -2401,13 +1790,16 @@ async function checkLogin() {
       if (!state.shorts)          state.shorts          = {};
       if (!state.priceAlerts)     state.priceAlerts     = {};
       if (state.lastDividendDay  === undefined) state.lastDividendDay  = 0;
-      if (state.totalGameDays    === undefined) state.totalGameDays    = 0;
-      if (!state.achievements)  state.achievements  = {};
-      if (!state.achievementLog) state.achievementLog = [];
-      if (!state.marketCycle)   state.marketCycle   = 'SIDEWAYS';
-      if (state.cycleDay === undefined) state.cycleDay = 0;
 
-      state.stats = mergeStats(state.stats, base.stats);
+      state.stats = {
+        totalTrades:    state.stats?.totalTrades    ?? 0,
+        realizedPnl:    state.stats?.realizedPnl    ?? 0,
+        bestTrade:      state.stats?.bestTrade      ?? 0,
+        worstTrade:     state.stats?.worstTrade     ?? 0,
+        startCash:      state.stats?.startCash      ?? base.stats.startCash,
+        totalFeesPaid:  state.stats?.totalFeesPaid  ?? 0,
+        totalDividends: state.stats?.totalDividends ?? 0,
+      };
 
       // Neue Stocks nachrüsten
       STOCKS.forEach(s => {
@@ -2419,10 +1811,14 @@ async function checkLogin() {
       });
       
 
-      // FIX: nur EIN lastMilestone-Block (der korrekte)
+      // STATT:
+      if (state.lastMilestone === undefined) state.lastMilestone = 0;
+
+      // SO:
       if (state.lastMilestone === undefined) {
+        // Höchsten bereits überschrittenen Milestone berechnen
         const nw = (state.cash || 0) + Object.entries(state.holdings || {})
-          .reduce((a, [t, h]) => a + h.qty * (state.prices?.[t] ?? 0), 0);
+          .reduce((a, [t, h]) => a + h.qty * (state.prices?.[t] || 0), 0);
         state.lastMilestone = Math.max(0, ...milestones.filter(m => nw >= m));
       }
 
@@ -2435,18 +1831,19 @@ async function checkLogin() {
     startTimers();
     renderAll();
     renderNews();
-    hideSkeleton();
 
     } catch(e) {
-        hideSkeleton();
-        if (e instanceof TypeError && e.message.includes('fetch')) {
-          showToast('Verbindung zum Server fehlgeschlagen', true);
-          showLoginScreen();
-        } else {
-          showToast('Fehler beim Laden: ' + e.message, true);
-        }
+      console.error(e);
+      // Nur bei Netzwerkfehler zum Login, nicht bei JS-Fehlern
+      if (e instanceof TypeError && e.message.includes('fetch')) {
+        showToast('Verbindung zum Server fehlgeschlagen', true);
+        showLoginScreen();
+      } else {
+        showToast('Fehler beim Laden: ' + e.message, true);
+        // KEIN showLoginScreen() hier
       }
     }
+}
 
 // ═══════════════════════════════════════════════════════
 // NEWS BOTTOM BAR
@@ -2495,11 +1892,17 @@ document.getElementById('stockModal').addEventListener('click', e => {
   if (e.target === document.getElementById('stockModal')) closeModal();
 });
 
-// Modal Tab-Navigation — delegated auf alle .modal-inner-tab Buttons
-document.querySelector('.modal-inner-tabs').addEventListener('click', e => {
-  const btn = e.target.closest('.modal-inner-tab');
-  if (!btn || !btn.dataset.mtab) return;
-  switchModalTab(btn.dataset.mtab);
+document.getElementById('mtabTrade').addEventListener('click', () => {
+  document.getElementById('mpanelTrade').style.display  = '';
+  document.getElementById('mpanelOrders').style.display = 'none';
+  document.getElementById('mtabTrade').classList.add('active');
+  document.getElementById('mtabOrders').classList.remove('active');
+});
+document.getElementById('mtabOrders').addEventListener('click', () => {
+  document.getElementById('mpanelTrade').style.display  = 'none';
+  document.getElementById('mpanelOrders').style.display = '';
+  document.getElementById('mtabOrders').classList.add('active');
+  document.getElementById('mtabTrade').classList.remove('active');
 });
 
 document.getElementById('mTabBuy').addEventListener('click', () => {
@@ -2525,9 +1928,7 @@ document.querySelector('.m-qty-btns').addEventListener('click', e => {
   if (btn.dataset.qty === 'max') {
     const price = state.prices[modalTicker];
     if (modalMode === 'buy') {
-      let qty = Math.floor(state.cash / price);
-      while (qty > 0 && qty * price + calcFee(qty * price) > state.cash) qty--;
-      document.getElementById('mQtyInput').value = Math.max(1, qty);
+      document.getElementById('mQtyInput').value = Math.max(1, Math.floor(state.cash / price));
     } else {
       document.getElementById('mQtyInput').value = state.holdings[modalTicker]?.qty || 0;
     }
@@ -2599,48 +2000,15 @@ document.getElementById('btnWatch').addEventListener('click', () => {
 
 document.getElementById('btnSave').addEventListener('click', saveGame);
 
-// Leaderboard Score posten
-document.getElementById('btnLeaderboard')?.addEventListener('click', postLeaderboard);
-
-// Achievements Overlay
-document.getElementById('btnAchievements')?.addEventListener('click', () => {
-  renderAchievements();
-  document.getElementById('achievementsOverlay').classList.add('open');
-});
-document.getElementById('btnCloseAchievements')?.addEventListener('click', () => {
-  document.getElementById('achievementsOverlay').classList.remove('open');
-});
-document.getElementById('achievementsOverlay')?.addEventListener('click', e => {
-  if (e.target === document.getElementById('achievementsOverlay'))
-    document.getElementById('achievementsOverlay').classList.remove('open');
-});
-
-// Bankruptcy New Game
-document.getElementById('btnBankruptcyReset')?.addEventListener('click', async () => {
-  document.getElementById('bankruptcyScreen').classList.remove('open');
-  bankruptcyShown = false;
-  stopTimers();
-  await fetch(API + '/save.php', {
-    method: 'POST', credentials: 'include',
-    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-    body: JSON.stringify({ ...defaultState(), _hardReset: true }),
-  });
-  location.reload();
-});
-
 document.getElementById('btnHardReset').addEventListener('click', async () => {
   const ok = await showConfirm('🧨', 'Hard Reset', 'Save will be permanently deleted. No undo.');
   if (!ok) return;
   stopTimers();
-  // FIX: CSRF-Header hinzugefügt — war der Grund warum Reset nicht funktionierte
   await fetch(API + '/save.php', {
     method: 'POST',
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': csrfToken,
-    },
-    body: JSON.stringify({ ...defaultState(), _hardReset: true }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...defaultState(), _hardReset: true }) // ← Flag setzen
   });
   location.reload();
 });
@@ -2722,9 +2090,7 @@ function fireInsiderTip() {
   setTimeout(() => {
     if (!state.prices[s.ticker]) return;
     const old = state.prices[s.ticker];
-    const insiderStock = STOCKS.find(x => x.ticker === s.ticker);
-    const insiderFloor = insiderStock ? insiderStock.basePrice * 0.10 : 1;
-    const np  = Math.max(insiderFloor, +(old * (1 + impact)).toFixed(2));
+    const np  = Math.max(1, +(old * (1 + impact)).toFixed(2));
     state.prices[s.ticker] = np;
     state.histories[s.ticker].push(np);
     if (state.histories[s.ticker].length > 60) state.histories[s.ticker].shift();
@@ -2738,55 +2104,24 @@ function fireInsiderTip() {
   }, 15000);
 }
 
-// Short Tab Buttons
+// Short buttons
 document.getElementById('btnOpenShort').addEventListener('click', () => {
   if (!modalTicker) return;
   const qty = parseInt(document.getElementById('shortQtyInput').value);
   if (!qty || qty < 1) { showToast('Enter a valid quantity', true); return; }
   openShort(modalTicker, qty);
   refreshModal();
-  refreshShortTab();
 });
 
 document.getElementById('btnCloseShort').addEventListener('click', () => {
   if (!modalTicker) return;
   const sh = state.shorts?.[modalTicker];
   if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
-  const inputVal = parseInt(document.getElementById('shortCoverQtyInput').value);
+  const inputVal = parseInt(document.getElementById('shortQtyInput').value);
   const qty = (!inputVal || inputVal >= sh.qty) ? sh.qty : inputVal;
   if (qty < 1) { showToast('Enter a valid quantity', true); return; }
   closeShort(modalTicker, qty);
   refreshModal();
-  refreshShortTab();
-});
-
-document.getElementById('btnCloseShortAll').addEventListener('click', () => {
-  if (!modalTicker) return;
-  const sh = state.shorts?.[modalTicker];
-  if (!sh) { showToast('No short position on ' + modalTicker, true); return; }
-  closeShort(modalTicker, sh.qty);
-  refreshModal();
-  refreshShortTab();
-});
-
-// Short Stop-Loss
-document.getElementById('btnSetShortStopLoss').addEventListener('click', () => {
-  if (!modalTicker) return;
-  const pct = parseFloat(document.getElementById('shortStopLossInput').value);
-  if (!pct || pct < 1 || pct > 99) { showToast('Enter a % between 1–99', true); return; }
-  state.stopLosses['short_' + modalTicker] = pct;
-  document.getElementById('shortStopLossStatus').textContent = `Active: auto-cover at +${pct}% loss`;
-  document.getElementById('btnClearShortStopLoss').style.display = '';
-  showToast(`🛡 Short stop-loss set for ${modalTicker} at +${pct}%`);
-});
-
-document.getElementById('btnClearShortStopLoss').addEventListener('click', () => {
-  if (!modalTicker) return;
-  delete state.stopLosses['short_' + modalTicker];
-  document.getElementById('shortStopLossInput').value = '';
-  document.getElementById('shortStopLossStatus').textContent = '';
-  document.getElementById('btnClearShortStopLoss').style.display = 'none';
-  showToast(`🛡 Short stop-loss removed for ${modalTicker}`);
 });
 
 document.getElementById('confirmYes').addEventListener('click', () => {
@@ -2878,334 +2213,6 @@ document.getElementById('btnSetAlert').addEventListener('click', () => {
   showToast(`🔔 Alert set for ${modalTicker} at ${fmt(target)} (${dir} current)`);
   refreshModal();
 });
-
-let activeMainTab = 'market';
- 
-// switchMainTab: Tabs entfernt — nur noch History Overlay
-function switchMainTab(tab) {
-  // Legacy-Compat: falls noch irgendwo aufgerufen
-  if (tab === 'history') openHistoryOverlay();
-}
-
-function openHistoryOverlay() {
-  renderHistoryTab();
-  document.getElementById('historyOverlay').classList.add('open');
-}
-
-function closeHistoryOverlay() {
-  document.getElementById('historyOverlay').classList.remove('open');
-}
-
-function updateQuickActions() {
-  if (!modalTicker) return;
-  const price    = state.prices[modalTicker];
-  const held     = state.holdings[modalTicker]?.qty || 0;
-  const maxBuy   = (() => {
-    let qty = Math.floor(state.cash / price);
-    while (qty > 0 && qty * price + calcFee(qty * price) > state.cash) qty--;
-    return Math.max(0, qty);
-  })();
- 
-  // Quick-Buy Buttons
-  const buyBtns = document.getElementById('quickBuyBtns');
-  if (buyBtns) {
-    buyBtns.innerHTML = [1, 5, 10, 50].map(n => `
-      <button class="quick-btn quick-buy ${maxBuy < n ? 'disabled' : ''}"
-              onclick="${maxBuy >= n ? `executeTrade('${modalTicker}','buy',${n});refreshModal()` : ''}">
-        +${n}
-      </button>`).join('') + `
-      <button class="quick-btn quick-buy ${maxBuy < 1 ? 'disabled' : ''}"
-              onclick="${maxBuy >= 1 ? `executeTrade('${modalTicker}','buy',${maxBuy});refreshModal()` : ''}">
-        MAX
-      </button>`;
-  }
- 
-  // Quick-Sell Buttons
-  const sellBtns = document.getElementById('quickSellBtns');
-  if (sellBtns) {
-    if (held > 0) {
-      sellBtns.innerHTML = [1, 5, 10].filter(n => n <= held).map(n => `
-        <button class="quick-btn quick-sell"
-                onclick="executeTrade('${modalTicker}','sell',${n});refreshModal()">
-          -${n}
-        </button>`).join('') + `
-        <button class="quick-btn quick-sell"
-                onclick="executeTrade('${modalTicker}','sell',${held});refreshModal()">
-          SELL ALL
-        </button>`;
-      sellBtns.style.display = '';
-    } else {
-      sellBtns.style.display = 'none';
-    }
-  }
-}
-
-// ── History Overlay ──────────────────────────────────
-document.getElementById('btnOpenHistory').addEventListener('click', openHistoryOverlay);
-document.getElementById('btnCloseHistory').addEventListener('click', closeHistoryOverlay);
-document.getElementById('historyOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('historyOverlay')) closeHistoryOverlay();
-});
-document.addEventListener('change', e => {
-  if (e.target.id === 'historyFilter') renderHistoryTab();
-});
-
-// ── CSV Export ────────────────────────────────────────
-document.addEventListener('click', e => {
-  if (e.target.id !== 'btnExportCSV') return;
-  const log = state.tradeLog || [];
-  if (!log.length) { showToast('No trades to export', true); return; }
-  const rows = [
-    ['Time','Ticker','Mode','Qty','Price','P&L','Fee'],
-    ...log.map(t => [t.time, t.ticker, t.mode, t.qty, t.price, t.pnl ?? '', t.fee])
-  ];
-  const csv  = rows.map(r => r.join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'lsx-trades.csv';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('📥 Trades exported as CSV');
-});
-
-
-// ═══════════════════════════════════════════════════════
-// WIRTSCHAFTSZYKLEN
-// ═══════════════════════════════════════════════════════
-const CYCLE_DURATION = 30; // Spieltage pro Zyklus
-const CYCLE_DRIFT = {
-  BULL:     +0.003,  // leicht positiver Drift
-  BEAR:     -0.003,  // leicht negativer Drift
-  SIDEWAYS:  0,
-};
-const CYCLE_COLORS = { BULL: 'var(--green)', BEAR: 'var(--red)', SIDEWAYS: 'var(--dim)' };
-const CYCLE_EMOJI  = { BULL: '🐂', BEAR: '🐻', SIDEWAYS: '➡' };
-
-function checkMarketCycle() {
-  state.cycleDay = (state.cycleDay || 0) + 1;
-  if (state.cycleDay >= CYCLE_DURATION) {
-    state.cycleDay = 0;
-    const cycles = ['BULL','BEAR','SIDEWAYS'];
-    // Wähle anderen Zyklus als aktuellen
-    const options = cycles.filter(c => c !== state.marketCycle);
-    const prev = state.marketCycle;
-    state.marketCycle = options[Math.floor(Math.random() * options.length)];
-    showToast(`📊 Market cycle changed: ${prev} → ${state.marketCycle}`);
-    sendDiscordWebhook({
-      title:       `📊 Marktzyklus: ${CYCLE_EMOJI[state.marketCycle]} ${state.marketCycle}`,
-      description: `Der Markt wechselt von **${prev}** zu **${state.marketCycle}**.`,
-      color:       state.marketCycle === 'BULL' ? 0x00ff88 : state.marketCycle === 'BEAR' ? 0xff3355 : 0x6b7a99,
-      footer:      { text: gameTimeStr() },
-      timestamp:   new Date().toISOString(),
-    });
-  }
-}
-
-// Drift im simulateTick anwenden — wird in renderMarketSummary gezeigt
-function getCycleDrift() {
-  return CYCLE_DRIFT[state.marketCycle || 'SIDEWAYS'];
-}
-
-// ═══════════════════════════════════════════════════════
-// MARGIN CALL
-// ═══════════════════════════════════════════════════════
-function checkMarginCalls() {
-  if (!state.shorts || !Object.keys(state.shorts).length) return;
-  Object.entries(state.shorts).forEach(([ticker, sh]) => {
-    const price   = state.prices[ticker];
-    const loss    = (price - sh.entryPrice) * sh.qty; // positiv = Verlust für Short
-    const collat  = sh.collateral;
-    // Margin Call wenn Verlust > 80% des Collateral
-    if (loss > collat * 0.80) {
-      showToast(`⚠️ MARGIN CALL — ${ticker} Short auto-covered!`, true);
-      closeShort(ticker, sh.qty);
-      sendDiscordWebhook({
-        title:       `🚨 Margin Call — ${ticker}`,
-        description: `Short-Position automatisch geschlossen. Verlust überstieg 80% des Collateral.`,
-        color:       0xff3355,
-        fields: [
-          { name: 'Ticker',     value: ticker,            inline: true },
-          { name: 'Verlust',    value: fmt(loss),         inline: true },
-          { name: 'Collateral', value: fmt(collat),       inline: true },
-        ],
-        footer:    { text: gameTimeStr() },
-        timestamp: new Date().toISOString(),
-      });
-    }
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// MARKET HOURS
-// ═══════════════════════════════════════════════════════
-function isMarketOpen() {
-  const h   = state.gameHour;
-  const day = state.gameDay;
-  // Wochenende (SAT=5, SUN=6) geschlossen
-  if (day === 5 || day === 6) return false;
-  // Öffnungszeiten 09:00–17:00
-  return h >= 9 && h < 17;
-}
-
-// ═══════════════════════════════════════════════════════
-// BANKRUPTCY
-// ═══════════════════════════════════════════════════════
-let bankruptcyShown = false;
-
-function checkBankruptcy() {
-  if (bankruptcyShown) return;
-  const nw       = getNetWorth();
-  const hasOpen  = Object.keys(state.holdings || {}).length > 0;
-  const hasShort = Object.keys(state.shorts   || {}).length > 0;
-  // Nur Bankrott wenn: Net Worth < $500 UND keine offenen Positionen mehr
-  if (nw < 500 && !hasOpen && !hasShort) {
-    bankruptcyShown = true;
-    stopTimers();
-    showBankruptcyScreen();
-  }
-}
-
-function showBankruptcyScreen() {
-  const nw          = getNetWorth();
-  const totalReturn = ((nw - state.stats.startCash) / state.stats.startCash * 100).toFixed(1);
-  const el          = document.getElementById('bankruptcyScreen');
-  if (!el) return;
-
-  document.getElementById('bk-networth').textContent   = fmt(nw);
-  document.getElementById('bk-return').textContent     = (totalReturn >= 0 ? '+' : '') + totalReturn + '%';
-  document.getElementById('bk-trades').textContent     = state.stats.totalTrades;
-  document.getElementById('bk-best').textContent       = fmt(state.stats.bestTrade);
-  document.getElementById('bk-worst').textContent      = fmt(Math.abs(state.stats.worstTrade));
-  document.getElementById('bk-days').textContent       = state.totalGameDays || 0;
-  document.getElementById('bk-dividends').textContent  = fmt(state.stats.totalDividends);
-  document.getElementById('bk-fees').textContent       = fmt(state.stats.totalFeesPaid);
-
-  el.classList.add('open');
-
-  sendDiscordWebhook({
-    title:       '💀 BANKROTT',
-    description: `Das Portfolio ist auf **${fmt(nw)}** gefallen. Game Over.`,
-    color:       0xff3355,
-    fields: [
-      { name: 'Return',     value: (totalReturn >= 0 ? '+' : '') + totalReturn + '%', inline: true },
-      { name: 'Trades',     value: `${state.stats.totalTrades}`,                      inline: true },
-      { name: 'Spieltage',  value: `${state.totalGameDays || 0}`,                     inline: true },
-    ],
-    footer:    { text: gameTimeStr() },
-    timestamp: new Date().toISOString(),
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// ACHIEVEMENTS
-// ═══════════════════════════════════════════════════════
-const ACHIEVEMENT_DEFS = [
-  // Net Worth
-  { id: 'nw_10k',      icon: '💵', title: 'Getting Started',   desc: 'Reach $10,000 net worth',           check: s => getNetWorth() >= 10_000   },
-  { id: 'nw_50k',      icon: '📈', title: 'Moving Up',         desc: 'Reach $50,000 net worth',           check: s => getNetWorth() >= 50_000   },
-  { id: 'nw_100k',     icon: '💰', title: 'Six Figures',       desc: 'Reach $100,000 net worth',          check: s => getNetWorth() >= 100_000  },
-  { id: 'nw_1m',       icon: '🥂', title: 'Millionaire',       desc: 'Reach $1,000,000 net worth',        check: s => getNetWorth() >= 1_000_000},
-  { id: 'nw_10m',      icon: '🏙', title: 'Mogul',             desc: 'Reach $10,000,000 net worth',       check: s => getNetWorth() >= 10_000_000},
-  // Trading
-  { id: 'trade_1',     icon: '🎯', title: 'First Trade',       desc: 'Execute your first trade',          check: s => s.stats.totalTrades >= 1  },
-  { id: 'trade_50',    icon: '📊', title: 'Active Trader',     desc: 'Execute 50 trades',                 check: s => s.stats.totalTrades >= 50 },
-  { id: 'trade_500',   icon: '⚡', title: 'Day Trader',        desc: 'Execute 500 trades',                check: s => s.stats.totalTrades >= 500},
-  { id: 'profit_10k',  icon: '🟢', title: 'In The Green',      desc: 'Realize $10,000 profit in one trade',check: s => s.stats.bestTrade >= 10_000 },
-  { id: 'profit_100k', icon: '💎', title: 'Diamond Hands',     desc: 'Realize $100,000 profit in one trade',check: s => s.stats.bestTrade >= 100_000 },
-  // Shorts
-  { id: 'short_1',     icon: '📉', title: 'Bear Mode',         desc: 'Open your first short',             check: s => s.stats.totalTrades >= 1 && s.tradeLog.some(t => t.mode === 'SHORT') },
-  { id: 'short_win',   icon: '🎯', title: 'Short Squeeze',     desc: 'Close a short with 50%+ gain',      check: s => s.stats.bestTrade > 0 && s.tradeLog.some(t => t.mode === 'COVER' && t.pnl > 0 && t.pnl / (state.prices[t.ticker] * t.qty) > 0.5) },
-  // Portfolio
-  { id: 'div_first',   icon: '💸', title: 'Dividend Day',      desc: 'Receive your first dividend',       check: s => s.stats.totalDividends > 0 },
-  { id: 'div_10k',     icon: '🏦', title: 'Passive Income',    desc: 'Receive $10,000 in dividends',      check: s => s.stats.totalDividends >= 10_000 },
-  { id: 'watchlist_5', icon: '⭐', title: 'Analyst',           desc: 'Add 5 stocks to your watchlist',    check: s => (s.watchlist||[]).length >= 5 },
-  { id: 'days_30',     icon: '📅', title: 'Veteran',           desc: 'Play for 30 game days',             check: s => (s.totalGameDays||0) >= 30 },
-  { id: 'days_100',    icon: '🏆', title: 'Legend',            desc: 'Play for 100 game days',            check: s => (s.totalGameDays||0) >= 100 },
-  { id: 'sector_4',    icon: '🌐', title: 'Diversified',       desc: 'Hold stocks in 4+ sectors',         check: s => {
-    const sectors = new Set(Object.keys(s.holdings).map(t => STOCKS.find(x=>x.ticker===t)?.sector).filter(Boolean));
-    return sectors.size >= 4;
-  }},
-  { id: 'fee_1k',      icon: '💸', title: 'Fee Machine',       desc: 'Pay $1,000 in trading fees',        check: s => s.stats.totalFeesPaid >= 1_000 },
-];
-
-function checkAchievements() {
-  if (!state.achievements) state.achievements = {};
-  if (!state.achievementLog) state.achievementLog = [];
-
-  ACHIEVEMENT_DEFS.forEach(def => {
-    if (state.achievements[def.id]) return; // already unlocked
-    try {
-      if (def.check(state)) {
-        state.achievements[def.id] = true;
-        state.achievementLog.push({ id: def.id, time: gameTimeStr() });
-        showAchievementToast(def);
-      }
-    } catch(e) {}
-  });
-}
-
-function showAchievementToast(def) {
-  const el = document.getElementById('achievementToast');
-  if (!el) return;
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:14px;">
-      <div style="font-size:32px">${def.icon}</div>
-      <div>
-        <div style="font-size:10px;letter-spacing:2px;color:var(--gold);font-family:var(--mono);margin-bottom:3px;">ACHIEVEMENT UNLOCKED</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);">${def.title}</div>
-        <div style="font-size:12px;color:var(--dim);">${def.desc}</div>
-      </div>
-    </div>`;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 5000);
-}
-
-function renderAchievements() {
-  const el = document.getElementById('achievementsGrid');
-  if (!el) return;
-  el.innerHTML = ACHIEVEMENT_DEFS.map(def => {
-    const unlocked = state.achievements?.[def.id];
-    const logEntry = state.achievementLog?.find(l => l.id === def.id);
-    return `
-      <div class="ach-card ${unlocked ? 'unlocked' : 'locked'}">
-        <div class="ach-icon">${def.icon}</div>
-        <div class="ach-title">${def.title}</div>
-        <div class="ach-desc">${def.desc}</div>
-        ${unlocked && logEntry ? `<div class="ach-time">${logEntry.time}</div>` : ''}
-      </div>`;
-  }).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-// LEADERBOARD via Discord Webhook
-// ═══════════════════════════════════════════════════════
-function postLeaderboard() {
-  // Nur eigenen Score posten — kein Backend nötig
-  const nw          = getNetWorth();
-  const totalReturn = ((nw - state.stats.startCash) / state.stats.startCash * 100).toFixed(1);
-  const username    = document.getElementById('userName')?.textContent || 'Anonym';
-
-  sendDiscordWebhook({
-    title:       '🏆 LSX Leaderboard — Score Submitted',
-    description: `**${username}** hat seinen Score eingereicht.`,
-    color:       0xffd700,
-    fields: [
-      { name: 'Net Worth',   value: `**${fmt(nw)}**`,                              inline: true },
-      { name: 'Return',      value: `**${(totalReturn>=0?'+':'')}${totalReturn}%**`, inline: true },
-      { name: 'Trades',      value: `${state.stats.totalTrades}`,                  inline: true },
-      { name: 'Best Trade',  value: fmt(state.stats.bestTrade),                    inline: true },
-      { name: 'Dividends',   value: fmt(state.stats.totalDividends),               inline: true },
-      { name: 'Game Days',   value: `${state.totalGameDays || 0}`,                 inline: true },
-      { name: 'Achievements',value: `${Object.keys(state.achievements||{}).length}/${ACHIEVEMENT_DEFS.length}`, inline: true },
-      { name: 'Cycle',       value: `${CYCLE_EMOJI[state.marketCycle||'SIDEWAYS']} ${state.marketCycle||'SIDEWAYS'}`, inline: true },
-    ],
-    footer:    { text: `LSX Leaderboard · ${new Date().toLocaleString('de-DE')}` },
-    timestamp: new Date().toISOString(),
-  });
-  showToast('🏆 Score auf Discord gepostet!');
-}
 
 // ═══════════════════════════════════════════════════════
 // BOOT
